@@ -2,7 +2,7 @@
 
 **The bridge between Burp Suite and modern AI.**
 
-Burp AI Agent is a professional-grade extension for Burp Suite that integrates advanced AI reasoning capabilities directly into your security workflow. Unlike simple "GPT wrappers," this extension is designed for power users, offering:
+Burp AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
 
 *   **Pluggable Backends**: Use local models (Ollama, LM Studio) or cloud providers (Gemini, Claude, OpenAI/Codex, OpenCode). Add custom backends via drop-in JARs.
 *   **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) to scrub sensitive data *before* it leaves Burp.
@@ -24,7 +24,7 @@ Burp AI Agent is a professional-grade extension for Burp Suite that integrates a
 
 ## Why use this?
 
-1.  **Augmented Intelligence**: Use AI to analyze complex requests, explain obscure JS, or draft proof-of-concept (PoC) exploits.
+1.  **AI-Assisted Analysis**: Use AI to analyze requests, explain JS, or draft proof-of-concept (PoC) exploits.
 2.  **Local Privacy**: Run Llama 3 or Mistral locally via Ollama for zero-data-leakage analysis.
 3.  **Agentic Workflows**: Connect Claude Desktop to Burp via MCP to let the AI "drive" Burp — navigating the site map, sending test requests, and verifying issues autonomously.
 4.  **Automated Scanning**: Let passive and active AI scanners work in the background while you focus on manual testing.

@@ -1,6 +1,6 @@
 # Limitations & Hallucinations
 
-AI is a powerful assistant, but it is not a replacement for human judgment. Users must be aware of its inherent limitations.
+AI is a useful tool, but it is not a replacement for human judgment. Users must be aware of its limitations.
 
 ## Trust but Verify
 
@@ -56,9 +56,9 @@ AI may generate plausible-sounding but fabricated evidence, such as:
 
 | Model Type | Strengths | Weaknesses |
 | :--- | :--- | :--- |
-| **Large cloud models** (GPT-4o, Claude, Gemini Pro) | Deep reasoning, broad knowledge, high-quality output. | Cost, privacy concerns, API rate limits. |
+| **Large cloud models** (GPT-4o, Claude, Gemini Pro) | Better reasoning, broader knowledge. | Cost, privacy concerns, API rate limits. |
 | **Small local models** (Llama 8B, Mistral 7B) | Free, private, fast. | Limited reasoning depth, may miss subtle vulnerabilities, shorter context windows. |
-| **Code-focused models** (CodeLlama, DeepSeek Coder) | Excellent JS/code analysis. | May struggle with non-code security concepts. |
+| **Code-focused models** (CodeLlama, DeepSeek Coder) | Good at JS/code analysis. | May struggle with non-code security concepts. |
 
 ## Responsible Use
 

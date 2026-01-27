@@ -1,6 +1,6 @@
 # Claude CLI
 
-Anthropic's Claude CLI provides access to the Claude family of models, recognized for superior reasoning, code analysis, and structured output generation.
+Anthropic's Claude CLI provides access to the Claude family of models, which perform well at reasoning, code analysis, and structured output generation.
 
 ## Setup
 
@@ -41,8 +41,8 @@ To specify a model, include the flag in the command field:
 
 ## Why Claude for Security?
 
-*   **Superior reasoning**: Market leader in logic chains and code comprehension.
-*   **Structured output**: Excellent at generating formatted reports, PoCs, and test plans.
+*   **Reasoning**: Strong at multi-step logic chains and code comprehension.
+*   **Structured output**: Generates well-formatted reports, PoCs, and test plans.
 *   **Safety-aware**: Built-in understanding of security concepts and vulnerability patterns.
 
 ## Troubleshooting

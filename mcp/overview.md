@@ -2,13 +2,13 @@
 
 The **Model Context Protocol (MCP)** is a standard that allows AI agents to connect to data sources and tools.
 
-## Why is this a game changer for Burp?
+## What does MCP enable?
 
-Traditionally, Burp extensions are isolated. With MCP, **Burp Suite becomes a "Tool"** that external AI agents can use.
+Traditionally, Burp extensions are isolated. With MCP, **Burp Suite becomes a tool** that external AI agents can use.
 
-### Use Case: The "Agentic" Pentester
+### Example: AI-Driven Testing
 
-Imagine running **Claude Desktop** (or another MCP client). By connecting it to the Burp AI Agent's MCP server, you can have a conversation like this:
+With **Claude Desktop** (or another MCP client) connected to the Burp AI Agent's MCP server, a session might look like this:
 
 > **You**: "Claude, check the proxy history for any requests to the `/api/login` endpoint."
 >
@@ -22,7 +22,7 @@ Imagine running **Claude Desktop** (or another MCP client). By connecting it to 
 >
 > **Claude**: *Calls `issue_create`...*
 
-This transforms Burp from a passive tool into an active environment that an AI can explore and manipulate under your supervision.
+This lets an AI explore and interact with Burp under your supervision.
 
 ## Connecting Claude Desktop
 

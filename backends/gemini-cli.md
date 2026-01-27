@@ -1,6 +1,6 @@
 # Gemini CLI
 
-Google's Gemini CLI provides access to the Gemini family of models, known for their massive context windows (1M+ tokens) and strong multimodal capabilities.
+Google's Gemini CLI provides access to the Gemini family of models, which support large context windows (1M+ tokens) and multimodal input.
 
 ## Setup
 
@@ -36,7 +36,7 @@ To specify a model, include the flag in the command field:
 
 ## Why Gemini for Security?
 
-*   **Massive context window**: Analyze entire JavaScript bundles or large API responses without truncation.
+*   **Large context window**: Analyze entire JavaScript bundles or large API responses without truncation.
 *   **Cost-effective**: Gemini Flash is one of the cheapest cloud options (~$0.15 per 1,000 requests).
 *   **Free tier available**: Google provides a free usage tier for Gemini API.
 
