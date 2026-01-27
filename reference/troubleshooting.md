@@ -1,0 +1,94 @@
+# Troubleshooting
+
+Common issues and their resolutions.
+
+## Installation Issues
+
+### Extension fails to load
+*   **Java Version**: Ensure you are using **Java 21**. Burp's "Errors" tab in the Extensions window will show `UnsupportedClassVersionError` if your Java is too old.
+*   **Corrupt JAR**: If downloading from GitHub, ensure the download completed fully. Compare the SHA-256 hash if provided.
+*   **Conflicting extensions**: Disable other extensions temporarily to check for conflicts.
+
+### Tab not appearing
+*   Ensure the extension is checked in **Extensions → Installed**.
+*   Check the **Errors** tab for any initialization crashes.
+*   Check the **Output** tab for error messages during loading.
+
+## Backend Issues
+
+### Backend status is "Crashed"
+*   **CLI Path**: Verify the command (e.g., `gemini`, `claude`, `codex`) is in your system PATH. Test by running the command in a normal terminal.
+*   **Authentication**: Most CLI tools require an initial login:
+    *   Gemini: `gemini auth login`
+    *   Claude: Set `ANTHROPIC_API_KEY` or run `claude login`
+    *   Codex: Set `OPENAI_API_KEY`
+    *   OpenCode: Configure provider credentials
+*   **Model Name**: Ensure the model name in your command or settings is correct (e.g., `llama3` vs `llama3.1`).
+*   **Immediate crash**: If the backend crashes immediately after launch, check the extension output tab for the exit code and error output.
+
+### Empty or "I don't know" responses
+*   **Context Limit**: If you attached too many requests, the model might be overwhelmed. Try a "Quick Recon" instead of "Find Vulnerabilities".
+*   **Ollama not running**: Ensure the Ollama server is running (`ollama serve`).
+*   **Model not downloaded**: For Ollama, verify the model is available (`ollama list`).
+*   **Wrong backend selected**: Check that the backend dropdown in the top bar matches your intended backend.
+
+### Backend won't start
+*   **Auto-restart disabled**: If the backend crashed previously, auto-restart may have been suppressed. Try restarting manually.
+*   **Port conflict** (HTTP backends): Ensure the Ollama/LM Studio port is not used by another process.
+*   **Environment variables**: Ensure API keys are set in the environment where Burp Suite is running, not just in your terminal profile.
+
+## MCP Issues
+
+### MCP Toggle won't stay ON
+*   **Port Conflict**: The default port `9876` might be used by another app. Try changing it in **Settings → MCP Server**.
+*   **Bind Error**: Check the Burp extension output for "Address already in use".
+*   **Previous instance**: If Burp crashed, a previous MCP server may still be bound to the port. The extension will attempt to shut it down automatically.
+
+### Claude Desktop won't connect
+*   **Token**: Ensure you have copied the correct Token into your Claude Desktop config file.
+*   **Config path**: Verify the config file location:
+    *   macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+    *   Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+*   **HTTPS/TLS**: If you enabled TLS, ensure the client supports the certificate or use the HTTP URL.
+*   **Restart Claude Desktop**: After modifying the config, restart Claude Desktop completely.
+*   **Port mismatch**: Ensure the port in the config matches the port in the extension settings.
+
+### MCP tools not appearing
+*   **Tool gating**: Many tools are disabled by default. Check **Settings → MCP Server → Tool Toggles**.
+*   **Unsafe tools**: Enable the "Unsafe Tools" master switch if you need tools that send traffic or modify state.
+*   **Pro-only tools**: Scanner-related tools require Burp Suite Professional.
+
+## Scanner Issues
+
+### No issues being created
+*   **Confidence threshold**: Passive findings only become issues when the confidence score is >= 85%. Lower-confidence findings appear in the View Findings panel.
+*   **Scope**: Ensure the target is in your Burp Suite **Target → Scope**. The scanner defaults to "Scope Only" for safety.
+*   **Min severity**: Check that the minimum severity threshold isn't set too high.
+*   **Backend not running**: The scanner needs an active backend to analyze requests.
+
+### Active scanner not scanning
+*   **Enable toggle**: Ensure the Active toggle is ON in the top bar.
+*   **Queue empty**: Requests must be queued via context menu or auto-queue from passive.
+*   **Deduplication**: The scanner skips URLs scanned within the last hour.
+*   **Scope Only**: If enabled, only in-scope targets are scanned.
+
+### AI is too slow
+*   Local models (Ollama/LM Studio) performance depends on your hardware. Using a GPU is highly recommended.
+*   Check the **Rate Limit** in scanner settings; if set too high, the scanner waits between requests.
+*   Reduce **Max Size (KB)** to send smaller context to the AI.
+*   Consider using a faster model (e.g., Gemini Flash, GPT-4o Mini, Llama 8B).
+
+## General Issues
+
+### Extension output is empty
+*   Ensure Burp Suite was launched from a terminal to see stdout/stderr output.
+*   Check **Extensions → Installed → Output/Errors** tabs.
+
+### Settings not saving
+*   Settings are stored in Burp's preferences. Ensure you don't have a read-only Burp project file.
+*   Some settings require an extension restart to take effect.
+
+### High memory usage
+*   Large response bodies can increase memory usage. Reduce **Max Size (KB)** in scanner settings.
+*   Disable the passive scanner when not actively needed.
+*   Close unused chat sessions.

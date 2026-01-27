@@ -1,0 +1,46 @@
+# OpenCode CLI
+
+OpenCode is an open-source CLI that supports multiple AI providers through a unified interface. It allows you to use models from Anthropic, OpenAI, Google, and other providers with a single tool.
+
+## Setup
+
+1.  **Install the CLI**: Follow the [OpenCode documentation](https://github.com/opencode-ai/opencode).
+2.  **Set API keys** for your chosen provider:
+    ```bash
+    # For Anthropic models:
+    export ANTHROPIC_API_KEY="sk-ant-..."
+    # For OpenAI models:
+    export OPENAI_API_KEY="sk-..."
+    # For Google models:
+    export GOOGLE_API_KEY="..."
+    ```
+3.  **Verify it works**: Test in your terminal:
+    ```bash
+    opencode "hello"
+    ```
+4.  **Configure in Burp**: Open **Burp AI Agent → Settings → AI Backend** and set:
+
+| Setting | Value |
+| :--- | :--- |
+| **Preferred Backend** | `OpenCode CLI` (select from dropdown) |
+| **OpenCode CLI Command** | `opencode --model anthropic/claude-sonnet-4-5` |
+
+The model flag must be included in the command field. Examples:
+
+```
+opencode --model anthropic/claude-sonnet-4-5
+opencode --model openai/gpt-4o
+opencode --model google/gemini-1.5-pro
+```
+
+## Why OpenCode?
+
+*   **Multi-provider**: Switch between providers without changing your Burp configuration.
+*   **Open-source**: Full transparency on how your data is handled.
+*   **Flexible**: Supports custom endpoints and self-hosted models.
+
+## Troubleshooting
+
+*   **"command not found"**: Ensure `opencode` is installed and in your system PATH.
+*   **Provider errors**: Verify the API key for your chosen provider is configured correctly.
+*   **Model not available**: Check that the model identifier follows the `provider/model` format.
