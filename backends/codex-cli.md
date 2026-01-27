@@ -29,14 +29,6 @@ To specify a model, include the flag in the command field:
 | :--- | :--- |
 | **Codex CLI Command** | `codex --model gpt-4.1` |
 
-## Recommended Models
-
-| Model | Best For |
-| :--- | :--- |
-| **GPT-4o** | General-purpose security analysis, well-balanced quality and speed. |
-| **GPT-4.1** | Latest iteration with improved instruction following. |
-| **GPT-4o Mini** | Cost-effective for high-volume scanning and quick triage. |
-
 ## Launch Modes
 
 The Codex backend supports two launch modes:

@@ -1,7 +1,5 @@
 # MCP Tools Reference
 
-This list is auto‑generated from the tool catalog.
-
 ## Burp Control
 | Tool | Unsafe | Default enabled | Pro only | Description |
 |---|---|---|---|---|

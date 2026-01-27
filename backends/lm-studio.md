@@ -43,13 +43,6 @@ When Auto-Start is enabled, the extension runs the server command automatically 
 | **Server Command** | *(empty)* | Custom command to launch the server. |
 | **Timeout** | 120 seconds | Request timeout (range: 30–3600 seconds). Increase for larger models or complex analyses. |
 
-## Recommended Models for Security
-
-*   **Llama 3 (8B)**: Good balance of speed and quality for general security analysis.
-*   **Mistral 7B**: Reliable instruction following, good for structured output.
-*   **CodeLlama**: Specialized for code analysis and JavaScript review.
-*   **DeepSeek Coder**: Strong code comprehension for PoC generation.
-
 ## Troubleshooting
 
 *   **Connection refused**: Ensure the LM Studio server is running and the port matches your configuration.

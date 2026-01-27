@@ -40,12 +40,6 @@ Spawns `ollama run` as a subprocess in a terminal window.
 
 The extension interacts with this process via stdin/stdout. The model name is extracted from the command automatically.
 
-## Recommended Models for Security
-
-*   **Llama 3 (8B)**: Fast, good general reasoning. Good for quick summaries.
-*   **Mistral 7B**: Reliable, follows instructions well.
-*   **CodeLlama / DeepSeek Coder**: Better for analyzing JavaScript or generating Python PoCs.
-
 ## Troubleshooting
 
 *   **Empty responses**: Ensure the model is actually downloaded (`ollama list`).

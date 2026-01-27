@@ -31,20 +31,6 @@ To specify a model, include the flag in the command field:
 | :--- | :--- |
 | **Claude CLI Command** | `claude --model sonnet` |
 
-## Recommended Models
-
-| Model | Best For |
-| :--- | :--- |
-| **Claude Sonnet** | Best balance of quality, speed, and cost. Recommended for most security tasks. |
-| **Claude Opus** | Maximum reasoning quality. Best for complex logic analysis and PoC generation. |
-| **Claude Haiku** | Fastest and cheapest. Good for quick summaries and high-volume triage. |
-
-## Why Claude for Security?
-
-*   **Reasoning**: Strong at multi-step logic chains and code comprehension.
-*   **Structured output**: Generates well-formatted reports, PoCs, and test plans.
-*   **Safety-aware**: Built-in understanding of security concepts and vulnerability patterns.
-
 ## Troubleshooting
 
 *   **"command not found"**: Ensure `claude` is installed and in your system PATH.

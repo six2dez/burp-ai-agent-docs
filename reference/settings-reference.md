@@ -2,8 +2,6 @@
 
 This page documents every configurable setting in the extension, organized by section.
 
-> **Note**: This page can be auto-generated from source code by running `python3 tools/generate_docs.py`. See [Testing & Debugging](../developer/testing.md) for details.
-
 ## AI Backend
 
 | Setting | Type | Default | Description |

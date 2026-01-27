@@ -43,22 +43,6 @@ If a backend is failing:
 2.  If it says **Crashed**, click it to see the exit code.
 3.  Check the `audit.jsonl` file (if Audit Logging is enabled) to see exactly what was sent to the model.
 
-## Auto-Generated Documentation
-
-The project includes a script that regenerates reference documentation from source code:
-
-```bash
-python3 tools/generate_docs.py
-```
-
-This script parses `AgentSettings.kt`, `SettingsPanel.kt`, `McpToolCatalog.kt`, and `McpTools.kt` to produce:
-
-*   `GitBook/reference/settings-reference.md` — All settings with defaults and ranges.
-*   `GitBook/mcp/tools-reference.md` — Quick MCP tool catalog table.
-*   `GitBook/mcp/tools-reference-detailed.md` — Detailed MCP tool reference with input schemas.
-
-> **Important**: If you manually edit these three files, your changes will be overwritten the next time `generate_docs.py` runs. Make structural changes in the source code or in the script itself.
-
 ## Manual UI Checks
 Before a release, perform these sanity checks:
 - [ ] Load extension in Burp Community and Pro.

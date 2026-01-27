@@ -1,7 +1,5 @@
 # MCP Tools Detailed Reference
 
-This page is auto‑generated from the tool catalog and schemas.
-
 ## Burp Control
 ### proxy_intercept
 - **Title**: Set proxy intercept state

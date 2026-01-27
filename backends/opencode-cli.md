@@ -33,12 +33,6 @@ opencode --model openai/gpt-4o
 opencode --model google/gemini-1.5-pro
 ```
 
-## Why OpenCode?
-
-*   **Multi-provider**: Switch between providers without changing your Burp configuration.
-*   **Open-source**: Full transparency on how your data is handled.
-*   **Flexible**: Supports custom endpoints and self-hosted models.
-
 ## Troubleshooting
 
 *   **"command not found"**: Ensure `opencode` is installed and in your system PATH.

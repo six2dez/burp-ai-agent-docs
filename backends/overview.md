@@ -2,38 +2,16 @@
 
 The Burp AI Agent is model-agnostic. It uses a "Supervisor" system to manage connections to various AI providers. You can choose the backend that best fits your security, cost, and performance needs.
 
-## Model Capability Matrix
+## Supported Backends
 
-| Task | Recommended Model | Reason |
-| :--- | :--- | :--- |
-| **Complex JS Analysis** | Gemini 1.5 Pro | Large context window (1M+ tokens). |
-| **PoC Generation** | Claude Sonnet | Strong reasoning and code generation. |
-| **Quick Summaries** | Llama 3.1 8B (Ollama) | Fast and fully local. |
-| **General Audit** | GPT-4o / Codex | Balanced quality and speed. |
-
-## Estimated Cost Comparison
-
-If using cloud backends, these are the approximate costs per 1,000 requests of medium size (~2K tokens per interaction):
-
-| Provider | Model | Approx. Cost (1K reqs) | Advantage |
+| Backend | Type | Privacy | Best For |
 | :--- | :--- | :--- | :--- |
-| **Anthropic** | Claude Sonnet | ~$6.00 USD | Strong reasoning quality. |
-| **Google Cloud** | Gemini 1.5 Flash | ~$0.15 USD | Low cost. |
-| **OpenAI** | GPT-4o | ~$5.00 USD | Reliable and well-documented. |
-| **Ollama** | Llama 3 / Mistral | **$0.00 USD** | Fully local, no data leaves your machine. |
-
-*Prices based on official API rates as of early 2025: Claude Sonnet ($3/M input), Gemini Flash ($0.075/M input).*
-
-## Comparison Table
-
-| Backend | Type | Privacy | Cost | Best For |
-| :--- | :--- | :--- | :--- | :--- |
-| **Ollama** | Local | High | Free | Offline analysis, strict privacy requirements. |
-| **LM Studio** | Local | High | Free | GUI-based model management, Windows users. |
-| **Gemini CLI** | Cloud | Medium | Varies (free tier) | Large context window (1M+ tokens). |
-| **Claude CLI** | Cloud | Medium | Paid | Reasoning and logic analysis. |
-| **Codex CLI** | Cloud | Medium | Paid | Code analysis and PoC generation. |
-| **OpenCode** | Cloud | Medium | Paid | Multi-provider support via single CLI. |
+| **Ollama** | Local | High | Offline analysis, strict privacy requirements. |
+| **LM Studio** | Local | High | GUI-based model management, Windows users. |
+| **Gemini CLI** | Cloud | Medium | Large context window analysis. |
+| **Claude CLI** | Cloud | Medium | Reasoning and logic analysis. |
+| **Codex CLI** | Cloud | Medium | Code analysis and PoC generation. |
+| **OpenCode** | Cloud | Medium | Multi-provider support via single CLI. |
 
 ## General Configuration
 

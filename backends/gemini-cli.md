@@ -26,20 +26,6 @@ To specify a model, include the flag in the command field:
 | :--- | :--- |
 | **Gemini CLI Command** | `gemini --model gemini-2.0-flash` |
 
-## Recommended Models
-
-| Model | Context Window | Best For |
-| :--- | :--- | :--- |
-| **Gemini 1.5 Pro** | 1M+ tokens | Complex JS analysis, large request/response pairs, multimodal analysis. |
-| **Gemini 1.5 Flash** | 1M+ tokens | Quick summaries, high-volume scanning. Very cost-effective. |
-| **Gemini 2.0 Flash** | 1M+ tokens | Latest generation, improved reasoning. |
-
-## Why Gemini for Security?
-
-*   **Large context window**: Analyze entire JavaScript bundles or large API responses without truncation.
-*   **Cost-effective**: Gemini Flash is one of the cheapest cloud options (~$0.15 per 1,000 requests).
-*   **Free tier available**: Google provides a free usage tier for Gemini API.
-
 ## Troubleshooting
 
 *   **"command not found"**: Ensure `gemini` is installed and in your system PATH. Try using the full path to the binary.
