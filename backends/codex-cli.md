@@ -29,15 +29,6 @@ To specify a model, include the flag in the command field:
 | :--- | :--- |
 | **Codex CLI Command** | `codex --model gpt-4.1` |
 
-## Launch Modes
-
-The Codex backend supports two launch modes:
-
-*   **Embedded (Built-in Chat)**: The extension manages the CLI process internally. Responses stream directly into the chat panel.
-*   **External Terminal**: Opens the CLI in your system terminal (iTerm2, cmd.exe, etc.). Useful for debugging or when you prefer the native CLI experience.
-
-Configure the launch mode via **Settings → AI Backend → External Terminal Template**.
-
 ## Troubleshooting
 
 *   **"command not found"**: Ensure `codex` is installed and in your system PATH.

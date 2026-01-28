@@ -21,9 +21,7 @@ This page documents every configurable setting in the extension, organized by se
 | **LM Studio Server Command** | Text | *(empty)* | Custom command to launch LM Studio server. |
 | **LM Studio Timeout** | Number | `120` | Timeout in seconds for LM Studio requests (range: 30–3600). |
 | **Auto-Restart** | Toggle | On | Automatically restart a crashed CLI backend. |
-| **External Terminal Template** | Text | *(OS-specific)* | Command template for launching backends in an external terminal. |
 | **Agent Profile** | Dropdown | `pentester` | System instruction profile. Options: `pentester`, `bughunter`, `auditor`. See [Agent Profiles](../user-guide/agent-profiles.md). |
-| **Auto-Submit (Non-Mac)** | Toggle | Off | Send a virtual "Enter" keystroke after pasting into external terminal (Windows/Linux only). |
 
 ## Privacy & Logging
 
@@ -94,13 +92,6 @@ This page documents every configurable setting in the extension, organized by se
 
 See [Prompt Defaults](prompt-defaults.md) for the full default text of each template.
 
-## UI Preferences
-
-| Setting | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| **Auto-Paste Context** | Toggle | On | Automatically paste the selected request/issue context into the chat input. |
-| **External Terminal Template** | Text | *(OS-specific)* | macOS: iTerm2, Windows: `cmd.exe`, Linux: `x-terminal-emulator`. |
-
 ## File Locations
 
 The extension stores data in `~/.burp-ai-agent/`. All subdirectories are created automatically on startup.
@@ -112,6 +103,5 @@ The extension stores data in `~/.burp-ai-agent/`. All subdirectories are created
 | `~/.burp-ai-agent/contexts/` | Context snapshot JSON files (SHA-256 indexed). |
 | `~/.burp-ai-agent/certs/` | Auto-generated TLS certificates (`mcp-keystore.p12`). |
 | `~/.burp-ai-agent/backends/` | Drop-in backend JAR files. Place custom `BackendFactory` JARs here for ServiceLoader discovery. See [Adding a Backend](../developer/adding-backend.md). |
-| `~/.burp-ai-agent/launch/` | Temporary shell scripts generated for external terminal backend launches. |
 | `~/.burp-ai-agent/AGENTS/` | Agent profile Markdown files. See [Agent Profiles](../user-guide/agent-profiles.md). |
 | `~/.burp-ai-agent/AGENTS/default` | Text file containing the active profile name (e.g., `pentester.md`). |

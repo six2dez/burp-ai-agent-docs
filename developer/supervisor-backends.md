@@ -83,19 +83,7 @@ The `McpSupervisor` manages the MCP server lifecycle separately from the AI back
 
 ## Launch Modes
 
-### Embedded Mode
-The supervisor runs the backend process internally. Output streams directly to the extension's chat panel. This is the default mode.
-
-### External Terminal Mode
-The supervisor launches the backend in an external terminal window using OS-specific templates:
-*   **macOS**: iTerm2 (default)
-*   **Windows**: `cmd.exe`
-*   **Linux**: `x-terminal-emulator`
-
-The `ExternalTerminalLauncher` handles:
-*   Template expansion with backend command and environment variables.
-*   OS detection for the correct terminal application.
-*   Process tracking for the launched terminal.
+The supervisor runs CLI backend processes internally (embedded mode). Output streams directly to the extension's chat panel.
 
 ## Failure Handling
 

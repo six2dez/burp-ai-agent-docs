@@ -65,7 +65,6 @@ On first launch, the extension automatically creates a directory at `~/.burp-ai-
 ├── bundles/             # Prompt bundle JSON files (determinism mode)
 ├── contexts/            # Context snapshot JSON files
 ├── backends/            # Drop-in backend JAR files (custom backends via ServiceLoader)
-├── launch/              # Temporary scripts for external terminal launches
 ├── certs/               # Auto-generated TLS certificates for MCP server
 │   └── mcp-keystore.p12
 └── AGENTS/              # Agent profile Markdown files (you must copy these)

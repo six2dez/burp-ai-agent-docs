@@ -31,19 +31,6 @@ CLI backends (Gemini, Claude, Codex, OpenCode) are launched as subprocesses. The
 ### HTTP Backends
 HTTP backends (Ollama, LM Studio) communicate via direct HTTP API calls. No subprocess is spawned. The extension connects to an already-running server, or can optionally auto-start it.
 
-## External Terminal Mode
-
-All CLI backends support two launch modes:
-*   **Embedded**: The extension manages the process internally and streams output to the chat panel.
-*   **External Terminal**: The CLI opens in your system's terminal application. Useful for interactive debugging.
-
-Default terminal templates:
-*   **macOS**: iTerm2
-*   **Windows**: `cmd.exe`
-*   **Linux**: `x-terminal-emulator`
-
-Configure via **Settings → AI Backend → External Terminal Template**.
-
 ## Custom Backends (Drop-in JARs)
 
 The extension supports **external backend plugins** via Java's ServiceLoader mechanism. To add a custom backend:

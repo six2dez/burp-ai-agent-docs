@@ -33,7 +33,7 @@ Accessible via the gear icon or settings sub-tab. Organized into collapsible acc
 
 | Section | What It Controls |
 | :--- | :--- |
-| **AI Backend** | Backend selection, CLI commands, HTTP URLs, model names, auto-start, timeouts, terminal templates. |
+| **AI Backend** | Backend selection, CLI commands, HTTP URLs, model names, auto-start, timeouts. |
 | **Privacy & Logging** | Redaction mode (STRICT/BALANCED/OFF), determinism, host salt, audit logging toggle. |
 | **MCP Server** | Host, port, TLS, external access, STDIO bridge, token, tool toggles, request limits. |
 | **Passive AI Scanner** | Rate limit, scope filtering, max size, min severity, auto-queue to active. |

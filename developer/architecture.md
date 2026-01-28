@@ -55,7 +55,7 @@ The extension is built in Kotlin targeting JVM 21, using the Burp Montoya API. I
 | `context/*` | Context collection from Burp selections (requests, responses, issues). |
 | `redact/*` | Redaction policies: cookie stripping, token redaction, host anonymization with salt. |
 | `backends/*` | Backend registry, adapters (Ollama, LM Studio, Gemini, Claude, Codex, OpenCode), diagnostics. |
-| `supervisor/*` | AgentSupervisor (backend lifecycle), ExternalTerminalLauncher (OS-specific terminal templates). |
+| `supervisor/*` | AgentSupervisor (backend lifecycle, health checks, auto-restart). |
 | `mcp/*` | KtorMcpServerManager (Ktor/Netty SSE server), McpStdioBridge, McpSupervisor, McpToolCatalog, McpTools, McpToolContext, McpRequestLimiter, McpTls. |
 | `scanner/*` | PassiveAiScanner, ActiveAiScanner, PayloadGenerator, ResponseAnalyzer, InjectionPointExtractor, AiScanCheck, ActiveScanModels. |
 | `audit/*` | AuditLogger (JSONL), Hashing (SHA-256). |
