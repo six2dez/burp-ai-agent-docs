@@ -11,6 +11,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| intercepting | Boolean | Yes | - |
 
 ### task_engine_state
 - **Title**: Set task execution engine state
@@ -22,6 +23,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| running | Boolean | Yes | - |
 
 
 ## Collaborator
@@ -71,6 +73,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| json | String | Yes | - |
 
 ### user_options_get
 - **Title**: Output user options
@@ -90,6 +93,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| json | String | Yes | - |
 
 
 ## Editor
@@ -111,6 +115,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| text | String | Yes | - |
 
 
 ## Issues
@@ -177,6 +182,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| count | Int | Yes | - |
+| offset | Int | Yes | - |
 
 ### proxy_http_history_regex
 - **Title**: Proxy HTTP history (regex)
@@ -188,6 +195,9 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| regex | String | Yes | - |
+| count | Int | Yes | - |
+| offset | Int | Yes | - |
 
 ### proxy_ws_history
 - **Title**: Proxy WebSocket history
@@ -199,6 +209,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| count | Int | Yes | - |
+| offset | Int | Yes | - |
 
 ### proxy_ws_history_regex
 - **Title**: Proxy WebSocket history (regex)
@@ -210,6 +222,9 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| regex | String | Yes | - |
+| count | Int | Yes | - |
+| offset | Int | Yes | - |
 
 ### response_body_search
 - **Title**: Search response bodies
@@ -238,6 +253,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| items | List<String> | Yes | - |
 
 ### diff_requests
 - **Title**: Diff requests
@@ -249,6 +265,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| requestA | String | Yes | - |
+| requestB | String | Yes | - |
 
 ### find_reflected
 - **Title**: Find reflected values
@@ -260,6 +278,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| request | String | Yes | - |
+| response | String | Yes | - |
 
 ### http1_request
 - **Title**: Send HTTP/1.1 request
@@ -303,6 +323,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
+| mode | String | No | "REPLACE_BASE_PARAMETER_VALUE_WITH_OFFSETS" |
 
 ### intruder
 - **Title**: Send to Intruder
@@ -348,6 +370,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
 
 ### repeater_tab
 - **Title**: Create repeater tab
@@ -392,6 +415,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
+| includeBody | Boolean | No | false |
 
 ### response_parse
 - **Title**: Parse response
@@ -403,6 +428,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
+| includeBody | Boolean | No | false |
 
 
 ## Scanner
@@ -416,6 +443,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| builtInConfiguration | String | Yes | - |
 
 ### scan_audit_start_mode
 - **Title**: Start scanner audit (mode)
@@ -459,6 +487,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| seedUrls | List<String> | Yes | - |
 
 ### scan_report
 - **Title**: Generate scanner report
@@ -485,6 +514,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| taskId | String | Yes | - |
 
 ### scan_task_status
 - **Title**: Get scan task status
@@ -496,6 +526,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| taskId | String | Yes | - |
 
 ### scanner_issues
 - **Title**: Scanner issues
@@ -507,6 +538,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| count | Int | Yes | - |
+| offset | Int | Yes | - |
 
 
 ## Scope
@@ -520,6 +553,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| url | String | Yes | - |
 
 ### scope_exclude
 - **Title**: Exclude from scope
@@ -531,6 +565,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| url | String | Yes | - |
 
 ### scope_include
 - **Title**: Include in scope
@@ -542,6 +577,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| url | String | Yes | - |
 
 
 ## Site Map
@@ -555,6 +591,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| count | Int | Yes | - |
+| offset | Int | Yes | - |
 
 ### site_map_regex
 - **Title**: Site map (regex)
@@ -566,6 +604,9 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| regex | String | Yes | - |
+| count | Int | Yes | - |
+| offset | Int | Yes | - |
 
 
 ## Utilities
@@ -579,6 +620,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
 
 ### base64_encode
 - **Title**: Base64 encode
@@ -590,6 +632,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
 
 ### cookie_jar_get
 - **Title**: Cookie jar
@@ -616,6 +659,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| base64 | String | Yes | - |
+| encoding | String | Yes | - |
 
 ### hash_compute
 - **Title**: Compute hash
@@ -627,6 +672,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
+| algorithm | String | Yes | - |
 
 ### jwt_decode
 - **Title**: Decode JWT
@@ -638,6 +685,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| token | String | Yes | - |
 
 ### random_string
 - **Title**: Generate random string
@@ -649,6 +697,8 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| length | Int | Yes | - |
+| characterSet | String | Yes | - |
 
 ### url_decode
 - **Title**: URL decode
@@ -660,6 +710,7 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
+| content | String | Yes | - |
 
 ### url_encode
 - **Title**: URL encode
@@ -671,4 +722,4 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
-
+| content | String | Yes | - |

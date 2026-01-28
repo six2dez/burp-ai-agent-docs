@@ -14,7 +14,7 @@ One of the core value propositions of the Burp AI Agent is the ability to use AI
   * **Cookies**: All Cookie values are scrubbed.
 * **Use Case**: Sending data to a cloud backend (Claude/Gemini) where you do not want to reveal the target identity.
 
-### 2. BALANCED Mode (Default)
+### 2. BALANCED Mode
 
 **"Pragmatic Security"** - Balances context for the AI with basic hygiene.
 
@@ -24,7 +24,7 @@ One of the core value propositions of the Burp AI Agent is the ability to use AI
   * **Hostnames**: **Preserved**. The AI _will_ see `bank-of-america.com`.
 * **Use Case**: Using local models (Ollama) or when you have legal clearance to share the target's identity with the AI provider.
 
-### 3. OFF
+### 3. OFF (Default)
 
 **"Raw Data"** - No filters.
 
