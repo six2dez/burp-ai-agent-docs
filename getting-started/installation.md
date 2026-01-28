@@ -4,30 +4,33 @@
 
 Before installing, ensure you have the following:
 
-1.  **Burp Suite**: Community or Professional edition (version 2023.12 or higher recommended).
-2.  **Java 21**: The extension is built for Java 21 (Temurin or Oracle JDK).
-    *   *Note*: Modern Burp Suite versions ship with a bundled Java runtime. You only need a separate Java installation if you are building from source or running the CLI backends in a specific environment.
+1. **Burp Suite**: Community or Professional edition (version 2023.12 or higher recommended).
+2. **Java 21**: The extension is built for Java 21 (Temurin or Oracle JDK).
+   * _Note_: Modern Burp Suite versions ship with a bundled Java runtime. You only need a separate Java installation if you are building from source or running the CLI backends in a specific environment.
 
 ## Option A: Download from GitHub Releases
 
-1.  Go to the [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases) page.
-2.  Download the latest `Burp-AI-Agent-<version>.jar` file.
+1. Go to the [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases) page.
+2. Download the latest `Burp-AI-Agent-<version>.jar` file.
 
 ## Option B: Build from Source
 
 If you prefer to build from source or want the latest development version:
 
-1.  **Prerequisites**: Install **Java 21** (Temurin or Oracle JDK) and ensure `JAVA_HOME` is set.
+1. **Prerequisites**: Install **Java 21** (Temurin or Oracle JDK) and ensure `JAVA_HOME` is set.
 2.  Clone the repository:
+
     ```bash
     git clone https://github.com/six2dez/burp-ai-agent.git
     cd burp-ai-agent
     ```
 3.  Build the fat JAR using the Gradle Shadow plugin:
+
     ```bash
     ./gradlew clean shadowJar
     ```
 4.  The output JAR will be at:
+
     ```
     build/libs/Burp-AI-Agent-<version>.jar
     ```
@@ -36,24 +39,25 @@ If you prefer to build from source or want the latest development version:
 
 ## Load into Burp Suite
 
-1.  Open Burp Suite.
-2.  Navigate to the **Extensions** tab.
-3.  Click on the **Installed** sub-tab.
-4.  Click the **Add** button.
-5.  In the "Extension Details" dialog:
-    *   **Extension type**: Select `Java`.
-    *   **Extension file**: Click "Select file..." and choose the `.jar` you downloaded.
-6.  Click **Next**.
+1. Open Burp Suite.
+2. Navigate to the **Extensions** tab.
+3. Click on the **Installed** sub-tab.
+4. Click the **Add** button.
+5. In the "Extension Details" dialog:
+   * **Extension type**: Select `Java`.
+   * **Extension file**: Click "Select file..." and choose the `.jar` you downloaded.
+6. Click **Next**.
 
-![Screenshot: Burp extensions add](../assets/screenshots/burp-extensions-add.png)
+![Screenshot: Burp extensions add](../.gitbook/assets/burp-extensions-add.png)
 
 ## Verify Installation
 
 Once loaded, you should see the following:
-*   **Output tab**: The extension should load without errors. You might see a "Extensions loaded" message.
-*   **Top-level Tab**: A new tab named **AI Agent** will appear in the main Burp navigation bar.
 
-![Screenshot: AI Agent tab](../assets/screenshots/burp-ai-agent-tab.png)
+* **Output tab**: The extension should load without errors. You might see a "Extensions loaded" message.
+* **Top-level Tab**: A new tab named **AI Agent** will appear in the main Burp navigation bar.
+
+![Screenshot: AI Agent tab](../.gitbook/assets/burp-ai-agent-tab.png)
 
 ## The `~/.burp-ai-agent/` Directory
 
@@ -86,9 +90,9 @@ You may also want to place custom backend JARs in `backends/` (see [Adding a Bac
 
 ## Troubleshooting
 
-*   **"Error loading extension"**: Check the "Errors" tab in the Extensions window. Common causes include incompatible Java versions (ensure you are using Java 21+ features).
-*   **Tab not appearing**: Ensure the extension is checked/enabled in the "Installed" list.
-*   **Permission errors**: Ensure your user has write access to `~/.burp-ai-agent/`.
+* **"Error loading extension"**: Check the "Errors" tab in the Extensions window. Common causes include incompatible Java versions (ensure you are using Java 21+ features).
+* **Tab not appearing**: Ensure the extension is checked/enabled in the "Installed" list.
+* **Permission errors**: Ensure your user has write access to `~/.burp-ai-agent/`.
 
 ## Next Steps
 
