@@ -6,19 +6,19 @@ This page documents every configurable setting in the extension, organized by se
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. Options: `ollama`, `lm-studio`, `gemini-cli`, `claude-cli`, `codex-cli`, `opencode-cli`. |
+| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. Options: `ollama`, `lmstudio`, `gemini-cli`, `claude-cli`, `codex-cli`, `opencode-cli`. |
 | **Codex CLI Command** | Text | `codex chat` | Shell command to launch the Codex backend. |
 | **Gemini CLI Command** | Text | `gemini` | Shell command to launch the Gemini backend. |
 | **Claude CLI Command** | Text | `claude` | Shell command to launch the Claude backend. |
 | **OpenCode CLI Command** | Text | `opencode` | Shell command to launch the OpenCode backend. |
 | **Ollama URL** | Text | `http://127.0.0.1:11434` | Base URL for the Ollama HTTP API. |
 | **Ollama Model** | Text | `llama3.1` | Model name to use with Ollama. |
-| **Ollama Auto-Start** | Toggle | Off | Automatically start `ollama serve` when backend is selected. |
+| **Ollama Auto-Start** | Toggle | On | Automatically start `ollama serve` when backend is selected. |
 | **Ollama Serve Command** | Text | `ollama serve` | Custom command to start the Ollama server. |
 | **LM Studio URL** | Text | `http://127.0.0.1:1234` | Base URL for the LM Studio HTTP API. |
 | **LM Studio Model** | Text | `lmstudio` | Model identifier for LM Studio. |
-| **LM Studio Auto-Start** | Toggle | Off | Automatically start LM Studio server. |
-| **LM Studio Server Command** | Text | *(empty)* | Custom command to launch LM Studio server. |
+| **LM Studio Auto-Start** | Toggle | On | Automatically start LM Studio server. |
+| **LM Studio Server Command** | Text | `lms server start` | Custom command to launch LM Studio server. |
 | **LM Studio Timeout** | Number | `120` | Timeout in seconds for LM Studio requests (range: 30–3600). |
 | **Auto-Restart** | Toggle | On | Automatically restart a crashed CLI backend. |
 | **Agent Profile** | Dropdown | `pentester` | System instruction profile. Options: `pentester`, `bughunter`, `auditor`. See [Agent Profiles](../user-guide/agent-profiles.md). |
@@ -41,13 +41,13 @@ This page documents every configurable setting in the extension, organized by se
 | **Port** | Number | `9876` | TCP port for the SSE server. |
 | **External Access** | Toggle | Off | Allow connections from non-loopback addresses. **Requires TLS.** |
 | **STDIO Bridge** | Toggle | Off | Enable stdin/stdout MCP transport in addition to SSE. |
-| **Token** | Text | *(auto-generated)* | Bearer token for authentication. Can be rotated. |
+| **Token** | Text | *(auto-generated)* | Bearer token for external access. Localhost access does not require a token. |
 | **TLS Enabled** | Toggle | Off | Enable HTTPS for the MCP server. |
-| **Auto-Generate Certificate** | Toggle | Off | Generate a self-signed PKCS12 keystore automatically. Stored at `~/.burp-ai-agent/certs/mcp-keystore.p12`. |
-| **Keystore Path** | Text | *(empty)* | Path to a custom PKCS12 keystore for TLS. |
-| **Keystore Password** | Text | *(empty)* | Password for the custom keystore. |
+| **Auto-Generate Certificate** | Toggle | On | Generate a self-signed PKCS12 keystore automatically. Stored at `~/.burp-ai-agent/certs/mcp-keystore.p12`. |
+| **Keystore Path** | Text | *(auto-populated)* | Path to a custom PKCS12 keystore for TLS. |
+| **Keystore Password** | Text | *(auto-generated)* | Password for the custom keystore. |
 | **Max Concurrent Requests** | Number | `4` | Maximum parallel MCP tool calls (range: 1–64). |
-| **Max Body Bytes** | Number | *(default)* | Maximum response body size returned by MCP tools. |
+| **Max Body Bytes** | Number | `2097152` | Maximum response body size returned by MCP tools (range: 256 KB – 100 MB). |
 | **Tool Toggles** | Checkboxes | *(varies)* | Enable/disable individual MCP tools. See [Tools Reference](../mcp/tools-reference.md). |
 | **Enable Unsafe Tools** | Toggle | Off | Master switch for all tools marked as "unsafe". |
 
@@ -59,8 +59,7 @@ This page documents every configurable setting in the extension, organized by se
 | **Rate Limit** | Number | `5` | Minimum seconds between analysis requests (range: 1–60). |
 | **Scope Only** | Toggle | On | Only analyze requests to in-scope targets. |
 | **Max Size (KB)** | Number | `96` | Maximum request+response size sent for analysis (range: 16–1024 KB). |
-| **Min Severity** | Dropdown | `LOW` | Ignore findings below this severity level. Options: `INFORMATION`, `LOW`, `MEDIUM`, `HIGH`. |
-| **Auto-Queue to Active** | Toggle | Off | Automatically send high-confidence passive findings to the active scanner queue. |
+| **Min Severity** | Dropdown | `LOW` | Ignore findings below this severity level. Options: `LOW`, `MEDIUM`, `HIGH`, `CRITICAL`. |
 
 ## Active AI Scanner
 
@@ -73,7 +72,8 @@ This page documents every configurable setting in the extension, organized by se
 | **Request Delay** | Number | `100` | Delay in milliseconds between requests (range: 0–5000). |
 | **Max Risk Level** | Dropdown | `SAFE` | Maximum payload risk level. Options: `SAFE`, `MODERATE`, `DANGEROUS`. |
 | **Scope Only** | Toggle | On | Only scan in-scope targets. |
-| **Scan Mode** | Dropdown | `BUG_BOUNTY` | Vulnerability class selection strategy. Options: `BUG_BOUNTY`, `PENTEST`, `FULL`. |
+| **Scan Mode** | Dropdown | `FULL` | Vulnerability class selection strategy. Options: `BUG_BOUNTY`, `PENTEST`, `FULL`. |
+| **Auto-Queue from Passive** | Toggle | On | Automatically queue high-confidence passive findings for active verification. |
 | **Use Collaborator (OAST)** | Toggle | Off | Enable out-of-band testing with Burp Collaborator payloads. |
 
 ## Prompt Templates

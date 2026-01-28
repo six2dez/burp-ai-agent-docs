@@ -26,6 +26,11 @@
 | editor_get | No | No | No | Outputs the contents of the active message editor. |
 | editor_set | Yes | No | No | Sets the content of the active message editor. |
 
+## Issues
+| Tool | Unsafe | Default enabled | Pro only | Description |
+|---|---|---|---|---|
+| issue_create | No | Yes | No | Creates a custom audit issue in Burp's issue list. |
+
 ## Extension
 | Tool | Unsafe | Default enabled | Pro only | Description |
 |---|---|---|---|---|
@@ -95,4 +100,3 @@
 | random_string | No | Yes | No | Generates a random string of specified length and character set. |
 | url_decode | No | Yes | No | URL decodes the input string. |
 | url_encode | No | Yes | No | URL encodes the input string. |
-

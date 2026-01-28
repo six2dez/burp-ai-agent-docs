@@ -4,7 +4,7 @@ This guide will get you from "Installed" to "First Vulnerability Found" in under
 
 ## 1. Enable the MCP Server (Optional but Recommended)
 The Model Context Protocol (MCP) server allows the plugin to expose tools.
-*   Click the **MCP** toggle in the top bar of the **Burp AI Agent** tab.
+*   Click the **MCP** toggle in the top bar of the **AI Agent** tab.
 *   The status indicator should turn green/active.
 
 ![Screenshot: Top bar toggles](../assets/screenshots/top-bar-toggles.png)
@@ -21,7 +21,7 @@ This enables role-specific AI instructions (pentester, bughunter, auditor). With
 
 ## 3. Configure Your AI Backend
 You need to tell the extension which AI model to use.
-1.  Go to **Burp AI Agent** → **Settings** → **AI Backend**.
+1.  Go to **AI Agent** → **Settings** → **AI Backend**.
 2.  Select your preferred backend from the dropdown:
     *   **Cloud**: `Gemini CLI`, `Claude CLI`, `Codex CLI` (requires API keys).
     *   **Local**: `Ollama` or `LM Studio` (free, private).
@@ -39,7 +39,7 @@ You need to tell the extension which AI model to use.
 ![Screenshot: Context menu on request](../assets/screenshots/context-menu-request.png)
 
 ## 5. Review the Analysis
-*   The **Burp AI Agent** tab will open (or focus).
+*   The **AI Agent** tab will open (or focus).
 *   A new chat session will start.
 *   The AI will stream its analysis of the request, highlighting potential security issues like SQLi, XSS, or IDOR.
 
@@ -49,6 +49,6 @@ You need to tell the extension which AI model to use.
 If you want the AI to work for you automatically:
 1.  Toggle **Passive** to **ON** in the top bar.
 2.  Browse your target application.
-3.  Check the **Target** → **Issues** tab (or the extension's findings view) for `[AI]` prefixed issues.
+3.  Check the **Target** → **Issues** tab (or the extension's findings view) for `[AI Passive]` prefixed issues.
 
 ![Screenshot: Scanner settings](../assets/screenshots/scanner-settings.png)

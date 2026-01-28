@@ -39,8 +39,8 @@ When Auto-Start is enabled, the extension runs the server command automatically 
 | :--- | :--- | :--- |
 | **LM Studio URL** | `http://127.0.0.1:1234` | Base URL for the LM Studio server API. |
 | **LM Studio Model** | `lmstudio` | Model identifier to use. |
-| **Auto-Start** | Off | Automatically start the LM Studio server. |
-| **Server Command** | *(empty)* | Custom command to launch the server. |
+| **Auto-Start** | On | Automatically start the LM Studio server. |
+| **Server Command** | `lms server start` | Custom command to launch the server. |
 | **Timeout** | 120 seconds | Request timeout (range: 30–3600 seconds). Increase for larger models or complex analyses. |
 
 ## Troubleshooting

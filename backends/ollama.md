@@ -2,11 +2,7 @@
 
 Ollama is a popular tool for running LLMs locally. It is the recommended backend for users who cannot send data to the cloud due to privacy or compliance/NDA reasons.
 
-## Modes
-
-The extension supports Ollama in two ways:
-
-### 1. HTTP Mode (Recommended)
+## HTTP Mode (Recommended)
 Connects directly to the Ollama HTTP API. This is faster and more reliable.
 
 **Setup**:
@@ -29,16 +25,7 @@ Connects directly to the Ollama HTTP API. This is faster and more reliable.
 
 Optional: enable **Ollama Auto-Start** and set **Ollama Serve Command** to `ollama serve` so the extension starts the server automatically.
 
-### 2. CLI Mode
-Spawns `ollama run` as a subprocess in a terminal window.
-
-**Setup**: In **Settings → AI Backend**, set:
-
-| Setting | Value |
-| :--- | :--- |
-| **Ollama CLI Command** | `ollama run llama3.1` (includes the model name) |
-
-The extension interacts with this process via stdin/stdout. The model name is extracted from the command automatically.
+> **Note**: The **Ollama CLI Command** field is used to detect the default model (e.g., from `ollama run llama3.1`) and for launch validation. The active backend communicates with the Ollama HTTP API.
 
 ## Troubleshooting
 

@@ -19,7 +19,7 @@ To build the extension JAR:
 ```bash
 ./gradlew clean shadowJar
 ```
-The output JAR will be in `build/libs/burp-ai-agent-all.jar`.
+The output JAR will be in `build/libs/Burp-AI-Agent-<version>.jar`.
 
 ## Debugging
 
@@ -34,13 +34,13 @@ In Burp Suite:
     *   **Errors**: Shows Java stack traces if the extension crashes.
 
 ### 2. Java Logs
-The extension uses SLF4J/Logback. Logs are typically printed to the Burp stdout.
+The extension uses SLF4J. Logs are typically printed to the Burp stdout.
 If you launched Burp from a terminal, check the terminal window for detailed logs.
 
 ### 3. Agent Debugging
 If a backend is failing:
 1.  Check the **Status** indicator in the top bar.
-2.  If it says **Crashed**, click it to see the exit code.
+2.  If it says **Crashed**, check **Extensions → Installed → Burp AI Agent → Output/Errors** for the exit code.
 3.  Check the `audit.jsonl` file (if Audit Logging is enabled) to see exactly what was sent to the model.
 
 ## Manual UI Checks

@@ -8,10 +8,9 @@ One of the core value propositions of the Burp AI Agent is the ability to use AI
 **"Zero Trust"** - Designed for highly sensitive engagements.
 
 *   **Redaction**:
-    *   **Hostnames**: Replaced with anonymized placeholders (e.g., `target-1.com`, `api-service-2.org`). The mapping is stable within a session so the AI can still understand relationships.
-    *   **Auth Tokens**: Bearer tokens, API keys, and common secret patterns are replaced with `<REDACTED_TOKEN>`.
+    *   **Hostnames**: Replaced with anonymized placeholders (e.g., `host-8f2a3b.local`). The mapping is stable for a given salt so the AI can still understand relationships.
+    *   **Auth Tokens**: Authorization headers, API keys, bearer tokens, and JWT-like strings are redacted.
     *   **Cookies**: All Cookie values are scrubbed.
-    *   **PII**: Attempt to identify and mask email addresses and phone numbers (best effort).
 *   **Use Case**: Sending data to a cloud backend (Claude/Gemini) where you do not want to reveal the target identity.
 
 ### 2. BALANCED Mode (Default)
@@ -19,7 +18,7 @@ One of the core value propositions of the Burp AI Agent is the ability to use AI
 
 *   **Redaction**:
     *   **Auth Tokens**: Redacted.
-    *   **Cookies**: Session IDs are often redacted, but non-sensitive cookies might be preserved (implementation dependent).
+    *   **Cookies**: Cookie headers are stripped.
     *   **Hostnames**: **Preserved**. The AI *will* see `bank-of-america.com`.
 *   **Use Case**: Using local models (Ollama) or when you have legal clearance to share the target's identity with the AI provider.
 
@@ -34,4 +33,4 @@ One of the core value propositions of the Burp AI Agent is the ability to use AI
 ## Important Notes
 
 *   **Active Scanning**: The Active Scanner *always* sends traffic to the *real* target. Privacy modes apply to the *prompt* sent to the AI, not the traffic the AI generates against the target.
-*   **Determinism**: In STRICT mode, the "Host Anonymization Salt" ensures that `target-1.com` always maps to the same real host across different requests in the same session, allowing the AI to correlate findings.
+*   **Determinism**: In STRICT mode, the "Host Anonymization Salt" ensures that the same host maps to the same pseudonym until you rotate the salt, allowing the AI to correlate findings safely.

@@ -22,7 +22,7 @@ The extension is built in Kotlin targeting JVM 21, using the Burp Montoya API. I
 │     AgentSupervisor, McpSupervisor      │
 ├─────────────────────────────────────────┤
 │  6. MCP Server                          │
-│     Ktor SSE + STDIO, 49+ tools        │
+│     Ktor SSE + STDIO, 53+ tools        │
 ├─────────────────────────────────────────┤
 │  7. Scanners                            │
 │     Passive AI Scanner, Active Scanner  │

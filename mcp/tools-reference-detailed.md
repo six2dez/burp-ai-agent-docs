@@ -113,6 +113,33 @@
 |---|---|---|---|
 
 
+## Issues
+### issue_create
+- **Title**: Create audit issue
+- **Unsafe**: No
+- **Default enabled**: Yes
+- **Pro only**: No
+- **Description**: Creates a custom audit issue in Burp's issue list for AI-discovered findings.
+- **Input fields**:
+
+| Name | Type | Required | Default |
+|---|---|---|---|
+| name | String | Yes | - |
+| detail | String | Yes | - |
+| baseUrl | String | Yes | - |
+| severity | String | Yes | - |
+| confidence | String | Yes | - |
+| remediation | String? | No | null |
+| background | String? | No | null |
+| remediationBackground | String? | No | null |
+| typicalSeverity | String? | No | null |
+| httpRequest | String? | No | null |
+| httpResponseContent | String? | No | null |
+| targetHostname | String | No | "" |
+| targetPort | Int | No | 443 |
+| usesHttps | Boolean | No | true |
+
+
 ## Extension
 ### status
 - **Title**: Extension status
@@ -644,5 +671,4 @@
 
 | Name | Type | Required | Default |
 |---|---|---|---|
-
 

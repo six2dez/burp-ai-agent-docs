@@ -12,7 +12,7 @@ The top bar provides quick access to the most important controls:
 | **Passive** toggle | Enables/disables background passive analysis of proxy traffic. |
 | **Active** toggle | Enables/disables active scanning (risk-based). See warnings in [Active Scanner](../scanners/active.md). |
 | **Backend** selector | Dropdown to choose the AI backend for new sessions. |
-| **Status** indicator | Shows backend state (Running, Stopped, Crashed) and MCP server status. Click for details on errors. |
+| **Status** indicator | Shows backend state (Running, Stopped, Crashed) and MCP server status. |
 
 ![Screenshot: Top bar](../assets/screenshots/top-bar.png)
 
@@ -36,8 +36,8 @@ Accessible via the gear icon or settings sub-tab. Organized into collapsible acc
 | **AI Backend** | Backend selection, CLI commands, HTTP URLs, model names, auto-start, timeouts. |
 | **Privacy & Logging** | Redaction mode (STRICT/BALANCED/OFF), determinism, host salt, audit logging toggle. |
 | **MCP Server** | Host, port, TLS, external access, STDIO bridge, token, tool toggles, request limits. |
-| **Passive AI Scanner** | Rate limit, scope filtering, max size, min severity, auto-queue to active. |
-| **Active AI Scanner** | Concurrency, payloads per point, timeout, delay, risk level, scan mode, collaborator. |
+| **Passive AI Scanner** | Rate limit, scope filtering, max size, min severity, findings view. |
+| **Active AI Scanner** | Concurrency, payloads per point, timeout, delay, risk level, scan mode, collaborator, auto-queue from passive. |
 | **Prompt Templates** | Editable default prompts for all context menu actions. |
 | **Help** | Quick links to documentation, MCP setup guide, and version info. |
 
@@ -56,7 +56,7 @@ If required dependencies are missing (e.g., a CLI tool not found in PATH), a ban
 
 ## Findings Panel
 
-When scanners are active, the extension provides a findings view showing:
+When scanners are active, the extension provides findings dialogs showing:
 *   Passive findings with severity, confidence, and detail.
 *   Active findings with confirmed vulnerability evidence.
 *   Status metrics (requests analyzed, issues found, queue size).

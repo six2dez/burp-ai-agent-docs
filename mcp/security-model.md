@@ -6,16 +6,17 @@ The MCP server in Burp AI Agent is designed with a **"Security by Default"** phi
 By default, the MCP server binds to `127.0.0.1`. This ensures that only processes running on your local machine (like Claude Desktop or a local script) can connect. External network access is blocked unless you explicitly change the bind address (not recommended).
 
 ## 2. Token Authentication
-Every request to the MCP server must include a secret **Token**.
+External requests to the MCP server must include a secret **Token**.
 *   The token is auto-generated on the first run.
 *   You can view or rotate the token in **Settings → MCP Server**.
-*   Clients must provide this token in the header (for SSE) or as a parameter.
+*   **Localhost access** does not require a token.
+*   **External access** requires `Authorization: Bearer <token>` on every request.
 
 ## 3. Tool Gating (Safe vs. Unsafe)
 Tools are categorized based on their potential impact:
 
 *   **Safe Tools**: Read-only operations (e.g., `proxy_http_history`, `site_map`). These are enabled by default.
-*   **Unsafe Tools**: Operations that can modify state or send network traffic (e.g., `http1_request`, `repeater_tab`, `issue_create`).
+*   **Unsafe Tools**: Operations that can modify state or send network traffic (e.g., `http1_request`, `repeater_tab`).
     *   **Disabled by default**: You must check the "Enable Unsafe Tools" box in settings.
     *   **Pro-Only**: Some tools (like Scanner-related tools) require Burp Suite Professional.
 

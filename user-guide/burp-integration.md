@@ -23,7 +23,7 @@ The extension integrates deeply with Burp Suite's existing tools and workflows.
 | Context menu actions (issues) | No | Yes |
 | Chat & sessions | Yes | Yes |
 | All AI backends | Yes | Yes |
-| MCP server (49+ tools) | Yes (non-Pro tools) | Yes (all tools) |
+| MCP server (53+ tools) | Yes (non-Pro tools) | Yes (all tools) |
 | Passive AI Scanner | Yes | Yes |
 | Active AI Scanner | Manual queue only | Full integration with native scanner |
 | Scanner MCP tools | No | Yes |
@@ -34,7 +34,7 @@ The extension gracefully detects the Burp edition at startup and disables Pro-on
 
 ## MCP Tool Toggles
 
-The MCP server exposes 49+ tools to external AI agents. For security, you control which tools are available:
+The MCP server exposes 53+ tools to external AI agents. For security, you control which tools are available:
 
 ### Safe vs Unsafe Tools
 
@@ -57,7 +57,7 @@ The MCP server exposes 49+ tools to external AI agents. For security, you contro
 On Burp Suite Professional, the extension registers an `AiScanCheck` with Burp's built-in active scanner. This means:
 
 *   AI-powered scan checks run alongside Burp's default checks during active scans.
-*   Findings are reported as native Burp issues with `[AI]` prefix.
+*   Findings are reported as native Burp issues with `[AI Active]` prefix.
 *   The AI scanner respects Burp's scan configuration and scope settings.
 
 On Community Edition, this integration is silently skipped and the AI scanner operates independently.

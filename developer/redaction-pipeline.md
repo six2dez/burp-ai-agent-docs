@@ -47,7 +47,7 @@ pseudonym = "host-" + SHA256(salt + ":" + hostname)[0:6] + ".local"
 
 Example: `bank-of-america.com` → `host-a3f2c1.local`
 
-The mapping is **stable** within a session: the same hostname always maps to the same pseudonym, so the AI can correlate findings across multiple requests to the same host.
+The mapping is **stable** for a given salt: the same hostname always maps to the same pseudonym until you rotate the salt, so the AI can correlate findings across multiple requests to the same host.
 
 A **reverse mapping** is maintained internally so the extension can translate pseudonyms back to real hosts when executing MCP tool actions.
 

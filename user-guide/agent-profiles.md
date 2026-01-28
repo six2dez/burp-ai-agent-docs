@@ -59,17 +59,15 @@ The extension maps context menu actions to profile sections:
 
 | Context Menu Action | Profile Section |
 | :--- | :--- |
-| Find Vulnerabilities | `[REQUEST_ANALYSIS]` |
-| Quick Recon | `[REQUEST_TRIAGE]` |
+| Find vulnerabilities | `[REQUEST_ANALYSIS]` |
+| Quick recon | `[REQUEST_TRIAGE]` |
 | Explain JS | `[JS_ANALYSIS]` |
-| Access Control | `[ACCESS_CONTROL]` |
-| Login Sequence | `[LOGIN_SEQUENCE]` |
-| Analyze this Issue | `[ISSUE_ANALYSIS]` |
-| Generate PoC & Validate | `[POC]` |
-| Impact & Severity | `[ISSUE_IMPACT]` |
-| Explain Headers | `[HEADERS]` |
-| Summarize Request/Response | `[REQUEST_SUMMARY]` |
-| Escalation Paths | `[ESCALATION_PATHS]` |
+| Access control | `[ACCESS_CONTROL]` |
+| Login sequence | `[LOGIN_SEQUENCE]` |
+| Analyze this issue | `[ISSUE_ANALYSIS]` |
+| Generate PoC & validate | `[POC]` |
+| Impact & severity | `[ISSUE_IMPACT]` |
+| Full report | `[FULL_REPORT]` |
 | Free-form chat | `[CHAT]` |
 
 If no matching section is found, the `[DEFAULT]` section is used. If neither exists, only the global section is injected.

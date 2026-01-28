@@ -8,7 +8,7 @@ The passive scanner analyzes proxy traffic in the background and can create issu
 2.  Responses are filtered by MIME type, scope, and size limits.
 3.  Qualifying responses are queued for AI analysis.
 4.  The AI analyzes the request/response pair for security issues using pattern matching and contextual reasoning.
-5.  Findings with confidence >= 85% are automatically promoted to Burp issues with an `[AI]` prefix.
+5.  Findings with confidence >= 85% are automatically promoted to Burp issues with an `[AI Passive]` prefix.
 
 ## Configuration
 
@@ -17,9 +17,8 @@ The passive scanner analyzes proxy traffic in the background and can create issu
 | **Enabled** | Off | Toggle in the top bar or settings panel. |
 | **Rate Limit** | 5 seconds | Minimum time between analysis requests (range: 1–60s). Prevents overwhelming the AI backend. |
 | **Scope Only** | On | Only analyze requests to targets in Burp's scope. |
-| **Max Size (KB)** | 96 KB | Maximum combined request+response size for analysis (range: 16–1024 KB). |
-| **Min Severity** | LOW | Ignore findings below this severity level (`INFORMATION`, `LOW`, `MEDIUM`, `HIGH`). |
-| **Auto-Queue to Active** | Off | Forward high-confidence findings to the [Active AI Scanner](active.md) for payload-based verification. |
+| **Max Size (KB)** | 96 KB | Maximum **response** size for analysis (range: 16–1024 KB). |
+| **Min Severity** | LOW | Ignore findings below this severity level (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`). |
 
 > **Trade-off**: Higher **Max Size** values (e.g., 500 KB) allow analysis of large JSON responses but significantly increase token costs for cloud backends or slow down local inference. The default of 96 KB covers most API endpoints.
 
@@ -65,7 +64,7 @@ The scanner checks for injectable headers from a curated allowlist:
 ## Output
 
 ### Findings View
-All passive analysis results are available in the **View Findings** panel within the extension. Each finding includes:
+All passive analysis results are available via **Settings → Passive AI Scanner → View findings**. Each finding includes:
 *   **Timestamp**: When the analysis occurred.
 *   **URL**: The analyzed endpoint.
 *   **Title**: Short description of the finding.
@@ -77,7 +76,7 @@ All passive analysis results are available in the **View Findings** panel within
 Findings are automatically promoted to Burp issues when:
 *   Confidence score >= **85%**
 *   Severity meets or exceeds the configured minimum.
-*   Issues are prefixed with `[AI]` for easy identification in the Issues panel.
+*   Issues are prefixed with `[AI Passive]` for easy identification in the Issues panel.
 
 ## Status Tracking
 
@@ -89,7 +88,7 @@ The scanner tracks operational metrics:
 
 ## Passive-to-Active Pipeline
 
-When **Auto-Queue to Active** is enabled, the passive scanner feeds confirmed findings into the active scanner:
+When **Auto-Queue from Passive** is enabled in the **Active AI Scanner** settings, the passive scanner feeds confirmed findings into the active scanner:
 
 1.  Passive scanner identifies a potential injection point or vulnerability pattern.
 2.  The finding is automatically queued for active testing.

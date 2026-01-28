@@ -60,7 +60,7 @@ Below is the complete list of screenshots referenced across the documentation. E
 
 | Filename | What to capture | Used in |
 | :--- | :--- | :--- |
-| `main-tab.png` | The full Burp AI Agent tab showing the chat panel with a response and the settings panel or top bar visible. Hero screenshot for the repo. | README.md |
+| `main-tab.png` | The full AI Agent tab showing the chat panel with a response and the settings panel or top bar visible. Hero screenshot for the repo. | README.md |
 
 ## Total: 20 screenshots
 

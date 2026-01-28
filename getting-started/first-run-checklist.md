@@ -4,7 +4,7 @@ Use this checklist after installation to ensure everything is configured correct
 
 ## Essential Setup
 
-- [ ] **Extension loaded**: The "Burp AI Agent" tab appears in the main Burp navigation bar.
+- [ ] **Extension loaded**: The "AI Agent" tab appears in the main Burp navigation bar.
 - [ ] **Backend selected**: A backend is chosen in **Settings → AI Backend** (e.g., Ollama, Gemini, Claude, Codex).
 - [ ] **Backend configured**: The CLI command or HTTP URL is correct and the backend is reachable.
 - [ ] **Backend running**: The status indicator in the top bar shows "Running" (green).

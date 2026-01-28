@@ -45,7 +45,7 @@ Common issues and their resolutions.
 *   **Previous instance**: If Burp crashed, a previous MCP server may still be bound to the port. The extension will attempt to shut it down automatically.
 
 ### Claude Desktop won't connect
-*   **Token**: Ensure you have copied the correct Token into your Claude Desktop config file.
+*   **Token**: If **External Access** is enabled, ensure your client sends `Authorization: Bearer <token>`. Localhost access does not require a token.
 *   **Config path**: Verify the config file location:
     *   macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
     *   Windows: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -69,7 +69,7 @@ Common issues and their resolutions.
 ### Active scanner not scanning
 *   **Enable toggle**: Ensure the Active toggle is ON in the top bar.
 *   **Queue empty**: Requests must be queued via context menu or auto-queue from passive.
-*   **Deduplication**: The scanner skips URLs scanned within the last hour.
+*   **Deduplication**: The scanner skips targets scanned within the last hour.
 *   **Scope Only**: If enabled, only in-scope targets are scanned.
 
 ### AI is too slow

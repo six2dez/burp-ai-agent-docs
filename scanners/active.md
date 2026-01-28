@@ -15,7 +15,7 @@ The Active AI Scanner performs **dynamic, targeted tests** against the applicati
 2.  **Injection points** are automatically extracted from the request (URL params, body params, headers, cookies, JSON fields, XML elements, path segments).
 3.  For each injection point, the AI selects appropriate payloads based on the vulnerability class, risk level, and scan mode.
 4.  Payloads are sent and responses are analyzed using multiple detection methods.
-5.  Confirmed findings are reported as Burp issues with an `[AI]` prefix.
+5.  Confirmed findings are reported as Burp issues with an `[AI Active]` prefix.
 
 ## Risk Levels
 
@@ -37,7 +37,7 @@ The scan mode determines which vulnerability classes are tested. Choose based on
 | :--- | :--- | :--- |
 | **BUG_BOUNTY** | Curated subset of high-impact vulnerability classes. Minimizes noise and focuses on reportable findings. | Bug bounty programs, time-limited assessments. |
 | **PENTEST** | More exhaustive testing. Includes information disclosure and lower-severity checks. | Professional penetration tests, compliance audits. |
-| **FULL** | All 56+ vulnerability classes are tested. Maximum coverage. | Comprehensive security assessments, internal applications. |
+| **FULL** | All 62 vulnerability classes are tested. Maximum coverage. | Comprehensive security assessments, internal applications. |
 
 ## Configuration
 
@@ -52,9 +52,9 @@ The scan mode determines which vulnerability classes are tested. Choose based on
 
 ## Vulnerability Classes
 
-The Active Scanner tests for **56 vulnerability classes** organized by category.
+The Active Scanner tests for **62 vulnerability classes** organized by category.
 
-### Injection (16 classes)
+### Injection (17 classes)
 
 | Class | Description |
 | :--- | :--- |
@@ -74,6 +74,7 @@ The Active Scanner tests for **56 vulnerability classes** organized by category.
 | `RFI` | Remote File Inclusion |
 | `PATH_TRAVERSAL` | Path Traversal / Directory Traversal |
 | `HOST_HEADER_INJECTION` | Host Header Injection |
+| `EMAIL_HEADER_INJECTION` | Email Header Injection |
 
 ### Access Control (9 classes)
 
@@ -160,12 +161,20 @@ The Active Scanner tests for **56 vulnerability classes** organized by category.
 | `S3_MISCONFIGURATION` | S3 Bucket Misconfiguration (passive-only) |
 | `SUBDOMAIN_TAKEOVER` | Subdomain Takeover (passive-only) |
 
-### Other (2 classes)
+### API Security (1 class)
+
+| Class | Description |
+| :--- | :--- |
+| `API_VERSION_BYPASS` | Deprecated/legacy API version access |
+
+### Other (4 classes)
 
 | Class | Description |
 | :--- | :--- |
 | `OPEN_REDIRECT` | Open Redirect |
-| `HEADER_INJECTION` | Header Injection / CRLF Injection |
+| `HEADER_INJECTION` | Header Injection |
+| `CRLF_INJECTION` | CRLF Injection |
+| `RACE_CONDITION` | Race Condition |
 
 > **Note**: Classes marked **(passive-only)** are detected through response analysis and cannot be actively tested with payloads.
 
@@ -216,6 +225,6 @@ On Burp Suite Professional, the Active AI Scanner integrates with the native sca
 1.  **Start Passive**: Let the Passive Scanner find interesting endpoints first.
 2.  **Verify First**: Use `SAFE` mode to confirm potential injection points without risk.
 3.  **Escalate Carefully**: Move to `MODERATE` only for confirmed injection points on authorized targets.
-4.  **Human in the Loop**: Use the `[AI]` findings as leads. Always verify them manually using Repeater before reporting.
+4.  **Human in the Loop**: Use the `[AI Active]` findings as leads. Always verify them manually using Repeater before reporting.
 5.  **Monitor Rate Limits**: If the target has WAF or rate limiting, increase the **Request Delay** and reduce **Max Concurrent Scans**.
 6.  **Use Scope**: Always enable **Scope Only** to prevent accidental scanning of third-party assets.

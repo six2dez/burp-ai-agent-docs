@@ -20,8 +20,16 @@ The `issue_create` MCP tool allows AI agents to programmatically create Burp aud
 | `detail` | String | Yes | Full description with evidence, steps, and technical details. |
 | `severity` | String | Yes | One of: `INFORMATION`, `LOW`, `MEDIUM`, `HIGH`. |
 | `confidence` | String | Yes | One of: `CERTAIN`, `FIRM`, `TENTATIVE`. |
-| `url` | String | Yes | The URL where the issue was found. |
+| `baseUrl` | String | Yes | The URL where the issue was found. |
 | `remediation` | String | No | Recommended fix for the vulnerability. |
+| `background` | String | No | Background information for the issue. |
+| `remediationBackground` | String | No | Background information for remediation. |
+| `typicalSeverity` | String | No | Typical severity (defaults to `severity`). |
+| `httpRequest` | String | No | Raw HTTP request to attach to the issue. |
+| `httpResponseContent` | String | No | Raw HTTP response to attach to the issue. |
+| `targetHostname` | String | No | Hostname for the attached request. |
+| `targetPort` | Int | No | Port for the attached request (default 443). |
+| `usesHttps` | Boolean | No | Whether the attached request uses HTTPS (default true). |
 
 ## Best Practices
 
@@ -48,7 +56,7 @@ An MCP client (like Claude Desktop) might call the tool like this:
   "detail": "The user_id parameter in GET /api/users is vulnerable to error-based SQL injection. Payload: user_id=1' OR '1'='1 produced a MySQL syntax error in the response body: 'You have an error in your SQL syntax near...' This indicates unsanitized user input is being interpolated directly into SQL queries.",
   "severity": "HIGH",
   "confidence": "FIRM",
-  "url": "https://example.com/api/users?user_id=1",
+  "baseUrl": "https://example.com/api/users?user_id=1",
   "remediation": "Use parameterized queries (prepared statements) instead of string concatenation for SQL queries. Apply input validation to reject non-numeric values for user_id."
 }
 ```

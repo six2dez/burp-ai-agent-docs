@@ -6,8 +6,8 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 
 *   **Pluggable Backends**: Use local models (Ollama, LM Studio) or cloud providers (Gemini, Claude, OpenAI/Codex, OpenCode). Add custom backends via drop-in JARs.
 *   **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) to scrub sensitive data *before* it leaves Burp.
-*   **MCP Server**: A full Model Context Protocol (MCP) server with 49+ tools that allows external AI agents (like Claude Desktop) to interact with Burp — browsing history, sending requests, scanning, and creating issues autonomously.
-*   **AI Scanners**: Passive and Active scanners that autonomously analyze traffic and flag vulnerabilities across 56+ vulnerability classes.
+*   **MCP Server**: A full Model Context Protocol (MCP) server with 53+ tools that allows external AI agents (like Claude Desktop) to interact with Burp — browsing history, sending requests, scanning, and creating issues autonomously.
+*   **AI Scanners**: Passive and Active scanners that autonomously analyze traffic and flag vulnerabilities across 62 vulnerability classes.
 *   **Audit Logging**: JSONL-based logging with SHA-256 integrity hashing for compliance and reproducibility.
 
 ## Key Features
@@ -15,8 +15,8 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 | Feature | Description |
 | :--- | :--- |
 | **6 Built-in Backends** | Ollama, LM Studio, Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI. |
-| **49+ MCP Tools** | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more. |
-| **56+ Vulnerability Classes** | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues. |
+| **53+ MCP Tools** | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more. |
+| **62 Vulnerability Classes** | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues. |
 | **3 Scan Modes** | BUG_BOUNTY, PENTEST, and FULL for different engagement types. |
 | **3 Privacy Modes** | STRICT (zero trust), BALANCED (pragmatic), OFF (raw data). |
 | **9 Prompt Templates** | Customizable templates for all context menu actions. |

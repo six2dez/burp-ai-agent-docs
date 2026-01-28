@@ -4,27 +4,25 @@ Audit logs provide a **tamper-evident, reproducible record** of every interactio
 
 ## What is Logged?
 
-Each interaction is recorded as a JSON object containing:
-*   **Timestamp**: Precise time of the request/response.
-*   **Prompt Bundle**: The exact text sent to the AI (after redaction).
-*   **Context Hashes**: SHA-256 hashes of the attached requests/responses to ensure the data hasn't been modified.
-*   **Backend Metadata**: Backend ID (e.g., `gemini-cli`), model name, and temperature settings.
-*   **Transcript**: The AI's response and any tool calls made.
+Each event is recorded as a JSON object containing:
+*   **Timestamp**: Precise time of the event.
+*   **Event Type**: `prompt`, `agent_chunk`, `prompt_complete`, or scanner/audit events.
+*   **Prompt Bundle**: The exact text sent to the AI (after redaction), plus hashes.
+*   **Backend Metadata**: Backend ID, model settings, and determinism state.
+*   **Response Chunks**: Streaming output captured as `agent_chunk` events.
 
 ## Log Format: JSONL
 Logs are stored in **JSON Lines (.jsonl)** format. Each line is a standalone JSON object, making it easy to parse with tools like `jq` or import into a SIEM.
 
 ## Security & Integrity
-To ensure logs haven't been tampered with:
-*   The extension can generate a **Digest** of the log file.
-*   When "Determinism Mode" is enabled, you can re-run a session and verify that the prompt hashes match the audit log exactly.
+To make logs tamper-evident:
+*   Each event includes a SHA-256 hash of the payload.
+*   When "Determinism Mode" is enabled, prompt bundles are stable for identical inputs, allowing hash comparison across runs.
 
 ## How to Enable
 
 1.  Navigate to **Settings** → **Privacy & Logging**.
 2.  Toggle **Audit Logging** to **ON**.
-
-![Screenshot: Audit logging toggle](../assets/screenshots/audit-logging.png)
 
 ## File Locations
 

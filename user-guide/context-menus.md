@@ -45,7 +45,7 @@ When you right-click on a scanner issue, these actions are available:
 3.  Context is passed through the [redaction pipeline](../privacy/privacy-modes.md) based on your privacy mode.
 4.  The corresponding [prompt template](prompt-templates.md) is combined with the redacted context.
 5.  The prompt is sent to the active AI backend.
-6.  The AI response streams into a new chat session in the Burp AI Agent tab.
+6.  The AI response streams into a new chat session in the AI Agent tab.
 
 ## Multiple Selections
 

@@ -12,7 +12,7 @@ With **Claude Desktop** (or another MCP client) connected to the Burp AI Agent's
 
 > **You**: "Claude, check the proxy history for any requests to the `/api/login` endpoint."
 >
-> **Claude**: *Calls `proxy_history_regex` tool on Burp...* "I found 3 requests. Here they are..."
+> **Claude**: *Calls `proxy_http_history_regex` tool on Burp...* "I found 3 requests. Here they are..."
 >
 > **You**: "Analyze the second one for SQL injection. You can send test requests."
 >
@@ -43,7 +43,7 @@ This method uses the `@modelcontextprotocol/server-sse` bridge to connect over H
       "args": [
         "-y",
         "@modelcontextprotocol/server-sse",
-        "http://127.0.0.1:9876/sse?token=YOUR_TOKEN_HERE"
+        "http://127.0.0.1:9876/sse"
       ]
     }
   }
@@ -52,7 +52,7 @@ This method uses the `@modelcontextprotocol/server-sse` bridge to connect over H
 
 > **Prerequisite**: This requires **Node.js** (v18+) and **npx** to be installed and available in your PATH. Install Node.js from [nodejs.org](https://nodejs.org/) or via your package manager.
 
-> **Note**: Replace `9876` with your configured port and copy the Token from the extension settings (**Settings → MCP Server → Token**).
+> **Note**: Replace `9876` with your configured port. If you enable **External Access**, your MCP client must send `Authorization: Bearer <token>` on every request.
 
 ### STDIO Transport (Alternative)
 
@@ -63,7 +63,7 @@ If you prefer not to use npx, enable the **STDIO Bridge** in **Settings → MCP 
 Any MCP-compatible client can connect to the Burp AI Agent. The server supports two transports:
 
 ### SSE Transport (Default)
-The primary transport uses Server-Sent Events over HTTP. Connect to `http://127.0.0.1:9876/sse?token=YOUR_TOKEN`.
+The primary transport uses Server-Sent Events over HTTP. Connect to `http://127.0.0.1:9876/sse`.
 
 ### STDIO Transport
 An alternative transport that uses standard input/output. Enable it in **Settings → MCP Server → STDIO Bridge**. This is useful for clients that prefer process-based communication instead of HTTP.
@@ -72,7 +72,7 @@ An alternative transport that uses standard input/output. Enable it in **Setting
 
 *   **SSE Server**: Runs a local Server-Sent Events server (default port `9876`) for clients to connect to.
 *   **STDIO Bridge**: Optional stdin/stdout transport for process-based MCP clients.
-*   **Tool Catalog**: 49+ tools exposing Burp functionality across 11 categories (History, Repeater, Scanner, Intruder, Scope, Site Map, Utilities, and more).
+*   **Tool Catalog**: 53+ tools exposing Burp functionality across 11 categories (History, Repeater, Scanner, Intruder, Scope, Site Map, Utilities, and more).
 *   **Safety Gating**: "Unsafe" tools (those that send traffic or modify state) are disabled by default and must be explicitly enabled in settings.
 *   **Request Limiting**: Configurable concurrency control (default: 4 concurrent requests, range: 1-64) to prevent overwhelming Burp.
 *   **Max Body Bytes**: Configurable limit on response body size returned by MCP tools.

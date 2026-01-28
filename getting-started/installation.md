@@ -11,7 +11,7 @@ Before installing, ensure you have the following:
 ## Option A: Download from GitHub Releases
 
 1.  Go to the [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases) page.
-2.  Download the latest `Burp-AI-Agent-x.x.x.jar` file.
+2.  Download the latest `Burp-AI-Agent-<version>.jar` file.
 
 ## Option B: Build from Source
 
@@ -29,7 +29,7 @@ If you prefer to build from source or want the latest development version:
     ```
 4.  The output JAR will be at:
     ```
-    build/libs/Burp-AI-Agent-0.1.0.jar
+    build/libs/Burp-AI-Agent-<version>.jar
     ```
 
 > **Note**: The Shadow plugin produces a fat JAR that bundles all dependencies. The Burp Montoya API is `compileOnly` and provided by Burp at runtime.
@@ -51,9 +51,9 @@ If you prefer to build from source or want the latest development version:
 
 Once loaded, you should see the following:
 *   **Output tab**: The extension should load without errors. You might see a "Extensions loaded" message.
-*   **Top-level Tab**: A new tab named **Burp AI Agent** will appear in the main Burp navigation bar.
+*   **Top-level Tab**: A new tab named **AI Agent** will appear in the main Burp navigation bar.
 
-![Screenshot: Burp AI Agent tab](../assets/screenshots/burp-ai-agent-tab.png)
+![Screenshot: AI Agent tab](../assets/screenshots/burp-ai-agent-tab.png)
 
 ## The `~/.burp-ai-agent/` Directory
 
