@@ -10,6 +10,8 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 *   **AI Scanners**: Passive and Active scanners that autonomously analyze traffic and flag vulnerabilities across 62 vulnerability classes.
 *   **Audit Logging**: JSONL-based logging with SHA-256 integrity hashing for compliance and reproducibility.
 
+![](assets/screenshots/main-tab.png)
+
 ## Key Features
 
 | Feature | Description |
