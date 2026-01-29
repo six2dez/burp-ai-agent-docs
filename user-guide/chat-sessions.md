@@ -10,12 +10,14 @@ Each chat session is an independent conversation with the AI. Sessions store:
 * **Creation time**: Timestamp for reference.
 * **Backend**: The AI backend that was active when the session was created.
 
+Session context is preserved per session. Follow-up prompts in the same session reuse the conversation history so the AI can keep track of previous responses and decisions.
+
 ### Parallel Sessions
 
 You can have multiple sessions open simultaneously, each using a different backend. For example:
 
 * Session 1: Claude analyzing a complex authentication flow.
-* Session 2: Ollama (local) doing quick recon on API endpoints.
+* Session 2: Ollama (local) analyzing API endpoints.
 
 Switch between sessions using the session list in the left sidebar.
 
@@ -60,6 +62,6 @@ The **Tools** button opens a menu of available MCP tools. Selecting a tool inser
 
 * **Be specific**: "Check this request for IDOR in the `user_id` parameter" is better than "find bugs."
 * **Use context menu shortcuts**: The pre-built actions have optimized prompts that produce better results than freeform questions.
-* **Iterate**: If the first response isn't detailed enough, ask follow-up questions in the same session — the AI has the full conversation context.
+* **Iterate**: If the first response isn't detailed enough, ask follow-up questions in the same session — the AI keeps the conversation context per session.
 * **Compare backends**: Try the same analysis with different backends to see which gives better results for your specific use case.
 * **Use passive scanner for volume**: For large-scope assessments, let the passive scanner work in the background and use chat for deep-dive analysis on specific findings.

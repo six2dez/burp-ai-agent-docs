@@ -82,6 +82,11 @@ Findings are automatically promoted to Burp issues when:
 * Severity meets or exceeds the configured minimum.
 * Issues are prefixed with `[AI Passive]` for easy identification in the Issues panel.
 
+Additional behaviors:
+* Issue details are sanitized to plain text (Markdown formatting removed).
+* If the title can be mapped to a known vulnerability class, the issue name is normalized to `[AI Passive] <VULN_CLASS>`.
+* Duplicate issues with the same name and base URL are consolidated (existing issue is kept).
+
 ## Status Tracking
 
 The scanner tracks operational metrics:

@@ -33,7 +33,7 @@ Use this checklist after installation to ensure everything is configured correct
 
 1. Browse to any website through Burp Proxy.
 2. Right-click a request in **Proxy → HTTP History**.
-3. Select **Extensions → Burp AI Agent → Quick recon**.
+3. Select **Extensions → Burp AI Agent → Analyze this request**.
 4. Verify that a chat session opens and the AI returns a response.
 
 If any step fails, check the [Troubleshooting](../reference/troubleshooting.md) guide.

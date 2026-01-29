@@ -60,7 +60,7 @@ The extension maps context menu actions to profile sections:
 | Context Menu Action | Profile Section |
 | :--- | :--- |
 | Find vulnerabilities | `[REQUEST_ANALYSIS]` |
-| Quick recon | `[REQUEST_TRIAGE]` |
+| Analyze this request | `[ANALYZE_REQUEST]` |
 | Explain JS | `[JS_ANALYSIS]` |
 | Access control | `[ACCESS_CONTROL]` |
 | Login sequence | `[LOGIN_SEQUENCE]` |

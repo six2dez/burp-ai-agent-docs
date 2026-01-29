@@ -79,7 +79,7 @@ The `McpSupervisor` manages the MCP server lifecycle separately from the AI back
 *   Direct HTTP API calls to a running server.
 *   No subprocess management needed.
 *   Optional auto-start if the server isn't running.
-*   Supported: Ollama, LM Studio.
+*   Supported: Ollama, LM Studio, Generic (OpenAI-compatible).
 
 ## Launch Modes
 

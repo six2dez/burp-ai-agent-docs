@@ -4,7 +4,7 @@
 
 Burp AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
 
-* **Pluggable Backends**: Use local models (Ollama, LM Studio) or cloud providers (Gemini, Claude, OpenAI/Codex, OpenCode). Add custom backends via drop-in JARs.
+* **Pluggable Backends**: Use local models (Ollama, LM Studio), generic OpenAI-compatible providers, or cloud providers (Gemini, Claude, OpenAI/Codex, OpenCode). Add custom backends via drop-in JARs.
 * **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) to scrub sensitive data _before_ it leaves Burp.
 * **MCP Server**: A full Model Context Protocol (MCP) server with 53+ tools that allows external AI agents (like Claude Desktop) to interact with Burp — browsing history, sending requests, scanning, and creating issues autonomously.
 * **AI Scanners**: Passive and Active scanners that autonomously analyze traffic and flag vulnerabilities across 62 vulnerability classes.
@@ -16,7 +16,7 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 
 | Feature                      | Description                                                                               |
 | ---------------------------- | ----------------------------------------------------------------------------------------- |
-| **6 Built-in Backends**      | Ollama, LM Studio, Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI.                       |
+| **7 Built-in Backends**      | Ollama, LM Studio, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI. |
 | **53+ MCP Tools**            | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more. |
 | **62 Vulnerability Classes** | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues.               |
 | **3 Scan Modes**             | BUG\_BOUNTY, PENTEST, and FULL for different engagement types.                            |

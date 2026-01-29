@@ -28,6 +28,12 @@ Request structured data:
 
 > _"Provide your findings in Markdown format with sections for Vulnerability Type, Evidence, Severity (CVSS), and Remediation."_
 
+### Language Control
+
+If you want consistent output language across teams, add:
+
+> _"Always answer in English."_
+
 ### Step-by-Step PoC
 
 For exploit generation, request structured steps:
@@ -47,7 +53,7 @@ These templates are used when you right-click on HTTP requests/responses:
 | Template                 | Used By                       | Purpose                                                                                           |
 | ------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------- |
 | **Find Vulnerabilities** | "Find vulnerabilities" action | Comprehensive security analysis covering injection, auth, info disclosure, and misconfigurations. |
-| **Quick Recon**          | "Quick recon" action          | Concise endpoint summary (5-7 bullets).                                                           |
+| **Analyze this request** | "Analyze this request" action | Concise endpoint summary (5-7 bullets).                                                           |
 | **Explain JS**           | "Explain JS" action           | JavaScript behavior analysis and security risk notes.                                             |
 | **Access Control**       | "Access control" action       | Authorization test plan for privilege escalation.                                                 |
 | **Login Sequence**       | "Login sequence" action       | Login flow extraction from traffic.                                                               |

@@ -34,6 +34,7 @@
 * [Overview](backends/overview.md)
 * [Ollama (Local)](backends/ollama.md)
 * [LM Studio (Local)](backends/lm-studio.md)
+* [Generic (OpenAI-compatible)](backends/openai-compatible.md)
 * [Gemini CLI](backends/gemini-cli.md)
 * [Claude CLI](backends/claude-cli.md)
 * [Codex CLI](backends/codex-cli.md)

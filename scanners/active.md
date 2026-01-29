@@ -16,7 +16,11 @@ The Active AI Scanner performs **dynamic, targeted tests** against the applicati
 2. **Injection points** are automatically extracted from the request (URL params, body params, headers, cookies, JSON fields, XML elements, path segments).
 3. For each injection point, the AI selects appropriate payloads based on the vulnerability class, risk level, and scan mode.
 4. Payloads are sent and responses are analyzed using multiple detection methods.
-5. Confirmed findings are reported as Burp issues with an `[AI Active]` prefix.
+5. Confirmed findings are reported as Burp issues with an `[AI Active]` prefix, normalized by vulnerability class (e.g., `[AI Active] SQLI`).
+
+## Targeted Tests (Context Menu)
+
+From the request context menu, **Targeted tests** lets you run focused active checks (SQLi, XSS, SSRF, IDOR, etc.) instead of scanning all classes. This uses the same active scanner pipeline and includes the same safety warnings.
 
 ## Risk Levels
 
@@ -50,6 +54,11 @@ The scan mode determines which vulnerability classes are tested. Choose based on
 * **Scope Only**: **CRITICAL**. Ensure this is checked to prevent scanning out-of-scope assets (e.g., Google Analytics, CDNs).
 * **Scan Mode**: Select `BUG_BOUNTY`, `PENTEST`, or `FULL`.
 * **Use Collaborator (OAST)**: Enable out-of-band checks. The scanner generates Burp Collaborator payloads and polls for DNS/HTTP interactions.
+
+## Issue Creation Behavior
+
+* Issue details are sanitized to plain text (Markdown formatting removed).
+* Issues are named by class (e.g., `[AI Active] SQLI`) and consolidated if an existing issue with the same name and base URL already exists.
 
 ## Vulnerability Classes
 

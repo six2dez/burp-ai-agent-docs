@@ -27,7 +27,7 @@ Common issues and their resolutions.
 *   **Immediate crash**: If the backend crashes immediately after launch, check the extension output tab for the exit code and error output.
 
 ### Empty or "I don't know" responses
-*   **Context Limit**: If you attached too many requests, the model might be overwhelmed. Try a "Quick Recon" instead of "Find Vulnerabilities".
+*   **Context Limit**: If you attached too many requests, the model might be overwhelmed. Try "Analyze this request" instead of "Find Vulnerabilities".
 *   **Ollama not running**: Ensure the Ollama server is running (`ollama serve`).
 *   **Model not downloaded**: For Ollama, verify the model is available (`ollama list`).
 *   **Wrong backend selected**: Check that the backend dropdown in the top bar matches your intended backend.
@@ -36,6 +36,10 @@ Common issues and their resolutions.
 *   **Auto-restart disabled**: If the backend crashed previously, auto-restart may have been suppressed. Try restarting manually.
 *   **Port conflict** (HTTP backends): Ensure the Ollama/LM Studio port is not used by another process.
 *   **Environment variables**: Ensure API keys are set in the environment where Burp Suite is running, not just in your terminal profile.
+*   **Windows long command line**: Some CLI backends can fail if the prompt/context is extremely large (OS command length limit). Use a smaller selection or switch to an HTTP backend.
+
+### Windows: OpenCode CLI not found
+*   If OpenCode was installed via npm, the launcher is `opencode` (without `.exe`). The extension normalizes `opencode.exe`, but a custom path should point to the actual launcher.
 
 ## MCP Issues
 

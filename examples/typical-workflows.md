@@ -32,7 +32,7 @@ Efficiently map and analyze a large application surface.
 Systematic testing of REST/GraphQL APIs.
 
 1.  Proxy API traffic through Burp.
-2.  Right-click API endpoints → **Quick recon** to understand each endpoint's purpose, parameters, and auth mechanism.
+2.  Right-click API endpoints → **Analyze this request** to understand each endpoint's purpose, parameters, and auth mechanism.
 3.  For authentication endpoints, use **Login sequence** to document the auth flow.
 4.  Test authorization with **Access control** to generate a test plan for IDOR/BOLA/BAC.
 5.  Enable the passive scanner with **Scope Only** to catch common API misconfigurations.

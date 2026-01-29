@@ -22,6 +22,8 @@ Connects directly to the LM Studio local server API.
 | **Preferred Backend** | `LM Studio` (select from dropdown)                                    |
 | **LM Studio URL**     | `http://127.0.0.1:1234` (default)                                     |
 | **LM Studio Model**   | The identifier of the model you loaded (check LM Studio's server log) |
+| **LM Studio API Key** | *(optional)* `Bearer` token                                           |
+| **LM Studio Headers** | *(optional)* Extra headers                                            |
 
 ### 2. Auto-Start Mode
 
@@ -45,6 +47,8 @@ When Auto-Start is enabled, the extension runs the server command automatically 
 | **Auto-Start**      | On                      | Automatically start the LM Studio server.                                                 |
 | **Server Command**  | `lms server start`      | Custom command to launch the server.                                                      |
 | **Timeout**         | 120 seconds             | Request timeout (range: 30–3600 seconds). Increase for larger models or complex analyses. |
+| **API Key**         | *(empty)*               | Optional `Authorization: Bearer` token for OpenAI-compatible servers.                     |
+| **Extra Headers**   | *(empty)*               | Extra headers, one per line (`Header: value`).                                            |
 
 ## Troubleshooting
 

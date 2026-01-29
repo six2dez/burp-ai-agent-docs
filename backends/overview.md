@@ -8,6 +8,7 @@ The Burp AI Agent is model-agnostic. It uses a "Supervisor" system to manage con
 | -------------- | ----- | ------- | ---------------------------------------------- |
 | **Ollama**     | Local | High    | Offline analysis, strict privacy requirements. |
 | **LM Studio**  | Local | High    | GUI-based model management, Windows users.     |
+| **Generic (OpenAI-compatible)** | HTTP | Medium | Any OpenAI-compatible provider (Z.AI, KILO, etc.). |
 | **Gemini CLI** | Cloud | Medium  | Large context window analysis.                 |
 | **Claude CLI** | Cloud | Medium  | Reasoning and logic analysis.                  |
 | **Codex CLI**  | Cloud | Medium  | Code analysis and PoC generation.              |
@@ -17,9 +18,9 @@ The Burp AI Agent is model-agnostic. It uses a "Supervisor" system to manage con
 
 1. Navigate to **Settings** → **AI Backend**.
 2. **Preferred Backend**: Choose the backend you want to use for _new_ chat sessions.
-3. **Command / URL**:
+3. **Command / URL / Headers**:
    * **CLI Backends**: Provide the shell command (e.g., `gemini`, `claude`). Ensure these tools are installed and authenticated in your OS terminal.
-   * **HTTP Backends**: Provide the URL (e.g., `http://127.0.0.1:11434` for Ollama).
+   * **HTTP Backends**: Provide the URL (e.g., `http://127.0.0.1:11434` for Ollama) plus optional API key and extra headers.
 
 ![Screenshot: Backend settings](../.gitbook/assets/backend-settings.png)
 
@@ -31,7 +32,7 @@ CLI backends (Gemini, Claude, Codex, OpenCode) are launched as subprocesses. The
 
 ### HTTP Backends
 
-HTTP backends (Ollama, LM Studio) communicate via direct HTTP API calls. No subprocess is spawned. The extension connects to an already-running server, or can optionally auto-start it.
+HTTP backends (Ollama, LM Studio, Generic OpenAI-compatible) communicate via direct HTTP API calls. No subprocess is spawned. The extension connects to an already-running server, or can optionally auto-start it (where supported).
 
 ## Custom Backends (Drop-in JARs)
 

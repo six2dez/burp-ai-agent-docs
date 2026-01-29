@@ -45,6 +45,7 @@ The `issue_create` MCP tool allows AI agents to programmatically create Burp aud
 *   **Evidence**: Include specific request/response excerpts, parameter names, and payload details.
 *   **Reproduction steps**: Number each step so a human can follow along.
 *   **Remediation**: Provide actionable fix recommendations, not generic advice.
+*   **Plain text**: Issue fields are sanitized to plain text (Markdown formatting removed) before they are stored in Burp.
 
 ## Example Usage
 

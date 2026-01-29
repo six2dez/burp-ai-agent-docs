@@ -33,7 +33,7 @@ Accessible via the gear icon or settings sub-tab. Organized into collapsible acc
 
 | Section                | What It Controls                                                                                               |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **AI Backend**         | Backend selection, CLI commands, HTTP URLs, model names, auto-start, timeouts.                                 |
+| **AI Backend**         | Backend selection, CLI commands, HTTP URLs, model names, API keys, extra headers, auto-start, timeouts.        |
 | **Privacy & Logging**  | Redaction mode (STRICT/BALANCED/OFF), determinism, host salt, audit logging toggle.                            |
 | **MCP Server**         | Host, port, TLS, external access, STDIO bridge, token, tool toggles, request limits.                           |
 | **Passive AI Scanner** | Rate limit, scope filtering, max size, min severity, findings view.                                            |
@@ -42,6 +42,9 @@ Accessible via the gear icon or settings sub-tab. Organized into collapsible acc
 | **Help**               | Quick links to documentation, MCP setup guide, and version info.                                               |
 
 ![Screenshot: Settings panel](../.gitbook/assets/settings-panel.png)
+
+**Open CLI buttons**: In the backend settings, CLI-based backends include an **Open CLI** button to launch a terminal with the configured command and MCP tools access.
+
 
 ## Privacy Pill
 

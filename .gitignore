@@ -1,0 +1,40 @@
+# Build output
+build/
+out/
+
+# Gradle
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Kotlin
+.kotlin/
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store
+
+# Claude / AI tools
+.claude/
+
+# Runtime data (user-specific, created at ~/.burp-ai-agent/)
+audit.jsonl
+
+# OS
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+AGENTS.md
+DECISIONS.md
+SPEC.md

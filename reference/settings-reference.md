@@ -6,20 +6,29 @@ This page documents every configurable setting in the extension, organized by se
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. Options: `ollama`, `lmstudio`, `gemini-cli`, `claude-cli`, `codex-cli`, `opencode-cli`. |
+| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. Options: `ollama`, `lmstudio`, `openai-compatible`, `gemini-cli`, `claude-cli`, `codex-cli`, `opencode-cli`. |
 | **Codex CLI Command** | Text | `codex chat` | Shell command to launch the Codex backend. |
 | **Gemini CLI Command** | Text | `gemini` | Shell command to launch the Gemini backend. |
 | **Claude CLI Command** | Text | `claude` | Shell command to launch the Claude backend. |
 | **OpenCode CLI Command** | Text | `opencode` | Shell command to launch the OpenCode backend. |
 | **Ollama URL** | Text | `http://127.0.0.1:11434` | Base URL for the Ollama HTTP API. |
 | **Ollama Model** | Text | `llama3.1` | Model name to use with Ollama. |
+| **Ollama API Key** | Text | *(empty)* | Optional `Authorization: Bearer` token for Ollama-compatible servers. |
+| **Ollama Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
 | **Ollama Auto-Start** | Toggle | On | Automatically start `ollama serve` when backend is selected. |
 | **Ollama Serve Command** | Text | `ollama serve` | Custom command to start the Ollama server. |
 | **LM Studio URL** | Text | `http://127.0.0.1:1234` | Base URL for the LM Studio HTTP API. |
 | **LM Studio Model** | Text | `lmstudio` | Model identifier for LM Studio. |
+| **LM Studio API Key** | Text | *(empty)* | Optional `Authorization: Bearer` token for OpenAI-compatible servers. |
+| **LM Studio Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
 | **LM Studio Auto-Start** | Toggle | On | Automatically start LM Studio server. |
 | **LM Studio Server Command** | Text | `lms server start` | Custom command to launch LM Studio server. |
 | **LM Studio Timeout** | Number | `120` | Timeout in seconds for LM Studio requests (range: 30–3600). |
+| **OpenAI-Compatible URL** | Text | *(empty)* | Base URL for an OpenAI-compatible provider. |
+| **OpenAI-Compatible Model** | Text | *(empty)* | Model identifier sent in requests. |
+| **OpenAI-Compatible API Key** | Text | *(empty)* | Optional `Authorization: Bearer` token. |
+| **OpenAI-Compatible Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
+| **OpenAI-Compatible Timeout** | Number | `120` | Timeout in seconds for OpenAI-compatible requests (range: 30–3600). |
 | **Auto-Restart** | Toggle | On | Automatically restart a crashed CLI backend. |
 | **Agent Profile** | Dropdown | `pentester` | System instruction profile. Options: `pentester`, `bughunter`, `auditor`. See [Agent Profiles](../user-guide/agent-profiles.md). |
 
@@ -81,7 +90,7 @@ This page documents every configurable setting in the extension, organized by se
 | Setting | Type | Description |
 | :--- | :--- | :--- |
 | **Find Vulnerabilities** | Text area | Default prompt for the "Find vulnerabilities" context menu action. |
-| **Quick Recon** | Text area | Default prompt for endpoint reconnaissance. |
+| **Analyze this request** | Text area | Default prompt for endpoint summary. |
 | **Explain JS** | Text area | Default prompt for JavaScript behavior analysis. |
 | **Access Control** | Text area | Default prompt for authorization test plan generation. |
 | **Login Sequence** | Text area | Default prompt for login flow extraction. |

@@ -15,15 +15,27 @@ When you right-click on an HTTP request/response, these actions are available un
 
 | Action                   | Description                                                                                                                                        |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AI Passive Scan**      | Queues the selected request(s) for passive AI analysis in the background.                                                                          |
+| **AI Active Scan**       | Queues the selected request(s) for active vulnerability testing. **Sends traffic to the target.**                                                  |
+| **Targeted tests**       | Submenu to run focused active checks (SQLi, XSS, SSRF, IDOR, etc.). **Sends traffic to the target.**                                               |
 | **Find vulnerabilities** | Comprehensive security analysis: checks for SQLi, XSS, CMDI, SSTI, SSRF, IDOR, BOLA, BAC, information disclosure, header/cookie misconfigurations. |
-| **Quick recon**          | Compact 5-7 bullet summary: HTTP method, path, auth mechanism, parameters, response type, security observations.                                   |
+| **Analyze this request** | Compact 5-7 bullet summary: HTTP method, path, auth mechanism, parameters, response type, security observations.                                   |
 | **Explain JS**           | Analyzes JavaScript behavior, summarizes functionality, and highlights security risks.                                                             |
 | **Access control**       | Generates a test plan for horizontal/vertical privilege escalation, authorization bypass, and missing access controls.                             |
 | **Login sequence**       | Drafts a login flow from the observed traffic, identifying parameters to capture and replay.                                                       |
-| **AI Passive Scan**      | Queues the selected request(s) for passive AI analysis in the background.                                                                          |
-| **AI Active Scan**       | Queues the selected request(s) for active vulnerability testing. **Sends traffic to the target.**                                                  |
 
 ![Screenshot: Request menu](../.gitbook/assets/context-menu-request.png)
+
+**Targeted tests submenu (examples):**
+* SQLi
+* XSS (Reflected/Stored/DOM)
+* SSRF
+* IDOR / BOLA
+* Path Traversal / LFI
+* Command Injection
+* SSTI
+* XXE
+* Open Redirect
 
 ## Issue Actions (Burp Pro)
 

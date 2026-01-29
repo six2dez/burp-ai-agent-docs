@@ -26,8 +26,12 @@ Connects directly to the Ollama HTTP API. This is faster and more reliable.
 | **Preferred Backend** | `Ollama` (select from dropdown)       |
 | **Ollama URL**        | `http://127.0.0.1:11434` (default)    |
 | **Ollama Model**      | `qwen2.5:14b-instruct` (or any model) |
+| **Ollama API Key**    | *(optional)* `Bearer` token           |
+| **Ollama Headers**    | *(optional)* Extra headers            |
 
 Optional: enable **Ollama Auto-Start** and set **Ollama Serve Command** to `ollama serve` so the extension starts the server automatically.
+
+If your Ollama-compatible server requires authentication, set **Ollama API Key** and/or add **Ollama Headers** (one per line: `Header: value`).
 
 > **Note**: The **Ollama CLI Command** field is used to detect the default model (e.g., from `ollama run qwen2.5:14b-instruct`) and for launch validation. The active backend communicates with the Ollama HTTP API.
 
