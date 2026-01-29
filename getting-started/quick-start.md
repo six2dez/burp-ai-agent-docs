@@ -11,15 +11,11 @@ The Model Context Protocol (MCP) server allows the plugin to expose tools.
 
 ![Screenshot: Top bar toggles](../.gitbook/assets/top-bar-toggles.png)
 
-## 2. Install Agent Profiles (Recommended)
+## 2. Agent Profiles (Recommended)
 
-Copy the sample profiles from the repository to your home directory:
+On first run, the extension auto-installs the bundled profiles into `~/.burp-ai-agent/AGENTS/`. This enables role-specific AI instructions (pentester, bughunter, auditor).
 
-```bash
-cp -r AGENTS/ ~/.burp-ai-agent/AGENTS/
-```
-
-This enables role-specific AI instructions (pentester, bughunter, auditor). Without this step the extension works fine, but the AI won't have system instructions tailored to your engagement type.
+To add a custom profile, drop a `*.md` file in `~/.burp-ai-agent/AGENTS/` and click **Refresh** next to the **Agent profile** dropdown in **Settings**.
 
 ## 3. Configure Your AI Backend
 

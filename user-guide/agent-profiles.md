@@ -4,17 +4,13 @@ Agent Profiles allow you to customize the AI's system instructions based on your
 
 ## Installation
 
-The extension creates the `~/.burp-ai-agent/AGENTS/` directory automatically, but the profile files themselves are **not** auto-generated. Copy them from the repository:
+On first run, the extension creates `~/.burp-ai-agent/AGENTS/` and auto-installs the bundled profiles. You should see three built-in profiles: `pentester.md`, `bughunter.md`, and `auditor.md`.
 
-```bash
-cp -r AGENTS/ ~/.burp-ai-agent/AGENTS/
-```
-
-This copies three built-in profiles: `pentester.md`, `bughunter.md`, and `auditor.md`. Without these files, the agent profile feature silently does nothing — no error is shown, but no system instructions are injected.
+If you delete them, simply re-run Burp or drop the files back into the directory.
 
 ## How It Works
 
-1. You select a profile from the **Agent profile** dropdown in **Settings** (options: `pentester`, `bughunter`, `auditor`).
+1. The **Agent profile** dropdown lists all `*.md` files in `~/.burp-ai-agent/AGENTS/` (use **Refresh** to reload).
 2. The extension writes the active profile name to `~/.burp-ai-agent/AGENTS/default`.
 3. When a chat session or context menu action runs, the extension loads the corresponding `.md` file and prepends its instructions to the AI prompt.
 
@@ -87,9 +83,9 @@ The extension UI offers three profile presets:
 1. Navigate to `~/.burp-ai-agent/AGENTS/`.
 2. Create a new Markdown file (e.g., `apitester.md`).
 3. Write your global instructions and any `[SECTION]` blocks you need.
-4. In the extension settings, the dropdown shows the three built-in names. To use a custom profile, either:
-   * Name your file to match one of the existing names (e.g., overwrite `pentester.md`).
-   * Or manually edit the `~/.burp-ai-agent/AGENTS/default` file to contain your custom filename (e.g., `apitester.md`).
+4. Open **Settings** and click **Refresh** next to the **Agent profile** dropdown. Your new profile will appear automatically.
+
+If you prefer automation, you can also edit `~/.burp-ai-agent/AGENTS/default` directly to set the active profile name (e.g., `apitester.md`).
 
 ## File Caching
 

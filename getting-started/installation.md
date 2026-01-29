@@ -71,20 +71,16 @@ On first launch, the extension automatically creates a directory at `~/.burp-ai-
 ├── backends/            # Drop-in backend JAR files (custom backends via ServiceLoader)
 ├── certs/               # Auto-generated TLS certificates for MCP server
 │   └── mcp-keystore.p12
-└── AGENTS/              # Agent profile Markdown files (you must copy these)
+└── AGENTS/              # Agent profile Markdown files (auto-installed)
     ├── default          # Text file containing the active profile name
     ├── pentester.md     # Pentester profile (default)
     ├── bughunter.md     # Bug bounty profile
     └── auditor.md       # Compliance auditor profile
 ```
 
-The extension creates all subdirectories automatically on startup. However, **agent profile files are NOT auto-generated** — you must copy them manually from the repository:
+The extension creates all subdirectories automatically on startup and auto-installs the bundled agent profiles. This gives you three ready-to-use profiles: `pentester`, `bughunter`, and `auditor`.
 
-```bash
-cp -r AGENTS/ ~/.burp-ai-agent/AGENTS/
-```
-
-This gives you three ready-to-use profiles: `pentester`, `bughunter`, and `auditor`. You can also create your own (see [Agent Profiles](../user-guide/agent-profiles.md)).
+To add your own, drop additional `*.md` files in `~/.burp-ai-agent/AGENTS/` (see [Agent Profiles](../user-guide/agent-profiles.md)).
 
 You may also want to place custom backend JARs in `backends/` (see [Adding a Backend](../developer/adding-backend.md)).
 

@@ -30,7 +30,7 @@ This page documents every configurable setting in the extension, organized by se
 | **OpenAI-Compatible Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
 | **OpenAI-Compatible Timeout** | Number | `120` | Timeout in seconds for OpenAI-compatible requests (range: 30–3600). |
 | **Auto-Restart** | Toggle | On | Automatically restart a crashed CLI backend. |
-| **Agent Profile** | Dropdown | `pentester` | System instruction profile. Options: `pentester`, `bughunter`, `auditor`. See [Agent Profiles](../user-guide/agent-profiles.md). |
+| **Agent Profile** | Dropdown | `pentester` | System instruction profile. Options are loaded from `~/.burp-ai-agent/AGENTS/*.md` (use **Refresh** to reload). See [Agent Profiles](../user-guide/agent-profiles.md). |
 
 ## Privacy & Logging
 
