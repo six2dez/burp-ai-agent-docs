@@ -1,5 +1,7 @@
 # Overview
 
+{% embed url="https://github.com/six2dez/burp-ai-agent" %}
+
 **The bridge between Burp Suite and modern AI.**
 
 Burp AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
@@ -14,15 +16,15 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 
 ## Key Features
 
-| Feature                      | Description                                                                               |
-| ---------------------------- | ----------------------------------------------------------------------------------------- |
+| Feature                      | Description                                                                                    |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- |
 | **7 Built-in Backends**      | Ollama, LM Studio, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI. |
-| **53+ MCP Tools**            | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more. |
-| **62 Vulnerability Classes** | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues.               |
-| **3 Scan Modes**             | BUG\_BOUNTY, PENTEST, and FULL for different engagement types.                            |
-| **3 Privacy Modes**          | STRICT (zero trust), BALANCED (pragmatic), OFF (raw data).                                |
-| **9 Prompt Templates**       | Customizable templates for all context menu actions.                                      |
-| **Burp Pro Integration**     | Native ScanCheck, Collaborator OAST, scanner issue actions.                               |
+| **53+ MCP Tools**            | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more.      |
+| **62 Vulnerability Classes** | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues.                    |
+| **3 Scan Modes**             | BUG\_BOUNTY, PENTEST, and FULL for different engagement types.                                 |
+| **3 Privacy Modes**          | STRICT (zero trust), BALANCED (pragmatic), OFF (raw data).                                     |
+| **9 Prompt Templates**       | Customizable templates for all context menu actions.                                           |
+| **Burp Pro Integration**     | Native ScanCheck, Collaborator OAST, scanner issue actions.                                    |
 
 ## Why use this?
 
