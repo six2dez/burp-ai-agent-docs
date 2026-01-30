@@ -20,17 +20,18 @@ Google's Gemini CLI provides access to the Gemini family of models, which suppor
 | Setting                | Value                                                      |
 | ---------------------- | ---------------------------------------------------------- |
 | **Preferred Backend**  | `Gemini CLI` (select from dropdown)                        |
-| **Gemini CLI Command** | `gemini` (or the full path, e.g., `/usr/local/bin/gemini`) |
+| **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash` |
 
 To specify a model, include the flag in the command field:
 
 | Setting                | Value                             |
 | ---------------------- | --------------------------------- |
-| **Gemini CLI Command** | `gemini --model gemini-2.0-flash` |
+| **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash` |
 
 ## Troubleshooting
 
 * **"command not found"**: Ensure `gemini` is installed and in your system PATH. Try using the full path to the binary.
 * **Windows (npm install + PATH issues)**: If Burp cannot find `gemini`, set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`. Burp may not inherit your shell PATH.
 * **Authentication errors**: Run `gemini auth login` in your terminal and follow the OAuth flow.
+* **Model errors**: If you see `ModelNotFoundError` or `RESOURCE_EXHAUSTED`, choose an available model from `gemini` → **Manual** and set it with `--model`.
 * **Rate limiting**: The free tier has rate limits. Consider upgrading to a paid tier for heavy scanning use.
