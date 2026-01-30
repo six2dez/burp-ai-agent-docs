@@ -31,5 +31,6 @@ To specify a model, include the flag in the command field:
 ## Troubleshooting
 
 * **"command not found"**: Ensure `gemini` is installed and in your system PATH. Try using the full path to the binary.
+* **Windows (npm install + PATH issues)**: If Burp cannot find `gemini`, set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`. Burp may not inherit your shell PATH.
 * **Authentication errors**: Run `gemini auth login` in your terminal and follow the OAuth flow.
 * **Rate limiting**: The free tier has rate limits. Consider upgrading to a paid tier for heavy scanning use.

@@ -28,6 +28,8 @@ You need to tell the extension which AI model to use.
 3. Type the CLI command or URL in the corresponding field. See the [Backends](../backends/overview.md) section for exact values per backend.
 
 > **Important**: If you use cloud backends (Gemini, Claude, Codex), make sure the CLI tool is installed, authenticated, and that any required environment variables (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc.) are set in the environment where Burp Suite is running — not just in your terminal profile. If you launch Burp from a GUI shortcut, those variables may not be inherited.
+>
+> If you run Burp on Windows but Codex in WSL, see **reference/troubleshooting.md** for the exact `.cmd` wrapper and configuration.
 
 ![Screenshot: Backend selection](../.gitbook/assets/backend-selection.png)
 

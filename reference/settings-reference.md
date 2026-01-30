@@ -7,10 +7,10 @@ This page documents every configurable setting in the extension, organized by se
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. Options: `ollama`, `lmstudio`, `openai-compatible`, `gemini-cli`, `claude-cli`, `codex-cli`, `opencode-cli`. |
-| **Codex CLI Command** | Text | `codex chat` | Shell command to launch the Codex backend. |
-| **Gemini CLI Command** | Text | `gemini` | Shell command to launch the Gemini backend. |
-| **Claude CLI Command** | Text | `claude` | Shell command to launch the Claude backend. |
-| **OpenCode CLI Command** | Text | `opencode` | Shell command to launch the OpenCode backend. |
+| **Codex CLI Command** | Text | `codex chat` | Shell command to launch the Codex backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`). |
+| **Gemini CLI Command** | Text | `gemini` | Shell command to launch the Gemini backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`). |
+| **Claude CLI Command** | Text | `claude` | Shell command to launch the Claude backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`). |
+| **OpenCode CLI Command** | Text | `opencode` | Shell command to launch the OpenCode backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\opencode.cmd`). |
 | **Ollama URL** | Text | `http://127.0.0.1:11434` | Base URL for the Ollama HTTP API. |
 | **Ollama Model** | Text | `llama3.1` | Model name to use with Ollama. |
 | **Ollama API Key** | Text | *(empty)* | Optional `Authorization: Bearer` token for Ollama-compatible servers. |
@@ -24,7 +24,7 @@ This page documents every configurable setting in the extension, organized by se
 | **LM Studio Auto-Start** | Toggle | On | Automatically start LM Studio server. |
 | **LM Studio Server Command** | Text | `lms server start` | Custom command to launch LM Studio server. |
 | **LM Studio Timeout** | Number | `120` | Timeout in seconds for LM Studio requests (range: 30–3600). |
-| **OpenAI-Compatible URL** | Text | *(empty)* | Base URL for an OpenAI-compatible provider. |
+| **OpenAI-Compatible URL** | Text | *(empty)* | Base URL for an OpenAI-compatible provider (include `/v1` or `/vN` if required). |
 | **OpenAI-Compatible Model** | Text | *(empty)* | Model identifier sent in requests. |
 | **OpenAI-Compatible API Key** | Text | *(empty)* | Optional `Authorization: Bearer` token. |
 | **OpenAI-Compatible Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |

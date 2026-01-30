@@ -34,5 +34,6 @@ To specify a model, include the flag in the command field:
 ## Troubleshooting
 
 *   **"command not found"**: Ensure `claude` is installed and in your system PATH.
+*   **Windows (npm install + PATH issues)**: If Burp cannot find `claude`, set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`. Burp may not inherit your shell PATH.
 *   **Authentication errors**: Verify your `ANTHROPIC_API_KEY` is set correctly, or re-authenticate with `claude login`.
 *   **Empty responses**: Check the Burp extension output tab for error details. The model name may be incorrect.

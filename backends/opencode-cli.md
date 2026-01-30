@@ -36,6 +36,7 @@ opencode --model google/gemini-1.5-pro
 ## Troubleshooting
 
 *   **"command not found"**: Ensure `opencode` is installed and in your system PATH.
+*   **Windows (npm install + PATH issues)**: If Burp cannot find `opencode`, set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\opencode.cmd`. Burp may not inherit your shell PATH.
 *   **Windows `.exe`**: If installed via npm, use `opencode` (without `.exe`). The extension normalizes bare `.exe` names to the correct launcher.
 *   **Provider errors**: Verify the API key for your chosen provider is configured correctly.
 *   **Model not available**: Check that the model identifier follows the `provider/model` format.

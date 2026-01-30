@@ -38,7 +38,33 @@ Common issues and their resolutions.
 *   **Environment variables**: Ensure API keys are set in the environment where Burp Suite is running, not just in your terminal profile.
 *   **Windows long command line**: Some CLI backends can fail if the prompt/context is extremely large (OS command length limit). Use a smaller selection or switch to an HTTP backend.
 
+### Windows + WSL: Codex CLI in WSL
+If Burp runs on Windows but you want Codex to run inside WSL on the same machine, point Burp to a Windows `.cmd` wrapper that forwards the args into WSL.
+
+1. Create a wrapper file, e.g. `D:\Docs\BugBounty\Burp\codex\codex.cmd`:
+
+    ```bat
+    @echo off
+    setlocal
+    wsl.exe -d Ubuntu -- script -q -c "bash -lc 'codex %*'" /dev/null 2>nul | findstr /V /R /C:"^OpenAI Codex v" /C:"^--------" /C:"^workdir:" /C:"^model:" /C:"^provider:" /C:"^approval:" /C:"^sandbox:" /C:"^reasoning" /C:"^session id:" /C:"^user$" /C:"^mcp startup:" /C:"^thinking$"
+    exit /b %ERRORLEVEL%
+    ```
+
+2. In Burp: **Burp AI Agent → Settings → AI Backend**
+
+| Setting               | Value                                                                 |
+| --------------------- | --------------------------------------------------------------------- |
+| **Preferred Backend** | `Codex CLI`                                                           |
+| **Codex CLI Command** | `D:\Docs\BugBounty\Burp\codex\codex.cmd chat`                          |
+
+Notes:
+
+* Replace `Ubuntu` with your WSL distro name.
+* Ensure Codex is installed and authenticated inside WSL.
+* Set `OPENAI_API_KEY` in the WSL environment (not only in Windows) if you use API-key auth.
+
 ### Windows: OpenCode CLI not found
+*   If OpenCode (or any npm-based CLI) was installed via npm, Burp may not inherit your shell PATH. Set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\opencode.cmd`.
 *   If OpenCode was installed via npm, the launcher is `opencode` (without `.exe`). The extension normalizes `opencode.exe`, but a custom path should point to the actual launcher.
 
 ## MCP Issues
