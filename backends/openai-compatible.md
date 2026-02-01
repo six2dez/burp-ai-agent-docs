@@ -6,7 +6,7 @@ Use this backend to connect to any provider that implements the OpenAI-compatibl
 
 1. Obtain the base URL from your provider.
 2. Identify the model name you want to use.
-3. Configure in Burp: **Burp AI Agent → Settings → AI Backend**:
+3. Configure in Burp: **Burp AI Agent → AI Backend tab in the bottom settings panel**:
 
 | Setting                     | Value                          |
 | -------------------------- | ------------------------------ |

@@ -18,7 +18,7 @@ OpenCode is an open-source CLI that supports multiple AI providers through a uni
     ```bash
     opencode "hello"
     ```
-4.  **Configure in Burp**: Open **Burp AI Agent → Settings → AI Backend** and set:
+4.  **Configure in Burp**: Open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
 
 | Setting | Value |
 | :--- | :--- |

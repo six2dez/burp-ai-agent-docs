@@ -1,6 +1,6 @@
 # Prompt Templates
 
-Prompt templates define the default text for each context menu action. They are the instructions sent to the AI along with the selected request/response or issue context. Edit them in **Settings → Prompt Templates**.
+Prompt templates define the default text for each context menu action. They are the instructions sent to the AI along with the selected request/response or issue context. Edit them in **Prompt Templates tab in the bottom settings panel**.
 
 ## Guide: Prompt Engineering for Pentesters
 
@@ -73,7 +73,7 @@ These templates are used when you right-click on scanner issues (Burp Pro):
 
 To customize a template:
 
-1. Navigate to **Settings → Prompt Templates**.
+1. Navigate to **Prompt Templates tab in the bottom settings panel**.
 2. Find the template you want to edit.
 3. Modify the text in the text area.
 4. Changes take effect immediately for new context menu actions.

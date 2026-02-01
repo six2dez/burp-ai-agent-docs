@@ -19,7 +19,7 @@ OpenAI's Codex CLI provides access to GPT-4o and other OpenAI models. It is the 
     ```bash
     codex "hello"
     ```
-4. **Configure in Burp**: Open **Burp AI Agent → Settings → AI Backend** and set:
+4. **Configure in Burp**: Open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
 
 | Setting               | Value                              |
 | --------------------- | ---------------------------------- |
@@ -45,7 +45,7 @@ If Burp runs on Windows but you want Codex to run inside WSL on the same machine
     exit /b %ERRORLEVEL%
     ```
 
-2. In Burp: **Burp AI Agent → Settings → AI Backend**
+2. In Burp: **Burp AI Agent → AI Backend tab in the bottom settings panel**
 
 | Setting               | Value                                                                 |
 | --------------------- | --------------------------------------------------------------------- |

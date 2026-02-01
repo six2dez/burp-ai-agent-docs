@@ -19,7 +19,7 @@ Connects directly to the Ollama HTTP API. This is faster and more reliable.
     ```bash
     ollama serve
     ```
-4. Configure in Burp: open **Burp AI Agent → Settings → AI Backend** and set:
+4. Configure in Burp: open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
 
 | Setting               | Value                                 |
 | --------------------- | ------------------------------------- |

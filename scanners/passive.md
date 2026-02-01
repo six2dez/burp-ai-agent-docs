@@ -14,7 +14,7 @@ The passive scanner analyzes proxy traffic in the background and can create issu
 
 | Setting           | Default   | Description                                                                                  |
 | ----------------- | --------- | -------------------------------------------------------------------------------------------- |
-| **Enabled**       | Off       | Toggle in the top bar or settings panel.                                                     |
+| **Enabled**       | Off       | Toggle in the top bar or the AI Passive Scanner tab in the bottom settings panel.                                                     |
 | **Rate Limit**    | 5 seconds | Minimum time between analysis requests (range: 1–60s). Prevents overwhelming the AI backend. |
 | **Scope Only**    | On        | Only analyze requests to targets in Burp's scope.                                            |
 | **Max Size (KB)** | 96 KB     | Maximum **response** size for analysis (range: 16–1024 KB).                                  |
@@ -65,7 +65,7 @@ The scanner checks for injectable headers from a curated allowlist: `Host`, `Ori
 
 ### Findings View
 
-All passive analysis results are available via **Settings → Passive AI Scanner → View findings**. Each finding includes:
+All passive analysis results are available via **AI Passive Scanner tab in the bottom settings panel → View findings**. Each finding includes:
 
 * **Timestamp**: When the analysis occurred.
 * **URL**: The analyzed endpoint.

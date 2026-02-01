@@ -15,7 +15,7 @@ Connects directly to the LM Studio local server API.
 1. Download and install LM Studio from [lmstudio.ai](https://lmstudio.ai).
 2. Download a model within LM Studio.
 3. Start the local server: **Developer** tab → **Start Server**.
-4. Configure in Burp: open **Burp AI Agent → Settings → AI Backend** and set:
+4. Configure in Burp: open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
 
 | Setting               | Value                                                                 |
 | --------------------- | --------------------------------------------------------------------- |
@@ -29,7 +29,7 @@ Connects directly to the LM Studio local server API.
 
 The extension can launch the LM Studio server for you.
 
-**Setup**: In **Settings → AI Backend**, set:
+**Setup**: In **AI Backend tab in the bottom settings panel**, set:
 
 | Setting                      | Value                                        |
 | ---------------------------- | -------------------------------------------- |

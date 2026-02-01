@@ -43,10 +43,10 @@ The MCP server exposes 53+ tools to external AI agents. For security, you contro
 
 ### Managing Tool Access
 
-1. Navigate to **Settings → MCP Server**.
+1. Navigate to the **Burp Integration** tab in the bottom settings panel.
 2. Use the **Tool Toggles** checkboxes to enable/disable individual tools.
 3. Use **Select All** / **Deselect All** for quick management.
-4. Toggle **Enable Unsafe Tools** to enable all unsafe tools at once.
+4. If needed, enable **Unsafe Tools** in the **MCP Server** tab to unlock unsafe tool toggles.
 
 ![Screenshot: MCP tool toggles](../.gitbook/assets/mcp-tool-toggles.png)
 

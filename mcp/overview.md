@@ -56,7 +56,7 @@ This method uses the `@modelcontextprotocol/server-sse` bridge to connect over H
 
 ### STDIO Transport (Alternative)
 
-If you prefer not to use npx, enable the **STDIO Bridge** in **Settings → MCP Server → STDIO Bridge**. This transport uses standard input/output and does not require Node.js. Configure your MCP client to launch the STDIO bridge process directly. See the [STDIO Bridge](overview.md#stdio-transport) section below for details.
+If you prefer not to use npx, enable the **STDIO Bridge** in **MCP Server tab in the bottom settings panel → STDIO Bridge**. This transport uses standard input/output and does not require Node.js. Configure your MCP client to launch the STDIO bridge process directly. See the [STDIO Bridge](overview.md#stdio-transport) section below for details.
 
 ## Connecting Other MCP Clients
 
@@ -68,14 +68,14 @@ The primary transport uses Server-Sent Events over HTTP. Connect to `http://127.
 
 ### STDIO Transport
 
-An alternative transport that uses standard input/output. Enable it in **Settings → MCP Server → STDIO Bridge**. This is useful for clients that prefer process-based communication instead of HTTP.
+An alternative transport that uses standard input/output. Enable it in **MCP Server tab in the bottom settings panel → STDIO Bridge**. This is useful for clients that prefer process-based communication instead of HTTP.
 
 ## Features
 
 * **SSE Server**: Runs a local Server-Sent Events server (default port `9876`) for clients to connect to.
 * **STDIO Bridge**: Optional stdin/stdout transport for process-based MCP clients.
 * **Tool Catalog**: 53+ tools exposing Burp functionality across 11 categories (History, Repeater, Scanner, Intruder, Scope, Site Map, Utilities, and more).
-* **Safety Gating**: "Unsafe" tools (those that send traffic or modify state) are disabled by default and must be explicitly enabled in settings.
+* **Safety Gating**: "Unsafe" tools are disabled by default. Enable the master switch in the **MCP Server** tab and individual tool toggles in the **Burp Integration** tab.
 * **Request Limiting**: Configurable concurrency control (default: 4 concurrent requests, range: 1-64) to prevent overwhelming Burp.
 * **Max Body Bytes**: Configurable limit on response body size returned by MCP tools.
 * **Health Check**: Built-in health endpoint at `GET /__mcp/health` for monitoring server status.

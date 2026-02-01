@@ -42,7 +42,7 @@ Systematic testing of REST/GraphQL APIs.
 
 Let an external AI agent drive Burp autonomously under your supervision.
 
-1.  Enable the **MCP** toggle. Note the token from **Settings → MCP Server**.
+1.  Enable the **MCP** toggle. Note the token from **MCP Server tab in the bottom settings panel**.
 2.  Configure Claude Desktop (or another MCP client) with the Burp MCP server connection.
 3.  Start a conversation: *"List the last 20 requests in proxy history for the target domain."*
 4.  The AI calls `proxy_http_history_regex` and returns results.
@@ -67,7 +67,7 @@ Deep-dive into client-side code for security issues.
 
 Produce a verifiable record of all AI interactions for compliance.
 
-1.  Enable **Audit Logging** in **Settings → Privacy & Logging**.
+1.  Enable **Audit Logging** in **Privacy & Logging tab in the bottom settings panel**.
 2.  Set **Privacy Mode** to **STRICT** for sensitive engagements.
 3.  Enable **Determinism Mode** for reproducible prompts.
 4.  Perform your assessment normally using context menus and chat.

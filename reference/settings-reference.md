@@ -1,6 +1,6 @@
 # Settings Reference
 
-This page documents every configurable setting in the extension, organized by section.
+This page documents every configurable setting in the extension, organized by section. Settings are grouped into tabs in the bottom settings panel of the AI Agent UI.
 
 ## AI Backend
 
@@ -57,8 +57,13 @@ This page documents every configurable setting in the extension, organized by se
 | **Keystore Password** | Text | *(auto-generated)* | Password for the custom keystore. |
 | **Max Concurrent Requests** | Number | `4` | Maximum parallel MCP tool calls (range: 1–64). |
 | **Max Body Bytes** | Number | `2097152` | Maximum response body size returned by MCP tools (range: 256 KB – 100 MB). |
-| **Tool Toggles** | Checkboxes | *(varies)* | Enable/disable individual MCP tools. See [Tools Reference](../mcp/tools-reference.md). |
 | **Enable Unsafe Tools** | Toggle | Off | Master switch for all tools marked as "unsafe". |
+
+## Burp Integration
+
+| Setting | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **Tool Toggles** | Checkboxes | *(varies)* | Enable/disable individual MCP tools by category. See [Tools Reference](../mcp/tools-reference.md). |
 
 ## Passive AI Scanner
 

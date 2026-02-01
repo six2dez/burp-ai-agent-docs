@@ -1,6 +1,6 @@
 # Prompt Defaults
 
-These are the default prompt templates used for the context menu actions. You can customize these in **Settings → Prompt Templates**.
+These are the default prompt templates used for the context menu actions. You can customize these in **Prompt Templates tab in the bottom settings panel**.
 
 ## Request-Based Prompts
 

@@ -15,13 +15,13 @@ The Model Context Protocol (MCP) server allows the plugin to expose tools.
 
 On first run, the extension auto-installs the bundled profiles into `~/.burp-ai-agent/AGENTS/`. This enables role-specific AI instructions (pentester, bughunter, auditor).
 
-To add a custom profile, drop a `*.md` file in `~/.burp-ai-agent/AGENTS/` and click **Refresh** next to the **Agent profile** dropdown in **Settings**.
+To add a custom profile, drop a `*.md` file in `~/.burp-ai-agent/AGENTS/` and click **Refresh** next to the **Agent profile** dropdown in the **AI Backend** tab of the bottom settings panel.
 
 ## 3. Configure Your AI Backend
 
 You need to tell the extension which AI model to use.
 
-1. Go to **AI Agent** → **Settings** → **AI Backend**.
+1. Go to the **AI Backend** tab in the bottom settings panel.
 2. Select your preferred backend from the dropdown:
    * **Cloud**: `Gemini CLI`, `Claude CLI`, `Codex CLI` (requires API keys).
    * **Local**: `Ollama` or `LM Studio` (free, private).
@@ -55,6 +55,6 @@ If you want the AI to work for you automatically:
 
 1. Toggle **Passive** to **ON** in the top bar.
 2. Browse your target application.
-3. Check the **Target** → **Issues** tab (or the extension's findings view) for `[AI Passive]` prefixed issues.
+3. Check the **Target** → **Issues** tab (or the findings view in the **AI Passive Scanner** tab) for `[AI Passive]` prefixed issues.
 
 ![Screenshot: Scanner settings](../.gitbook/assets/scanner-settings.png)

@@ -50,7 +50,7 @@ If Burp runs on Windows but you want Codex to run inside WSL on the same machine
     exit /b %ERRORLEVEL%
     ```
 
-2. In Burp: **Burp AI Agent → Settings → AI Backend**
+2. In Burp: **Burp AI Agent → AI Backend tab in the bottom settings panel**
 
 | Setting               | Value                                                                 |
 | --------------------- | --------------------------------------------------------------------- |
@@ -70,7 +70,7 @@ Notes:
 ## MCP Issues
 
 ### MCP Toggle won't stay ON
-*   **Port Conflict**: The default port `9876` might be used by another app. Try changing it in **Settings → MCP Server**.
+*   **Port Conflict**: The default port `9876` might be used by another app. Try changing it in **MCP Server tab in the bottom settings panel**.
 *   **Bind Error**: Check the Burp extension output for "Address already in use".
 *   **Previous instance**: If Burp crashed, a previous MCP server may still be bound to the port. The extension will attempt to shut it down automatically.
 
@@ -84,7 +84,7 @@ Notes:
 *   **Port mismatch**: Ensure the port in the config matches the port in the extension settings.
 
 ### MCP tools not appearing
-*   **Tool gating**: Many tools are disabled by default. Check **Settings → MCP Server → Tool Toggles**.
+*   **Tool gating**: Many tools are disabled by default. Check the **Burp Integration** tab tool toggles in the bottom settings panel.
 *   **Unsafe tools**: Enable the "Unsafe Tools" master switch if you need tools that send traffic or modify state.
 *   **Pro-only tools**: Scanner-related tools require Burp Suite Professional.
 

@@ -2,6 +2,8 @@
 
 One of the core value propositions of the Burp AI Agent is the ability to use AI safely. Privacy modes strictly control what data is allowed to leave Burp.
 
+Configure privacy settings in the **Privacy & Logging** tab of the bottom settings panel.
+
 ## Modes Explained
 
 ### 1. STRICT Mode

@@ -46,6 +46,8 @@ The scan mode determines which vulnerability classes are tested. Choose based on
 
 ## Configuration
 
+Configure these options in the **AI Active Scanner** tab of the bottom settings panel.
+
 * **Max Concurrent Scans**: Number of parallel scans (range: 1–10, default: 3). Keep low to avoid WAF blocking or DoS.
 * **Max Payloads per Point**: Maximum payload variations per injection point (range: 1–50, default: 10).
 * **Timeout**: Seconds to wait for each scan request (range: 5–120, default: 30).

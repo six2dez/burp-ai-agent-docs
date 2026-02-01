@@ -29,22 +29,22 @@ The main interaction area where you communicate with the AI:
 
 ## Settings Panel
 
-Accessible via the gear icon or settings sub-tab. Organized into collapsible accordion sections:
+The settings area lives in the bottom panel of the AI Agent tab. It uses native Burp-style tabs, and each tab shows its options directly (no collapsible accordions). The panel can be resized or collapsed using the horizontal splitter.
 
-| Section                | What It Controls                                                                                               |
+| Tab | What It Controls |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
 | **AI Backend**         | Backend selection, CLI commands, HTTP URLs, model names, API keys, extra headers, auto-start, timeouts.        |
-| **Privacy & Logging**  | Redaction mode (STRICT/BALANCED/OFF), determinism, host salt, audit logging toggle.                            |
-| **MCP Server**         | Host, port, TLS, external access, STDIO bridge, token, tool toggles, request limits.                           |
-| **Passive AI Scanner** | Rate limit, scope filtering, max size, min severity, findings view.                                            |
-| **Active AI Scanner**  | Concurrency, payloads per point, timeout, delay, risk level, scan mode, collaborator, auto-queue from passive. |
+| **AI Passive Scanner** | Rate limit, scope filtering, max size, min severity, findings view.                                            |
+| **AI Active Scanner**  | Concurrency, payloads per point, timeout, delay, risk level, scan mode, collaborator, auto-queue from passive. |
+| **MCP Server**         | Host, port, TLS, external access, STDIO bridge, token, request limits, unsafe tools master switch.             |
+| **Burp Integration**   | MCP tool toggles grouped by category with safe/unsafe gating.                                                  |
 | **Prompt Templates**   | Editable default prompts for all context menu actions.                                                         |
+| **Privacy & Logging**  | Redaction mode (STRICT/BALANCED/OFF), determinism, host salt, audit logging toggle.                            |
 | **Help**               | Quick links to documentation, MCP setup guide, and version info.                                               |
 
 ![Screenshot: Settings panel](../.gitbook/assets/settings-panel.png)
 
 **Open CLI buttons**: In the backend settings, CLI-based backends include an **Open CLI** button to launch a terminal with the configured command and MCP tools access.
-
 
 ## Privacy Pill
 
@@ -56,7 +56,7 @@ A small indicator in the UI showing the active privacy mode:
 
 ## Dependency Banner
 
-If required dependencies are missing (e.g., a CLI tool not found in PATH), a banner appears at the top of the settings panel with guidance on how to resolve the issue.
+If required dependencies are missing (e.g., a CLI tool not found in PATH), a banner appears at the top of the settings area with guidance on how to resolve the issue.
 
 ## Findings Panel
 

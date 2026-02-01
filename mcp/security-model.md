@@ -8,7 +8,7 @@ By default, the MCP server binds to `127.0.0.1`. This ensures that only processe
 ## 2. Token Authentication
 External requests to the MCP server must include a secret **Token**.
 *   The token is auto-generated on the first run.
-*   You can view or rotate the token in **Settings → MCP Server**.
+*   You can view or rotate the token in **MCP Server tab in the bottom settings panel**.
 *   **Localhost access** does not require a token.
 *   **External access** requires `Authorization: Bearer <token>` on every request.
 
