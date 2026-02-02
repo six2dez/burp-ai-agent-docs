@@ -19,7 +19,7 @@ To build the extension JAR:
 ```bash
 ./gradlew clean shadowJar
 ```
-The output JAR will be in `build/libs/Burp-AI-Agent-<version>.jar`.
+The output JAR will be in `build/libs/Burp-AI-Agent-<version>.jar`. Use that JAR to install the extension in Burp.
 
 ## Debugging
 

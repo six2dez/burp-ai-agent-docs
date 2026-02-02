@@ -24,7 +24,7 @@ If you prefer to build from source or want the latest development version:
     git clone https://github.com/six2dez/burp-ai-agent.git
     cd burp-ai-agent
     ```
-3.  Build the fat JAR using the Gradle Shadow plugin:
+3.  Build the fat JAR using the Gradle Shadow plugin (make sure Gradle runs with Java 21, e.g. `JAVA_HOME` points to a JDK 21 install):
 
     ```bash
     ./gradlew clean shadowJar
@@ -34,6 +34,7 @@ If you prefer to build from source or want the latest development version:
     ```
     build/libs/Burp-AI-Agent-<version>.jar
     ```
+
 
 > **Note**: The Shadow plugin produces a fat JAR that bundles all dependencies. The Burp Montoya API is `compileOnly` and provided by Burp at runtime.
 
