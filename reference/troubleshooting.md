@@ -23,6 +23,7 @@ Common issues and their resolutions.
     *   Claude: Set `ANTHROPIC_API_KEY` or run `claude login`
     *   Codex: Set `OPENAI_API_KEY`
     *   OpenCode: Configure provider credentials
+*   **OpenCode default model**: If you see `AI backend error (opencode-cli): process has not exited`, set a default model in `opencode.json` or add `--model` to the OpenCode command.
 *   **Model Name**: Ensure the model name in your command or settings is correct (e.g., `llama3` vs `llama3.1`).
 *   **Immediate crash**: If the backend crashes immediately after launch, check the extension output tab for the exit code and error output.
 
