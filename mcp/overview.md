@@ -31,9 +31,9 @@ To allow Cloud AI Agents to "drive" Burp Suite, you must configure the MCP serve
 * **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 * **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
 
-### SSE via npx (Default)
+### SSE via stdio bridge (Default)
 
-This method uses the `@modelcontextprotocol/server-sse` bridge to connect over HTTP:
+Claude Desktop expects a **stdio** MCP server, so you need a small bridge that connects to Burp's SSE endpoint. Use `supergateway` for the bridge:
 
 ```json
 {
@@ -42,7 +42,8 @@ This method uses the `@modelcontextprotocol/server-sse` bridge to connect over H
       "command": "npx",
       "args": [
         "-y",
-        "@modelcontextprotocol/server-sse",
+        "supergateway",
+        "--sse",
         "http://127.0.0.1:9876/sse"
       ]
     }
@@ -53,6 +54,26 @@ This method uses the `@modelcontextprotocol/server-sse` bridge to connect over H
 > **Prerequisite**: This requires **Node.js** (v18+) and **npx** to be installed and available in your PATH. Install Node.js from [nodejs.org](https://nodejs.org/) or via your package manager.
 
 > **Note**: Replace `9876` with your configured port. If you enable **External Access**, your MCP client must send `Authorization: Bearer <token>` on every request.
+
+If you need to pass `Authorization: Bearer <token>`, use the `--oauth2Bearer` flag in `supergateway`:
+
+```json
+{
+  "mcpServers": {
+    "burp-ai-agent": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "supergateway",
+        "--sse",
+        "http://127.0.0.1:9876/sse",
+        "--oauth2Bearer",
+        "your-token"
+      ]
+    }
+  }
+}
+```
 
 ### STDIO Transport (Alternative)
 
