@@ -72,6 +72,7 @@ All passive analysis results are available via **AI Passive Scanner tab in the b
 * **Title**: Short description of the finding.
 * **Severity**: `INFORMATION`, `LOW`, `MEDIUM`, `HIGH`, or `CRITICAL`.
 * **Detail**: Full AI analysis with evidence.
+* **Reasoning**: Model-provided analysis logic when present in scanner JSON output.
 * **Confidence**: Percentage score (0–100%).
 
 ### Issue Creation
@@ -106,3 +107,16 @@ When **Auto-Queue from Passive** is enabled in the **Active AI Scanner** setting
 4. Confirmed vulnerabilities are reported as separate Burp issues.
 
 This two-stage pipeline maximizes coverage while minimizing unnecessary active traffic.
+
+
+## Reliability and Parsing Behavior
+
+The passive scanner includes reliability and parsing hardening:
+
+- Backend startup now uses bounded readiness polling instead of a fixed sleep.
+- Response completion waiting uses latch synchronization instead of polling loops.
+- AI JSON output parsing uses Jackson-based parsing for nested/escaped content support.
+- Request metadata sent to AI is redaction-aware before prompt generation.
+- Passive analysis completion has a bounded timeout window (90 seconds).
+
+These changes are internal and keep the user-facing workflow unchanged.

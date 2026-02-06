@@ -100,3 +100,13 @@ The `BackendDiagnostics` module logs diagnostic information when backends fail:
 *   Environment variables used for launch.
 
 This information is available in the Burp extension output tab.
+
+
+## Current Supervisor and Backend Notes
+
+Current implementation details:
+
+- Supervisor lifecycle transitions (`start/stop/restart`) are lock-protected for stronger consistency.
+- Embedded CLI environment setup was deduplicated into shared helper logic.
+- External backend classloader lifecycle is explicit; registry closes classloader on reload/shutdown.
+- HTTP backends now rely on shared support utilities for retry behavior and bounded conversation history.

@@ -49,3 +49,20 @@ Before a release, perform these sanity checks:
 - [ ] Verify tab appearance on macOS (Retina), Linux, and Windows (HiDPI).
 - [ ] Check context menus appear on Request/Response and Issues.
 - [ ] Verify scrolling in the Chat interface.
+
+
+## Recommended Local Test Command
+
+To reduce flakiness and keep CI-like behavior locally, use:
+
+```bash
+JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home ./gradlew test --no-daemon -Dorg.gradle.workers.max=1
+```
+
+Additional focus areas covered by the test suite:
+
+- Passive scanner JSON parsing with nested/escaped content.
+- Injection point extraction for escaped strings, booleans, and nulls.
+- Active payload generation paths (numeric/string/UUID).
+- Response analyzer diff and time-based detection boundaries.
+- Shared HTTP conversation history trimming and concurrent writes.

@@ -123,3 +123,24 @@ Notes:
 *   Large response bodies can increase memory usage. Reduce **Max Size (KB)** in scanner settings.
 *   Disable the passive scanner when not actively needed.
 *   Close unused chat sessions.
+
+
+### Active scan queued 0 targets
+
+If an active scan action reports that no targets were queued:
+
+- The target may be out of scope while **Scope Only** is enabled.
+- The request may be invalid for active extraction.
+- The active queue may have reached its hard cap (`2000` pending targets).
+
+Check scanner status in the **AI Active Scanner** tab and clear queue if needed.
+
+### Agent profile warning about MCP tools
+
+If Settings shows profile warnings about missing/disabled tools:
+
+- The selected AGENTS profile references MCP tools currently disabled in **Burp Integration**.
+- The tool may be gated by **Unsafe mode**.
+- The tool may be unavailable in your Burp edition (Pro-only tools).
+
+Enable required tools/toggles or adjust the profile content.

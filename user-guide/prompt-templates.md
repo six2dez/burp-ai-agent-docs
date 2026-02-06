@@ -2,6 +2,12 @@
 
 Prompt templates define the default text for each context menu action. They are the instructions sent to the AI along with the selected request/response or issue context. Edit them in **Prompt Templates tab in the bottom settings panel**.
 
+## Default Template Style
+
+Built-in templates use a structured format with explicit sections (`ROLE`/`TASK`/`SCOPE`/`OUTPUT`) to improve consistency, reduce hallucinations, and make results easier to verify.
+
+Use [Prompt Defaults](../reference/prompt-defaults.md) to review exact current defaults from code.
+
 ## Guide: Prompt Engineering for Pentesters
 
 The quality of the AI's response depends heavily on how you structure the prompt. Consider these techniques when editing templates:

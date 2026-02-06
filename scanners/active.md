@@ -240,3 +240,14 @@ On Burp Suite Professional, the Active AI Scanner integrates with the native sca
 4. **Human in the Loop**: Use the `[AI Active]` findings as leads. Always verify them manually using Repeater before reporting.
 5. **Monitor Rate Limits**: If the target has WAF or rate limiting, increase the **Request Delay** and reduce **Max Concurrent Scans**.
 6. **Use Scope**: Always enable **Scope Only** to prevent accidental scanning of third-party assets.
+
+
+## Queue Safety and Backpressure
+
+The active scanner enforces queue backpressure to keep runtime stable under heavy workloads:
+
+- A hard queue limit is applied (`ACTIVE_SCAN_MAX_QUEUE_SIZE`, default `2000`).
+- New targets are dropped when the queue is full and a diagnostic log is emitted.
+- Context-menu initiated active scans now surface queue status more explicitly in the UI.
+
+This complements the existing 1-hour dedup window and scope filtering.

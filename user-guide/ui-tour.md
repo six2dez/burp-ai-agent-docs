@@ -12,7 +12,7 @@ The top bar provides quick access to the most important controls:
 | **Passive** toggle   | Enables/disables background passive analysis of proxy traffic.                                          |
 | **Active** toggle    | Enables/disables active scanning (risk-based). See warnings in [Active Scanner](../scanners/active.md). |
 | **Backend** selector | Dropdown to choose the AI backend for new sessions.                                                     |
-| **Status** indicator | Shows backend state (Running, Stopped, Crashed) and MCP server status.                                  |
+| **Status** indicator | Shows backend state (`Status: <state> | Backend: <id>`) plus an AI health badge (`AI: OK`/`AI: Offline`) and MCP status. |
 
 ![Screenshot: Top bar](../.gitbook/assets/top-bar.png)
 

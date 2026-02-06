@@ -17,6 +17,8 @@ This page documents every configurable setting in the extension, organized by se
 | **Ollama Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
 | **Ollama Auto-Start** | Toggle | On | Automatically start `ollama serve` when backend is selected. |
 | **Ollama Serve Command** | Text | `ollama serve` | Custom command to start the Ollama server. |
+| **Ollama Timeout** | Number | `120` | Timeout in seconds for Ollama requests (range: 30–3600). |
+| **Ollama Context Window** | Number | `8192` | Context window sent to Ollama (range: 2048–128000). |
 | **LM Studio URL** | Text | `http://127.0.0.1:1234` | Base URL for the LM Studio HTTP API. |
 | **LM Studio Model** | Text | `lmstudio` | Model identifier for LM Studio. |
 | **LM Studio API Key** | Text | *(empty)* | Optional `Authorization: Bearer` token for OpenAI-compatible servers. |
@@ -119,3 +121,19 @@ The extension stores data in `~/.burp-ai-agent/`. All subdirectories are created
 | `~/.burp-ai-agent/backends/` | Drop-in backend JAR files. Place custom `BackendFactory` JARs here for ServiceLoader discovery. See [Adding a Backend](../developer/adding-backend.md). |
 | `~/.burp-ai-agent/AGENTS/` | Agent profile Markdown files. See [Agent Profiles](../user-guide/agent-profiles.md). |
 | `~/.burp-ai-agent/AGENTS/default` | Text file containing the active profile name (e.g., `pentester.md`). |
+
+
+## Runtime Defaults
+
+Some operational limits are intentionally runtime constants (not direct UI fields):
+
+- **Active scanner queue max**: `2000` targets (`ACTIVE_SCAN_MAX_QUEUE_SIZE`).
+- **Active dedup window**: `1 hour` (`DEDUP_WINDOW_MS = 3,600,000`).
+- **Passive analysis wait timeout**: `90s` (`PASSIVE_SCAN_TIMEOUT_MS`).
+- **HTTP backend conversation history cap**: `20` messages (`MAX_HISTORY_MESSAGES`).
+- **Large prompt threshold for Claude CLI fallback path**: `32,000` characters.
+
+### Additional backend setting notes
+
+- **Ollama Timeout**: Default `120` seconds (range `30–3600`).
+- **Ollama Context Window**: Default `8192` (range `2048–128000`).

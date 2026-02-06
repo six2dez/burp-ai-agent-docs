@@ -65,3 +65,15 @@ You can select multiple requests in Proxy History or Site Map and apply context 
 
 * Batch passive scanning of many endpoints.
 * Queuing multiple targets for active scanning.
+
+
+## Active Scan Safety and Queue Visibility
+
+For active scan actions, the context menu flow adds safety and visibility:
+
+- Explicit confirmation dialogs before queuing active tests.
+- Target validation before enqueue.
+- Queue state visibility (current queue and max queue).
+- Clear warning when no target was queued (filtered target or full queue).
+
+Passive manual scan remains available from context menu without requiring MCP server state.

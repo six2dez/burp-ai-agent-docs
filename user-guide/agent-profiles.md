@@ -97,3 +97,12 @@ The profile loader caches the parsed profile and checks the file modification ti
 * Use section-specific instructions for detailed guidance per action type.
 * The `[DEFAULT]` section is a good place for general output formatting preferences.
 * Profile instructions appear as "System instructions (AGENTS):" in the prompt sent to the AI.
+
+
+## Profile Validation
+
+The settings UI validates profile tool references against currently enabled MCP tools.
+
+- If a profile references tools that are disabled, unsafe-gated, or unavailable in current edition, a warning is shown.
+- Validation checks tool references from bullet lists and common call formats (`/tool ...`, JSON tool calls).
+- This helps prevent silent profile/tool mismatches during sessions.

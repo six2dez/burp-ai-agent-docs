@@ -85,3 +85,16 @@ The extension entry point is `BurpAiAgentExtension.initialize(MontoyaApi)`, whic
 | **Coroutines** | kotlinx-coroutines 1.9.0 |
 | **Testing** | JUnit 5, Mockito-Kotlin |
 | **Build** | Gradle (Kotlin DSL), Shadow plugin for fat JAR |
+
+
+## Current Architecture Notes
+
+Key internal architecture notes:
+
+- **UI modularization**: settings sections moved into dedicated panel classes under `ui/panels/`.
+- **Shared HTTP backend layer**: `backends/http/HttpBackendSupport.kt` centralizes client/retry/history logic.
+- **Scanner shared helpers**: common issue mapping/remediation/allowlist logic extracted from scanner implementations.
+- **Centralized runtime constants**: `config/Defaults.kt` for scanner/backend/supervisor limits.
+- **Lifecycle/resource hardening**: backend external classloader is closed on reload/shutdown.
+
+See also: project source `docs/ARCHITECTURE.md` for the most detailed and current architecture snapshot.

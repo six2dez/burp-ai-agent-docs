@@ -48,3 +48,12 @@ This allows teams to integrate proprietary or enterprise AI services without mod
 ## Burp Pro vs Community
 
 All backends work with both Burp Suite Community and Professional editions. However, some MCP tools exposed to backends (like Scanner-related tools) are only available on Burp Pro.
+
+
+## HTTP Backend Internals
+
+Implementation highlights:
+
+- Ollama, LM Studio, and OpenAI-compatible backends now share HTTP client/retry/history logic.
+- Shared conversation history is bounded (20 messages) for deterministic memory behavior.
+- Retry behavior is standardized across HTTP backends for common transient connection errors.
