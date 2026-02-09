@@ -57,4 +57,4 @@ If you want the AI to work for you automatically:
 2. Browse your target application.
 3. Check the **Target** → **Issues** tab (or the findings view in the **AI Passive Scanner** tab) for `[AI Passive]` prefixed issues.
 
-<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>

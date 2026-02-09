@@ -57,7 +57,7 @@ Once loaded, you should see the following:
 * **Output tab**: The extension should load without errors. You might see a "Extensions loaded" message.
 * **Top-level Tab**: A new tab named **AI Agent** will appear in the main Burp navigation bar.
 
-<figure><img src="../.gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
 
 ## The `~/.burp-ai-agent/` Directory
 
