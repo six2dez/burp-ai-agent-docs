@@ -38,4 +38,5 @@ Use this checklist after installation to ensure everything is configured correct
 
 If any step fails, check the [Troubleshooting](../reference/troubleshooting.md) guide.
 
-![Screenshot: Settings overview](../.gitbook/assets/settings-overview.png)
+<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+
