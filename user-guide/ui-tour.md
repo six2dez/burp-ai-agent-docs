@@ -11,7 +11,7 @@ The top bar provides quick access to the most important controls:
 | **MCP** toggle       | Starts/stops the MCP server. Green = running.                                                           |
 | **Passive** toggle   | Enables/disables background passive analysis of proxy traffic.                                          |
 | **Active** toggle    | Enables/disables active scanning (risk-based). See warnings in [Active Scanner](../scanners/active.md). |
-| **Backend** selector | Dropdown to choose the AI backend for new sessions.                                                     |
+| **Backend** selector | Dropdown to choose the AI backend for new sessions (only available backends are shown).               |
 | **Status** indicator | Shows backend state (`Status: <state> | Backend: <id>`) plus an AI health badge (`AI: OK`/`AI: Offline`) and MCP status. |
 
 ![Screenshot: Top bar](../.gitbook/assets/top-bar.png)
@@ -20,16 +20,19 @@ The top bar provides quick access to the most important controls:
 
 The main interaction area where you communicate with the AI:
 
-* **Session list**: Left sidebar showing all chat sessions with title, timestamp, and backend used.
-* **Chat area**: Displays conversation with AI responses rendered as formatted **Markdown** (headers, code blocks, tables, lists).
-* **Input field**: Type prompts or paste context. Supports multi-line input.
+* **Session list**: Left sidebar showing all chat sessions with title, timestamp, and last backend used.
+* **Usage stats**: Summary of total messages and per-backend usage at the bottom of the session list.
+* **Chat area**: Displays conversation with AI responses rendered as formatted **Markdown** (headers, code blocks, lists, links, quotes).
+* **Input field**: Type prompts or paste context. `Enter` sends, `Shift+Enter` inserts a new line.
 * **Tools button**: Inserts MCP tool commands into the input field for forcing specific tool calls.
 * **Context preview**: Shows the redacted context that will be sent to the AI, so you can verify what data leaves Burp.
 * **Streaming**: AI responses stream in real time as they are generated, not as a single block.
+* **Cancel button**: Stop an in-flight response.
+* **Export**: Right-click a session to export as Markdown.
 
 ## Settings Panel
 
-The settings area lives in the bottom panel of the AI Agent tab. It uses native Burp-style tabs, and each tab shows its options directly (no collapsible accordions). The panel can be resized or collapsed using the horizontal splitter.
+The settings area lives in the bottom panel of the AI Agent tab. It uses native Burp-style tabs, and each tab shows its options directly. The panel can be resized or collapsed using the toggle bar or the horizontal splitter.
 
 | Tab | What It Controls |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
@@ -56,7 +59,15 @@ A small indicator in the UI showing the active privacy mode:
 
 ## Dependency Banner
 
-If required dependencies are missing (e.g., a CLI tool not found in PATH), a banner appears at the top of the settings area with guidance on how to resolve the issue.
+If MCP is disabled, a banner appears at the top of the tab reminding you to enable MCP to use AI features.
+
+## Keyboard Shortcuts
+
+* **New session**: `Cmd/Ctrl + N`
+* **Delete session**: `Cmd/Ctrl + W`
+* **Clear chat**: `Cmd/Ctrl + L`
+* **Export chat**: `Cmd/Ctrl + E`
+* **Toggle settings panel**: `Esc`
 
 ## Findings Panel
 

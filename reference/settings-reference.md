@@ -6,7 +6,7 @@ This page documents every configurable setting in the extension, organized by se
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. Options: `ollama`, `lmstudio`, `openai-compatible`, `gemini-cli`, `claude-cli`, `codex-cli`, `opencode-cli`. |
+| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. The list is filtered to backends that are available on this machine. |
 | **Codex CLI Command** | Text | `codex chat` | Shell command to launch the Codex backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`). |
 | **Gemini CLI Command** | Text | `gemini --output-format text --model gemini-2.5-flash` | Shell command to launch the Gemini backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`). |
 | **Claude CLI Command** | Text | `claude` | Shell command to launch the Claude backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`). |
@@ -131,6 +131,7 @@ Some operational limits are intentionally runtime constants (not direct UI field
 - **Active dedup window**: `1 hour` (`DEDUP_WINDOW_MS = 3,600,000`).
 - **Passive analysis wait timeout**: `90s` (`PASSIVE_SCAN_TIMEOUT_MS`).
 - **HTTP backend conversation history cap**: `20` messages (`MAX_HISTORY_MESSAGES`).
+- **CLI history cap**: `10` messages or `20,000` characters (whichever is reached first).
 - **Large prompt threshold for Claude CLI fallback path**: `32,000` characters.
 
 ### Additional backend setting notes

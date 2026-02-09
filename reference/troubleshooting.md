@@ -18,6 +18,7 @@ Common issues and their resolutions.
 
 ### Backend status is "Crashed"
 *   **CLI Path**: Verify the command (e.g., `gemini`, `claude`, `codex`) is in your system PATH. Test by running the command in a normal terminal.
+*   **GUI PATH differences**: If Burp is launched from a GUI shortcut, PATH can be truncated. The extension attempts to capture the login shell PATH, but if the backend still doesn't appear, set the full CLI path in the settings.
 *   **Authentication**: Most CLI tools require an initial login:
     *   Gemini: `gemini auth login`
     *   Claude: Set `ANTHROPIC_API_KEY` or run `claude login`

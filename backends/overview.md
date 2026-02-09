@@ -17,7 +17,7 @@ The Burp AI Agent is model-agnostic. It uses a "Supervisor" system to manage con
 ## General Configuration
 
 1. Navigate to the **AI Backend** tab in the bottom settings panel.
-2. **Preferred Backend**: Choose the backend you want to use for _new_ chat sessions.
+2. **Preferred Backend**: Choose the backend you want to use for _new_ chat sessions. The dropdown only shows backends that are available on your machine.
 3. **Command / URL / Headers**:
    * **CLI Backends**: Provide the shell command (e.g., `gemini`, `claude`). Ensure these tools are installed and authenticated in your OS terminal. On Windows with npm-installed CLIs, use the full shim path with double backslashes (e.g., `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`).
    * **HTTP Backends**: Provide the URL (e.g., `http://127.0.0.1:11434` for Ollama) plus optional API key and extra headers.
