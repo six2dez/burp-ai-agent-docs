@@ -12,7 +12,7 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 * **AI Scanners**: Passive and Active scanners that autonomously analyze traffic and flag vulnerabilities across 62 vulnerability classes.
 * **Audit Logging**: JSONL-based logging with SHA-256 integrity hashing for compliance and reproducibility.
 
-![](.gitbook/assets/main-tab.png)
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
 
 ## Key Features
 
@@ -51,15 +51,14 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 * [**Reference**](reference/settings-reference.md): Complete settings, glossary, and troubleshooting.
 * [**Developer**](developer/architecture.md): Architecture, data flow, and extension development.
 
-
 ## Operational Notes
 
-- Passive scanner reliability hardening (atomic state, bounded backend startup polling, latch-based completion wait).
-- Active scanner queue backpressure with a hard cap (default: 2000 queued targets) to prevent unbounded growth.
-- Shared HTTP backend support for retry/client/history logic across Ollama, LM Studio, and OpenAI-compatible providers.
-- Type-safe scanner settings in code (`SeverityLevel`, `PayloadRisk`, `ScanMode`) with backward-compatible persistence.
-- AGENTS profile validation against enabled MCP tools, with warnings in Settings.
-- Settings UI modularization into dedicated panel classes (Backend, Passive, Active, MCP, Prompt, Privacy, Help).
-- Passive scanner issue details now include model reasoning when provided by backend JSON output.
-- Structured prompt defaults moved to role/task/scope/output format for better response consistency.
-- Additional unit tests for scanner parsing/generation/analyzers and backend conversation history.
+* Passive scanner reliability hardening (atomic state, bounded backend startup polling, latch-based completion wait).
+* Active scanner queue backpressure with a hard cap (default: 2000 queued targets) to prevent unbounded growth.
+* Shared HTTP backend support for retry/client/history logic across Ollama, LM Studio, and OpenAI-compatible providers.
+* Type-safe scanner settings in code (`SeverityLevel`, `PayloadRisk`, `ScanMode`) with backward-compatible persistence.
+* AGENTS profile validation against enabled MCP tools, with warnings in Settings.
+* Settings UI modularization into dedicated panel classes (Backend, Passive, Active, MCP, Prompt, Privacy, Help).
+* Passive scanner issue details now include model reasoning when provided by backend JSON output.
+* Structured prompt defaults moved to role/task/scope/output format for better response consistency.
+* Additional unit tests for scanner parsing/generation/analyzers and backend conversation history.
