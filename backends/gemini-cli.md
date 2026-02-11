@@ -20,13 +20,16 @@ Google's Gemini CLI provides access to the Gemini family of models, which suppor
 | Setting                | Value                                                      |
 | ---------------------- | ---------------------------------------------------------- |
 | **Preferred Backend**  | `Gemini CLI` (select from dropdown)                        |
-| **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash` |
+| **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash --yolo` |
 
 To specify a model, include the flag in the command field:
 
 | Setting                | Value                             |
 | ---------------------- | --------------------------------- |
-| **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash` |
+| **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash --yolo` |
+
+> **Why `--yolo` by default?**  
+> Gemini may block MCP tool execution with approval policy prompts in embedded mode. Using `--yolo` avoids interactive approval friction for Burp MCP workflows.
 
 ## Troubleshooting
 

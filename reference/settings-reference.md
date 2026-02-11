@@ -8,7 +8,7 @@ This page documents every configurable setting in the extension, organized by se
 | :--- | :--- | :--- | :--- |
 | **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. The list is filtered to backends that are available on this machine. |
 | **Codex CLI Command** | Text | `codex chat` | Shell command to launch the Codex backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`). |
-| **Gemini CLI Command** | Text | `gemini --output-format text --model gemini-2.5-flash` | Shell command to launch the Gemini backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`). |
+| **Gemini CLI Command** | Text | `gemini --output-format text --model gemini-2.5-flash --yolo` | Shell command to launch the Gemini backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`). |
 | **Claude CLI Command** | Text | `claude` | Shell command to launch the Claude backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`). |
 | **OpenCode CLI Command** | Text | `opencode` | Shell command to launch the OpenCode backend (Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\opencode.cmd`). |
 | **Ollama URL** | Text | `http://127.0.0.1:11434` | Base URL for the Ollama HTTP API. |
