@@ -11,8 +11,8 @@ The top bar provides quick access to the most important controls:
 | **MCP** toggle       | Starts/stops the MCP server. Green = running.                                                           |
 | **Passive** toggle   | Enables/disables background passive analysis of proxy traffic.                                          |
 | **Active** toggle    | Enables/disables active scanning (risk-based). See warnings in [Active Scanner](../scanners/active.md). |
-| **Backend** selector | Dropdown to choose the AI backend for new sessions (only available backends are shown).               |
-| **Status** indicator | Shows backend state (`Status: <state> | Backend: <id>`) plus an AI health badge (`AI: OK`/`AI: Offline`) and MCP status. |
+| **Backend** selector | Dropdown to choose the AI backend for new sessions (only available backends are shown).                 |
+| **Status** indicator | Shows backend state (\`Status:                                                                          |
 
 ![Screenshot: Top bar](../.gitbook/assets/top-bar.png)
 
@@ -34,7 +34,7 @@ The main interaction area where you communicate with the AI:
 
 The settings area lives in the bottom panel of the AI Agent tab. It uses native Burp-style tabs, and each tab shows its options directly. The panel can be resized or collapsed using the toggle bar or the horizontal splitter.
 
-| Tab | What It Controls |
+| Tab                    | What It Controls                                                                                               |
 | ---------------------- | -------------------------------------------------------------------------------------------------------------- |
 | **AI Backend**         | Backend selection, CLI commands, HTTP URLs, model names, API keys, extra headers, auto-start, timeouts.        |
 | **AI Passive Scanner** | Rate limit, scope filtering, max size, min severity, findings view.                                            |
@@ -45,7 +45,7 @@ The settings area lives in the bottom panel of the AI Agent tab. It uses native 
 | **Privacy & Logging**  | Redaction mode (STRICT/BALANCED/OFF), determinism, host salt, audit logging toggle.                            |
 | **Help**               | Quick links to documentation, MCP setup guide, and version info.                                               |
 
-![Screenshot: Settings panel](../.gitbook/assets/settings-panel.png)
+<figure><img src="../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
 
 **Open CLI buttons**: In the backend settings, CLI-based backends include an **Open CLI** button to launch a terminal with the configured command and MCP tools access.
 

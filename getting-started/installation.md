@@ -35,7 +35,6 @@ If you prefer to build from source or want the latest development version:
     build/libs/Burp-AI-Agent-<version>.jar
     ```
 
-
 > **Note**: The Shadow plugin produces a fat JAR that bundles all dependencies. The Burp Montoya API is `compileOnly` and provided by Burp at runtime.
 
 ## Load into Burp Suite
@@ -58,7 +57,7 @@ Once loaded, you should see the following:
 * **Output tab**: The extension should load without errors. You might see a "Extensions loaded" message.
 * **Top-level Tab**: A new tab named **AI Agent** will appear in the main Burp navigation bar.
 
-![Screenshot: AI Agent tab](../.gitbook/assets/burp-ai-agent-tab.png)
+<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
 
 ## The `~/.burp-ai-agent/` Directory
 
