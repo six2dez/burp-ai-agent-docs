@@ -1,6 +1,6 @@
 # Audit Logging
 
-Audit logs provide a **tamper-evident, reproducible record** of every interaction between Burp and the AI backend. This is essential for professional security audits, compliance, and debugging complex AI behavior.
+Audit logs provide a tamper-evident, reproducible record of interactions between Burp and the AI backend. This supports audits, compliance workflows, and debugging.
 
 ## What is Logged?
 
@@ -12,7 +12,7 @@ Each event is recorded as a JSON object containing:
 *   **Response Chunks**: Streaming output captured as `agent_chunk` events.
 
 ## Log Format: JSONL
-Logs are stored in **JSON Lines (.jsonl)** format. Each line is a standalone JSON object, making it easy to parse with tools like `jq` or import into a SIEM.
+Logs are stored in **JSON Lines (.jsonl)** format. Each line is a standalone JSON object, which can be parsed with tools like `jq` or imported into a SIEM.
 
 ## Security & Integrity
 To make logs tamper-evident:

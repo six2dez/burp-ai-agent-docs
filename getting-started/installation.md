@@ -6,7 +6,7 @@ Before installing, ensure you have the following:
 
 1. **Burp Suite**: Community or Professional edition (version 2023.12 or higher recommended).
 2. **Java 21**: The extension is built for Java 21 (Temurin or Oracle JDK).
-   * _Note_: Modern Burp Suite versions ship with a bundled Java runtime. You only need a separate Java installation if you are building from source or running the CLI backends in a specific environment.
+   * _Note_: Recent Burp Suite versions ship with a bundled Java runtime. You only need a separate Java installation if you are building from source or running the CLI backends in a specific environment.
 
 ## Option A: Download from GitHub Releases
 
@@ -15,7 +15,7 @@ Before installing, ensure you have the following:
 
 ## Option B: Build from Source
 
-If you prefer to build from source or want the latest development version:
+If you prefer to build from source:
 
 1. **Prerequisites**: Install **Java 21** (Temurin or Oracle JDK) and ensure `JAVA_HOME` is set.
 2.  Clone the repository:
@@ -78,7 +78,7 @@ On first launch, the extension automatically creates a directory at `~/.burp-ai-
     └── auditor.md       # Compliance auditor profile
 ```
 
-The extension creates all subdirectories automatically on startup and auto-installs the bundled agent profiles. This gives you three ready-to-use profiles: `pentester`, `bughunter`, and `auditor`.
+The extension creates all subdirectories automatically on startup and auto-installs the bundled agent profiles. This provides three default profiles: `pentester`, `bughunter`, and `auditor`.
 
 To add your own, drop additional `*.md` files in `~/.burp-ai-agent/AGENTS/` (see [Agent Profiles](../user-guide/agent-profiles.md)).
 

@@ -1,6 +1,6 @@
 # Architecture
 
-The extension is built in Kotlin targeting JVM 21, using the Burp Montoya API. It follows a layered architecture with clear module boundaries.
+The extension is built in Kotlin on the JVM using Burp Montoya API. It follows layered boundaries so UI, context, privacy, backend, supervision, scanner, MCP, and audit concerns remain separable.
 
 ## Layers
 
@@ -15,86 +15,91 @@ The extension is built in Kotlin targeting JVM 21, using the Burp Montoya API. I
 │  3. Redaction Pipeline                  │
 │     Privacy modes, token/host scrubbing │
 ├─────────────────────────────────────────┤
-│  4. Backend Adapters (Pluggable)        │
+│  4. Prompt Resolution                   │
+│     Built-in templates + BountyPrompt   │
+├─────────────────────────────────────────┤
+│  5. Backend Adapters (Pluggable)        │
 │     CLI + HTTP backends via registry    │
 ├─────────────────────────────────────────┤
-│  5. Supervisor                          │
+│  6. Supervisor                          │
 │     AgentSupervisor, McpSupervisor      │
 ├─────────────────────────────────────────┤
-│  6. MCP Server                          │
-│     Ktor SSE + STDIO, 53+ tools        │
+│  7. MCP Server                          │
+│     SSE + STDIO tools gateway           │
 ├─────────────────────────────────────────┤
-│  7. Scanners                            │
+│  8. Scanners                            │
 │     Passive AI Scanner, Active Scanner  │
 ├─────────────────────────────────────────┤
-│  8. Audit Logging                       │
+│  9. Audit Logging                       │
 │     JSONL + SHA-256 hashing             │
 ├─────────────────────────────────────────┤
-│  9. Alerts                              │
+│ 10. Alerts                              │
 │     Webhook notifications               │
 └─────────────────────────────────────────┘
 ```
 
 ## Design Goals
 
-*   **Modularity**: Each layer can be developed, tested, and replaced independently.
-*   **Testability**: Redaction is pure (no side effects). Backends are behind interfaces.
-*   **Extensibility**: New backends can be added via ServiceLoader without modifying core code. New MCP tools follow a descriptor + handler pattern.
-*   **Determinism**: When enabled, context ordering and redaction are stable for reproducible audit trails.
-*   **Privacy-first**: Redaction is applied before any data leaves Burp, regardless of the destination.
+* **Modularity**: Layers can evolve independently.
+* **Testability**: Redaction and parsing logic remain unit-testable.
+* **Extensibility**: Backends and tools are pluggable.
+* **Determinism**: Stable context ordering and stable anonymization when enabled.
+* **Privacy-first**: Redaction runs before outbound backend calls.
 
 ## Key Modules
 
 | Package | Purpose |
 | :--- | :--- |
-| `ui/*` | Swing UI: MainTab, ChatPanel, SettingsPanel, components (AccordionPanel, ActionCard, ToggleSwitch, PrivacyPill, DependencyBanner). |
-| `ui/UiActions` | Context menu action definitions and handlers. |
-| `ui/UiTheme` | Theming and color management. |
-| `ui/MarkdownRenderer` | Renders AI responses as formatted Markdown in the chat panel. |
-| `ui/McpHelpPanel` | MCP configuration help and quick-start instructions. |
-| `context/*` | Context collection from Burp selections (requests, responses, issues). |
-| `redact/*` | Redaction policies: cookie stripping, token redaction, host anonymization with salt. |
-| `backends/*` | Backend registry, adapters (Ollama, LM Studio, OpenAI-compatible, Gemini, Claude, Codex, OpenCode), diagnostics. |
-| `supervisor/*` | AgentSupervisor (backend lifecycle, health checks, auto-restart). |
-| `mcp/*` | KtorMcpServerManager (Ktor/Netty SSE server), McpStdioBridge, McpSupervisor, McpToolCatalog, McpTools, McpToolContext, McpRequestLimiter, McpTls. |
-| `scanner/*` | PassiveAiScanner, ActiveAiScanner, PayloadGenerator, ResponseAnalyzer, InjectionPointExtractor, AiScanCheck, ActiveScanModels. |
-| `audit/*` | AuditLogger (JSONL), Hashing (SHA-256). |
-| `alerts/*` | Webhook alerting for finding notifications. |
-| `config/*` | AgentSettings (preferences storage, default values). |
+| `ui/*` | Swing UI, settings panels, and interaction components. |
+| `ui/UiActions` | Context menu wiring for request/response and issue actions. |
+| `context/*` | Context collection from Burp selections. |
+| `redact/*` | Privacy policy and redaction engine. |
+| `prompts/bountyprompt/*` | Curated BountyPrompt catalog, loader, tag resolver, and output parser. |
+| `backends/*` | Backend registry, built-in adapters, diagnostics. |
+| `supervisor/*` | Backend and MCP lifecycle supervisors. |
+| `mcp/*` | MCP server manager, tool catalog, request limiter, and transport bridges. |
+| `scanner/*` | Passive and active scanner engines plus analyzers/generators. |
+| `audit/*` | JSONL audit writer and hash utilities. |
+| `alerts/*` | Optional webhook notifications. |
+| `config/*` | Settings model, persistence, and defaults. |
 
 ## Entry Point
 
-The extension entry point is `BurpAiAgentExtension.initialize(MontoyaApi)`, which:
+`BurpAiAgentExtension.initialize(MontoyaApi)` performs:
 
-1.  Initializes the backend registry (built-in + external JARs from `~/.burp-ai-agent/backends/`).
-2.  Creates the audit logger, settings, supervisor, and scanners.
-3.  Registers the main UI tab and context menu providers.
-4.  Registers `AiScanCheck` with Burp Pro's native scanner (with Community Edition fallback).
-5.  Starts the MCP server if enabled.
+1. Backend registry initialization (built-ins plus drop-in JARs).
+2. Settings/audit/supervisor/scanner initialization.
+3. UI tab and context menu provider registration.
+4. Scanner integration registration (Burp Pro path plus Community fallback).
+5. MCP startup when enabled.
 
-## Technology Stack
+## BountyPrompt Integration Path
+
+BountyPrompt actions are integrated through `UiActions` and `prompts/bountyprompt/*`:
+
+1. Loader reads curated JSON prompts from configured directory.
+2. Resolver applies redaction-aware tag substitution.
+3. Composed prompt is sent through normal chat backend pipeline.
+4. Optional output parsing creates Burp issues through confidence gating.
+5. Audit events record action invocation and issue creation results.
+
+## Core Technology Components
 
 | Component | Technology |
 | :--- | :--- |
-| **Language** | Kotlin 2.1 (JVM 21) |
-| **Burp API** | Montoya API 2025.12 |
-| **HTTP Server** | Ktor 3.1.3 (Netty) |
-| **Serialization** | kotlinx-serialization-json, Jackson |
-| **HTTP Client** | OkHttp 4.12 |
-| **MCP SDK** | Kotlin SDK 0.5.0 |
-| **Coroutines** | kotlinx-coroutines 1.9.0 |
-| **Testing** | JUnit 5, Mockito-Kotlin |
-| **Build** | Gradle (Kotlin DSL), Shadow plugin for fat JAR |
+| **Language** | Kotlin (JVM) |
+| **Burp API** | Montoya API |
+| **HTTP Server** | Ktor (Netty) |
+| **Serialization** | kotlinx-serialization, Jackson |
+| **HTTP Client** | OkHttp |
+| **Coroutines** | kotlinx-coroutines |
+| **Testing** | JUnit, Mockito-Kotlin |
+| **Build** | Gradle Kotlin DSL with Shadow JAR |
 
+## Operational Guarantees
 
-## Current Architecture Notes
-
-Key internal architecture notes:
-
-- **UI modularization**: settings sections moved into dedicated panel classes under `ui/panels/`.
-- **Shared HTTP backend layer**: `backends/http/HttpBackendSupport.kt` centralizes client/retry/history logic.
-- **Scanner shared helpers**: common issue mapping/remediation/allowlist logic extracted from scanner implementations.
-- **Centralized runtime constants**: `config/Defaults.kt` for scanner/backend/supervisor limits.
-- **Lifecycle/resource hardening**: backend external classloader is closed on reload/shutdown.
-
-See also: project source `docs/ARCHITECTURE.md` for the most detailed and current architecture snapshot.
+* Settings UI is split into dedicated tab/panel classes.
+* Shared HTTP backend support centralizes retry/client/history behavior.
+* Scanner helpers centralize shared mapping/remediation logic.
+* Runtime limits are centralized in defaults/constants.
+* External backend classloaders are closed during reload/shutdown.

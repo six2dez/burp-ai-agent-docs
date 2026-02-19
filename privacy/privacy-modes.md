@@ -1,41 +1,44 @@
 # Privacy Modes
 
-One of the core value propositions of the Burp AI Agent is the ability to use AI safely. Privacy modes strictly control what data is allowed to leave Burp.
+Privacy modes define what data can leave Burp when the extension calls AI backends.
 
-Configure privacy settings in the **Privacy & Logging** tab of the bottom settings panel.
+Configure them in **Privacy & Logging** in the bottom settings panel.
 
-## Modes Explained
+## Modes
 
-### 1. STRICT Mode
+### STRICT
 
-**"Zero Trust"** - Designed for highly sensitive engagements.
+Designed for high-sensitivity engagements.
 
-* **Redaction**:
-  * **Hostnames**: Replaced with anonymized placeholders (e.g., `host-8f2a3b.local`). The mapping is stable for a given salt so the AI can still understand relationships.
-  * **Auth Tokens**: Authorization headers, API keys, bearer tokens, and JWT-like strings are redacted.
-  * **Cookies**: All Cookie values are scrubbed.
-* **Use Case**: Sending data to a cloud backend (Claude/Gemini) where you do not want to reveal the target identity.
+* **Hostnames**: Anonymized with stable pseudonyms.
+* **Auth tokens**: Redacted.
+* **Cookies**: Stripped/redacted.
 
-### 2. BALANCED Mode
+Typical use: cloud backends where host identity must not be exposed.
 
-**"Pragmatic Security"** - Balances context for the AI with basic hygiene.
+### BALANCED
 
-* **Redaction**:
-  * **Auth Tokens**: Redacted.
-  * **Cookies**: Cookie headers are stripped.
-  * **Hostnames**: **Preserved**. The AI _will_ see `bank-of-america.com`.
-* **Use Case**: Using local models (Ollama) or when you have legal clearance to share the target's identity with the AI provider.
+Balances context quality and basic hygiene.
 
-### 3. OFF (Default)
+* **Hostnames**: Preserved.
+* **Auth tokens**: Redacted.
+* **Cookies**: Stripped/redacted.
 
-**"Raw Data"** - No filters.
+Typical use: local or approved environments where hostnames can be shared.
 
-* **Redaction**: None. The exact raw HTTP request is sent to the model.
-* **Use Case**: Internal testing, or when you are testing your own application and want the AI to have maximum context (e.g., debugging a specific session token issue).
+### OFF
+
+No redaction.
+
+* Full raw request/response context is eligible for transmission.
+
+Typical use: controlled internal testing where maximum context is required.
 
 ![Screenshot: Privacy settings](../.gitbook/assets/privacy-settings.png)
 
 ## Important Notes
 
-* **Active Scanning**: The Active Scanner _always_ sends traffic to the _real_ target. Privacy modes apply to the _prompt_ sent to the AI, not the traffic the AI generates against the target.
-* **Determinism**: In STRICT mode, the "Host Anonymization Salt" ensures that the same host maps to the same pseudonym until you rotate the salt, allowing the AI to correlate findings safely.
+* Privacy mode governs prompt context sent to AI backends.
+* Active scanning still sends real traffic to real targets.
+* Determinism mode preserves stable redaction mapping behavior.
+* BountyPrompt actions apply redaction before tag resolution, so each `[HTTP_*]` segment inherits the active privacy policy.

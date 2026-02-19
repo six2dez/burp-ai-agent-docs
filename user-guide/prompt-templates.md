@@ -1,94 +1,87 @@
 # Prompt Templates
 
-Prompt templates define the default text for each context menu action. They are the instructions sent to the AI along with the selected request/response or issue context. Edit them in **Prompt Templates tab in the bottom settings panel**.
+Prompt templates define default instructions for context menu actions. They are sent together with selected Burp context.
+
+Edit them in **Prompt Templates** in the bottom settings panel.
 
 ## Default Template Style
 
-Built-in templates use a structured format with explicit sections (`ROLE`/`TASK`/`SCOPE`/`OUTPUT`) to improve consistency, reduce hallucinations, and make results easier to verify.
+Built-in templates use a structured format with explicit sections (`ROLE` / `TASK` / `SCOPE` / `OUTPUT`) to improve consistency and reduce speculative output.
 
-Use [Prompt Defaults](../reference/prompt-defaults.md) to review exact current defaults from code.
+Use [Prompt Defaults](../reference/prompt-defaults.md) to review exact built-in defaults.
+
+## Built-In Request Prompts
+
+These templates are used for request/response actions:
+
+| Template | Used By | Purpose |
+| :--- | :--- | :--- |
+| **Find Vulnerabilities** | `Find vulnerabilities` | Broad security analysis across injection, auth/access, disclosure, and configuration issues. |
+| **Analyze this request** | `Analyze this request` | Concise endpoint summary. |
+| **Explain JS** | `Explain JS` | JavaScript behavior and risk analysis. |
+| **Access Control** | `Access control` | Authorization testing guidance. |
+| **Login Sequence** | `Login sequence` | Login flow extraction and replay guidance. |
+
+## Built-In Issue Prompts
+
+These templates are used for scanner issue actions:
+
+| Template | Used By | Purpose |
+| :--- | :--- | :--- |
+| **Analyze this Issue** | `Analyze this issue` | Root cause analysis and validation steps. |
+| **Generate PoC & Validate** | `Generate PoC & validate` | Step-by-step PoC with expected evidence. |
+| **Impact & Severity** | `Impact & severity` | Impact and severity reasoning. |
+| **Full Report** | `Full report` | Complete report structure for delivery. |
+
+## BountyPrompt Integration Controls
+
+The same tab includes BountyPrompt controls:
+
+* **Enable BountyPrompt actions**: Shows/hides curated submenu actions in request/response context menus.
+* **Prompt directory**: Filesystem location containing BountyPrompt JSON prompt files.
+* **Auto-create issues**: Enables automatic Burp issue creation for eligible BountyPrompt outputs.
+* **Issue confidence threshold**: Minimum confidence score (0-100) required for automatic issue creation.
+* **Enabled prompt IDs**: Comma- or newline-separated allowlist of curated IDs.
+
+See [BountyPrompt Actions](bountyprompt-actions.md) for operational behavior and curated IDs.
 
 ## Guide: Prompt Engineering for Pentesters
 
-The quality of the AI's response depends heavily on how you structure the prompt. Consider these techniques when editing templates:
-
 ### Role Prompting
 
-Start with a clear role definition:
+Start with a clear role definition, for example:
 
-> _"Act as a senior offensive security expert specialized in web application penetration testing."_
-
-This primes the AI to respond with the appropriate depth and terminology.
+> Act as a senior offensive security expert specialized in web application penetration testing.
 
 ### Evidence-Based Reasoning
 
-Instruct the AI to cite specific evidence:
+Require concrete evidence:
 
-> _"Always cite specific header values, parameter names, or response patterns to justify your findings."_
-
-This reduces hallucination and produces more actionable output.
+> Always cite specific header values, parameter names, or response patterns to justify findings.
 
 ### Output Formatting
 
-Request structured data:
+Request a stable structure:
 
-> _"Provide your findings in Markdown format with sections for Vulnerability Type, Evidence, Severity (CVSS), and Remediation."_
+> Provide findings in Markdown with sections for Type, Evidence, Severity, Impact, and Remediation.
 
 ### Language Control
 
-If you want consistent output language across teams, add:
+To keep team output consistent:
 
-> _"Always answer in English."_
-
-### Step-by-Step PoC
-
-For exploit generation, request structured steps:
-
-> _"Break the PoC into: 1. Attack vector, 2. Payload, 3. Expected response, 4. Success indicator."_
+> Always answer in English.
 
 ### Scope Limiting
 
-Prevent the AI from speculating beyond the data:
+Reduce speculation:
 
-> _"Only report findings supported by evidence in the provided request/response. Do not speculate about vulnerabilities you cannot verify."_
+> Only report findings supported by evidence in the provided request/response context.
 
-## Request Prompts
+## Customization Workflow
 
-These templates are used when you right-click on HTTP requests/responses:
+1. Open **Prompt Templates** in the bottom settings panel.
+2. Edit the desired template text.
+3. Run a context action to validate result quality.
+4. Iterate until output quality matches your workflow.
 
-| Template                 | Used By                       | Purpose                                                                                           |
-| ------------------------ | ----------------------------- | ------------------------------------------------------------------------------------------------- |
-| **Find Vulnerabilities** | "Find vulnerabilities" action | Comprehensive security analysis covering injection, auth, info disclosure, and misconfigurations. |
-| **Analyze this request** | "Analyze this request" action | Concise endpoint summary (5-7 bullets).                                                           |
-| **Explain JS**           | "Explain JS" action           | JavaScript behavior analysis and security risk notes.                                             |
-| **Access Control**       | "Access control" action       | Authorization test plan for privilege escalation.                                                 |
-| **Login Sequence**       | "Login sequence" action       | Login flow extraction from traffic.                                                               |
-
-## Issue Prompts
-
-These templates are used when you right-click on scanner issues (Burp Pro):
-
-| Template                    | Used By                          | Purpose                                                         |
-| --------------------------- | -------------------------------- | --------------------------------------------------------------- |
-| **Analyze this Issue**      | "Analyze this issue" action      | Deep analysis with root cause, evidence, and validation steps.  |
-| **Generate PoC & Validate** | "Generate PoC & validate" action | Step-by-step PoC with curl requests and expected responses.     |
-| **Impact & Severity**       | "Impact & severity" action       | CIA impact, exploitability, business risk, and CVSS assessment. |
-| **Full Report**             | "Full report" action             | Complete vulnerability report ready for client delivery.        |
-
-## Customization
-
-To customize a template:
-
-1. Navigate to **Prompt Templates tab in the bottom settings panel**.
-2. Find the template you want to edit.
-3. Modify the text in the text area.
-4. Changes take effect immediately for new context menu actions.
-
-> **Tip**: You can reset a template to its default by clearing the text field. The extension will fall back to the built-in default.
-
-## Best Practices
-
-* **Keep templates focused**: Each template should serve a single purpose. Don't try to combine vulnerability analysis with PoC generation in one template.
-* **Include output format**: Tell the AI exactly how you want the response structured (Markdown, bullets, tables).
-* **Test with real data**: After editing a template, test it on a real request to verify the output quality.
-* **Version control**: Consider backing up your custom templates if you've invested significant effort in tuning them.
+Tip: clearing a template field falls back to built-in defaults.

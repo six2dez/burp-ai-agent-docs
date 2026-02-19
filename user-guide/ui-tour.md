@@ -1,65 +1,65 @@
 # UI Tour
 
-This section describes every UI area and what it does.
+This page describes each UI area and what it controls.
 
 ## Top Bar
 
-The top bar provides quick access to the most important controls:
+The top bar provides quick access to core runtime controls:
 
-| Control              | Description                                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------------------------- |
-| **MCP** toggle       | Starts/stops the MCP server. Green = running.                                                           |
-| **Passive** toggle   | Enables/disables background passive analysis of proxy traffic.                                          |
-| **Active** toggle    | Enables/disables active scanning (risk-based). See warnings in [Active Scanner](../scanners/active.md). |
-| **Backend** selector | Dropdown to choose the AI backend for new sessions (only available backends are shown).                 |
-| **Status** indicator | Shows backend state (\`Status:                                                                          |
+| Control | Description |
+| :--- | :--- |
+| **MCP toggle** | Starts/stops the MCP server. Green indicates running state. |
+| **Passive toggle** | Enables/disables background passive analysis of proxy traffic. |
+| **Active toggle** | Enables/disables active scanning. See warnings in [Active Scanner](../scanners/active.md). |
+| **Backend selector** | Chooses the AI backend for new sessions (available backends only). |
+| **Status indicator** | Shows backend state such as `Ready`, `Starting`, `Running`, or `Crashed`. |
 
 ![Screenshot: Top bar](../.gitbook/assets/top-bar.png)
 
 ## Chat Panel
 
-The main interaction area where you communicate with the AI:
+Main interaction area for AI conversations:
 
-* **Session list**: Left sidebar showing all chat sessions with title, timestamp, and last backend used.
-* **Usage stats**: Summary of total messages and per-backend usage at the bottom of the session list.
-* **Chat area**: Displays conversation with AI responses rendered as formatted **Markdown** (headers, code blocks, lists, links, quotes).
-* **Input field**: Type prompts or paste context. `Enter` sends, `Shift+Enter` inserts a new line.
-* **Tools button**: Inserts MCP tool commands into the input field for forcing specific tool calls.
-* **Context preview**: Shows the redacted context that will be sent to the AI, so you can verify what data leaves Burp.
-* **Streaming**: AI responses stream in real time as they are generated, not as a single block.
-* **Cancel button**: Stop an in-flight response.
-* **Export**: Right-click a session to export as Markdown.
+* **Session list**: Sidebar with title, timestamp, and backend metadata.
+* **Usage stats**: Message and backend usage counters.
+* **Chat area**: Markdown-rendered assistant output.
+* **Input field**: `Enter` sends, `Shift+Enter` inserts new line.
+* **Tools button**: Inserts MCP tool commands into input.
+* **Context preview**: Shows the redacted context that will be sent.
+* **Streaming**: Responses stream incrementally.
+* **Cancel button**: Stops in-flight response.
+* **Export**: Right-click session to export Markdown.
 
 ## Settings Panel
 
-The settings area lives in the bottom panel of the AI Agent tab. It uses native Burp-style tabs, and each tab shows its options directly. The panel can be resized or collapsed using the toggle bar or the horizontal splitter.
+The settings panel is in the bottom area of the AI Agent tab. It can be resized or collapsed.
 
-| Tab                    | What It Controls                                                                                               |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------- |
-| **AI Backend**         | Backend selection, CLI commands, HTTP URLs, model names, API keys, extra headers, auto-start, timeouts.        |
-| **AI Passive Scanner** | Rate limit, scope filtering, max size, min severity, findings view.                                            |
-| **AI Active Scanner**  | Concurrency, payloads per point, timeout, delay, risk level, scan mode, collaborator, auto-queue from passive. |
-| **MCP Server**         | Host, port, TLS, external access, STDIO bridge, token, request limits, unsafe tools master switch.             |
-| **Burp Integration**   | MCP tool toggles grouped by category with safe/unsafe gating.                                                  |
-| **Prompt Templates**   | Editable default prompts for all context menu actions.                                                         |
-| **Privacy & Logging**  | Redaction mode (STRICT/BALANCED/OFF), determinism, host salt, audit logging toggle.                            |
-| **Help**               | Quick links to documentation, MCP setup guide, and version info.                                               |
+| Tab | What It Controls |
+| :--- | :--- |
+| **AI Backend** | Backend selection, CLI commands, HTTP URLs, model names, API keys, headers, auto-start, and timeout settings. |
+| **AI Passive Scanner** | Rate limit, scope filtering, max size, minimum severity, findings view. |
+| **AI Active Scanner** | Concurrency, payload depth, timeout, delay, risk level, scan mode, collaborator, queue controls. |
+| **MCP Server** | Host, port, TLS, external access, STDIO bridge, token, limits, unsafe-tools switch. |
+| **Burp Integration** | MCP tool toggles grouped by category with safe/unsafe gating. |
+| **Prompt Templates** | Built-in request/issue prompt templates plus BountyPrompt integration controls. |
+| **Privacy & Logging** | Privacy mode, determinism, host salt, audit logging. |
+| **Help** | Quick links to docs and MCP setup instructions. |
 
 <figure><img src="../.gitbook/assets/image (5).png" alt=""><figcaption></figcaption></figure>
 
-**Open CLI buttons**: In the backend settings, CLI-based backends include an **Open CLI** button to launch a terminal with the configured command and MCP tools access.
+**Open CLI buttons**: CLI-based backend settings include an **Open CLI** button to launch a terminal with the configured command and MCP tool access.
 
 ## Privacy Pill
 
-A small indicator in the UI showing the active privacy mode:
+Visual indicator of active privacy mode:
 
-* **STRICT**: Displayed with a prominent visual indicator to remind you that data is being heavily redacted.
+* **STRICT**: High-visibility indicator for heavy redaction.
 * **BALANCED**: Moderate indicator.
-* **OFF**: Warning-style indicator to alert you that no redaction is active.
+* **OFF**: Warning-style indicator that raw context is being sent.
 
 ## Dependency Banner
 
-If MCP is disabled, a banner appears at the top of the tab reminding you to enable MCP to use AI features.
+If MCP is disabled, a banner is shown at the top of the tab reminding you to enable MCP for AI features.
 
 ## Keyboard Shortcuts
 
@@ -71,8 +71,8 @@ If MCP is disabled, a banner appears at the top of the tab reminding you to enab
 
 ## Findings Panel
 
-When scanners are active, the extension provides findings dialogs showing:
+When scanners are active, findings dialogs provide:
 
-* Passive findings with severity, confidence, and detail.
-* Active findings with confirmed vulnerability evidence.
+* Passive findings with severity/confidence/detail.
+* Active findings with confirmation evidence.
 * Status metrics (requests analyzed, issues found, queue size).

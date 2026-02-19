@@ -1,32 +1,48 @@
 # Context Menus
 
-The extension adds actions to Burp's right-click context menus in multiple tools. Actions are available wherever you can select HTTP requests/responses or scanner issues.
+The extension adds actions to Burp right-click menus in tools where HTTP traffic or scanner findings are selected.
 
 ## Where Context Menus Appear
 
-* **Proxy → HTTP History**: Right-click any request.
+* **Proxy -> HTTP History**: Right-click any request.
 * **Repeater**: Right-click the request or response.
 * **Site Map**: Right-click any entry.
-* **Scanner → Issues** (Pro only): Right-click any finding.
+* **Scanner -> Issues** (Pro only): Right-click any finding.
 
 ## Request Actions
 
-When you right-click on an HTTP request/response, these actions are available under **Extensions → Burp AI Agent**:
+When you right-click HTTP request/response items, these actions are available under **Extensions -> Burp AI Agent**:
 
-| Action                   | Description                                                                                                                                        |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **AI Passive Scan**      | Queues the selected request(s) for passive AI analysis in the background.                                                                          |
-| **AI Active Scan**       | Queues the selected request(s) for active vulnerability testing. **Sends traffic to the target.**                                                  |
-| **Targeted tests**       | Submenu to run focused active checks (SQLi, XSS, SSRF, IDOR, etc.). **Sends traffic to the target.**                                               |
-| **Find vulnerabilities** | Comprehensive security analysis: checks for SQLi, XSS, CMDI, SSTI, SSRF, IDOR, BOLA, BAC, information disclosure, header/cookie misconfigurations. |
-| **Analyze this request** | Compact 5-7 bullet summary: HTTP method, path, auth mechanism, parameters, response type, security observations.                                   |
-| **Explain JS**           | Analyzes JavaScript behavior, summarizes functionality, and highlights security risks.                                                             |
-| **Access control**       | Generates a test plan for horizontal/vertical privilege escalation, authorization bypass, and missing access controls.                             |
-| **Login sequence**       | Drafts a login flow from the observed traffic, identifying parameters to capture and replay.                                                       |
+| Action | Description |
+| :--- | :--- |
+| **AI Passive Scan** | Queues selected request(s) for passive AI analysis in the background. |
+| **AI Active Scan** | Queues selected request(s) for active testing. Sends traffic to the target. |
+| **Targeted tests** | Submenu for focused active checks (SQLi, XSS, SSRF, IDOR, etc.). Sends traffic to the target. |
+| **BountyPrompt** | Curated submenu of tag-aware prompts loaded from JSON files. Uses selective context extraction before model invocation. |
+| **Find vulnerabilities** | Broad security analysis for injection, auth/access, disclosure, and misconfiguration classes. |
+| **Analyze this request** | Compact endpoint summary (method, route, auth, params, response type, security notes). |
+| **Explain JS** | JavaScript behavior and risk analysis. |
+| **Access control** | Authorization test plan for horizontal/vertical privilege escalation paths. |
+| **Login sequence** | Login flow extraction and replay guidance from observed traffic. |
 
 ![Screenshot: Request menu](../.gitbook/assets/context-menu-request.png)
 
-**Targeted tests submenu (examples):**
+## BountyPrompt Submenu
+
+The **BountyPrompt** submenu is grouped by category:
+
+* **Detection**: API key exposure, CSRF assessment, security headers, vulnerable software, sensitive errors, vulnerable file upload endpoints.
+* **Recon**: Endpoint extraction from observed traffic.
+* **Advisory**: Suggested follow-up attack vectors.
+
+Menu entries show the selected item count, for example `Security Headers Analysis (3)`.
+
+If BountyPrompt integration is disabled or no curated prompts are loadable from the configured directory, the submenu appears disabled with a tooltip.
+
+## Targeted Tests Submenu
+
+Examples:
+
 * SQLi
 * XSS (Reflected/Stored/DOM)
 * SSRF
@@ -39,41 +55,42 @@ When you right-click on an HTTP request/response, these actions are available un
 
 ## Issue Actions (Burp Pro)
 
-When you right-click on a scanner issue, these actions are available:
+When you right-click scanner issues, these actions are available:
 
-| Action                      | Description                                                                                                                                     |
-| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Analyze this issue**      | Deep analysis: explains the vulnerability, identifies root cause, cites evidence from the request/response, and lists validation steps.         |
-| **Generate PoC & validate** | Produces step-by-step proof-of-concept with exact HTTP requests (curl format where possible), expected responses, and safe validation criteria. |
-| **Impact & severity**       | Assesses CIA impact, exploitability, business risk, and CVSS considerations.                                                                    |
-| **Full report**             | Generates a structured vulnerability report: summary, root cause, evidence, impact, PoC, and remediation recommendations.                       |
+| Action | Description |
+| :--- | :--- |
+| **Analyze this issue** | Detailed analysis with root cause, evidence, and validation flow. |
+| **Generate PoC & validate** | Step-by-step proof-of-concept with expected responses and success criteria. |
+| **Impact & severity** | CIA impact, exploitability, business risk, and CVSS-style reasoning. |
+| **Full report** | Structured vulnerability report for delivery. |
 
 ![Screenshot: Issue menu](../.gitbook/assets/context-menu-issue.png)
 
-## How It Works
+## Execution Flow
 
-1. You right-click and select an action.
-2. The extension collects context from the selected request/response or issue.
-3. Context is passed through the [redaction pipeline](../privacy/privacy-modes.md) based on your privacy mode.
-4. The corresponding [prompt template](prompt-templates.md) is combined with the redacted context.
-5. The prompt is sent to the active AI backend.
-6. The AI response streams into a new chat session in the AI Agent tab.
+1. Select one or more requests/responses or scanner issues.
+2. Trigger a context menu action.
+3. The extension collects selection context.
+4. Privacy mode redaction is applied.
+5. Action prompt/template is composed.
+6. The prompt is sent to the selected AI backend.
+7. Response streams into a chat session.
+
+For BountyPrompt actions, tag resolution runs after redaction and before prompt composition.
 
 ## Multiple Selections
 
-You can select multiple requests in Proxy History or Site Map and apply context menu actions to all of them at once. This is useful for:
+You can select multiple requests in Proxy History or Site Map and run actions across all selected items. This is useful for:
 
-* Batch passive scanning of many endpoints.
-* Queuing multiple targets for active scanning.
-
+* Batch passive scanning.
+* Batch queuing for active scanning.
+* Running the same BountyPrompt action across related endpoints.
 
 ## Active Scan Safety and Queue Visibility
 
-For active scan actions, the context menu flow adds safety and visibility:
+For active scan actions, the context flow enforces safety and visibility:
 
-- Explicit confirmation dialogs before queuing active tests.
-- Target validation before enqueue.
-- Queue state visibility (current queue and max queue).
-- Clear warning when no target was queued (filtered target or full queue).
-
-Passive manual scan remains available from context menu without requiring MCP server state.
+* Confirmation dialogs before queueing active tests.
+* Target validation before enqueue.
+* Queue state visibility (current and maximum queue size).
+* Explicit warning when no target is queued (filtered target or full queue).

@@ -1,10 +1,10 @@
 # Typical Workflows
 
-These workflows demonstrate how to use the Burp AI Agent effectively in real-world security assessments.
+These workflows show common ways to use Burp AI Agent in security assessments.
 
 ## Bug Bounty Triage
 
-Rapidly assess endpoints and generate reports for submission.
+Assess endpoints and generate submission reports.
 
 1.  Browse the target application with Burp Proxy.
 2.  In **Proxy → HTTP History**, right-click an interesting request → **Find vulnerabilities**.
@@ -16,7 +16,7 @@ Rapidly assess endpoints and generate reports for submission.
 
 ## Large Scope Reconnaissance
 
-Efficiently map and analyze a large application surface.
+Map and analyze a large application surface.
 
 1.  Set your target in **Target → Scope**.
 2.  Enable the **Passive** toggle in the top bar.
@@ -36,11 +36,11 @@ Systematic testing of REST/GraphQL APIs.
 3.  For authentication endpoints, use **Login sequence** to document the auth flow.
 4.  Test authorization with **Access control** to generate a test plan for IDOR/BOLA/BAC.
 5.  Enable the passive scanner with **Scope Only** to catch common API misconfigurations.
-6.  Use the MCP server with Claude Desktop for agentic testing: *"Check all API endpoints in proxy history for missing authorization checks."*
+6.  Use the MCP server with Claude Desktop for supervised MCP testing: *"Check all API endpoints in proxy history for missing authorization checks."*
 
-## Agentic Pentesting with MCP
+## MCP-Driven Pentesting
 
-Let an external AI agent drive Burp autonomously under your supervision.
+Use an external AI agent to execute Burp tools under your supervision.
 
 1.  Enable the **MCP** toggle. Note the token from **MCP Server tab in the bottom settings panel**.
 2.  Configure Claude Desktop (or another MCP client) with the Burp MCP server connection.
@@ -71,6 +71,6 @@ Produce a verifiable record of all AI interactions for compliance.
 2.  Set **Privacy Mode** to **STRICT** for sensitive engagements.
 3.  Enable **Determinism Mode** for reproducible prompts.
 4.  Perform your assessment normally using context menus and chat.
-5.  After the assessment, review `~/.burp-ai-agent/audit.jsonl` for the complete interaction log.
+5.  After the assessment, review `~/.burp-ai-agent/audit.jsonl` for the full interaction log.
 6.  Use the SHA-256 hashes in the audit log to verify that context data hasn't been modified.
 7.  Export prompt bundles via the audit logger's ZIP export for archival.

@@ -26,7 +26,7 @@ This lets an AI explore and interact with Burp under your supervision.
 
 ## Connecting Cloud AI Agents
 
-To allow Cloud AI Agents to "drive" Burp Suite, you must configure the MCP server. Edit your Codex/Claude/Gemini/... configuration file:
+To allow cloud AI agents to interact with Burp Suite, configure the MCP server. Edit your Codex/Claude/Gemini/... configuration file:
 
 * **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
 * **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`

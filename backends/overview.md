@@ -1,10 +1,10 @@
 # Overview
 
-The Burp AI Agent is model-agnostic. It uses a "Supervisor" system to manage connections to various AI providers. You can choose the backend that best fits your security, cost, and performance needs.
+Burp AI Agent is model-agnostic. It uses a Supervisor to manage connections to multiple AI providers. Choose a backend based on your security, cost, and performance requirements.
 
 ## Supported Backends
 
-| Backend        | Type  | Privacy | Best For                                       |
+| Backend        | Type  | Privacy | Typical Use                                       |
 | -------------- | ----- | ------- | ---------------------------------------------- |
 | **Ollama**     | Local | High    | Offline analysis, strict privacy requirements. |
 | **LM Studio**  | Local | High    | GUI-based model management, Windows users.     |

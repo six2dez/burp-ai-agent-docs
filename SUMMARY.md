@@ -14,6 +14,7 @@
 * [Context Menus](user-guide/context-menus.md)
 * [Chat & Sessions](user-guide/chat-sessions.md)
 * [Prompt Templates](user-guide/prompt-templates.md)
+* [BountyPrompt Actions](user-guide/bountyprompt-actions.md)
 * [Agent Profiles](user-guide/agent-profiles.md)
 * [Burp Integration](user-guide/burp-integration.md)
 

@@ -38,11 +38,11 @@ The scanner operates in three risk modes. You must select the appropriate level 
 
 The scan mode determines which vulnerability classes are tested. Choose based on your engagement type.
 
-| Mode            | Description                                                                                              | Use Case                                                   |
-| --------------- | -------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| **BUG\_BOUNTY** | Curated subset of high-impact vulnerability classes. Minimizes noise and focuses on reportable findings. | Bug bounty programs, time-limited assessments.             |
-| **PENTEST**     | More exhaustive testing. Includes information disclosure and lower-severity checks.                      | Professional penetration tests, compliance audits.         |
-| **FULL**        | All 62 vulnerability classes are tested. Maximum coverage.                                               | Comprehensive security assessments, internal applications. |
+| Mode            | Description                                                                                              | Use Case                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| **BUG\_BOUNTY** | Curated subset of high-impact vulnerability classes. Minimizes noise and focuses on reportable findings. | Bug bounty programs, time-limited assessments.    |
+| **PENTEST**     | Broader testing set, including information disclosure and lower-severity checks.                        | Penetration tests, compliance audits.             |
+| **FULL**        | All 62 vulnerability classes are tested.                                                                 | Broad security assessments, internal applications. |
 
 ## Configuration
 
@@ -232,7 +232,7 @@ When **Auto-Queue to Active** is enabled in the passive scanner settings, high-c
 
 On Burp Suite Professional, the Active AI Scanner integrates with the native scan engine via `ScanCheck`. This means AI-generated scan checks run alongside Burp's built-in scanner. On Burp Community Edition, the scanner operates independently using manual queue management.
 
-## Best Practices
+## Recommended Practices
 
 1. **Start Passive**: Let the Passive Scanner find interesting endpoints first.
 2. **Verify First**: Use `SAFE` mode to confirm potential injection points without risk.

@@ -1,103 +1,124 @@
 # Data Flow
 
-This page describes how data moves through the extension, from user action to AI response.
+This page describes data movement from Burp selection to AI output.
 
-## Chat Flow (Context Menu → AI Response)
+## Standard Chat Flow (Context Menu -> AI Response)
 
 ```
-User right-clicks request        Context menu action triggered
-        │                                    │
-        ▼                                    ▼
-┌───────────────┐              ┌──────────────────────┐
-│ Burp Selection │──────────►  │  ContextCollector     │
-│ (request/issue)│              │  Extracts URL, method,│
-└───────────────┘              │  headers, params, body│
-                                └──────────┬───────────┘
-                                           │
-                                           ▼
-                                ┌──────────────────────┐
-                                │  Redaction Pipeline   │
-                                │  Applies privacy mode │
-                                │  (STRICT/BALANCED/OFF)│
-                                └──────────┬───────────┘
-                                           │
-                                           ▼
-                                ┌──────────────────────┐
-                                │  Prompt Bundle        │
-                                │  Context + template + │
-                                │  SHA-256 hash         │
-                                └──────────┬───────────┘
-                                           │
-                                           ▼
-                                ┌──────────────────────┐
-                                │  Backend Adapter      │
-                                │  CLI (subprocess) or  │
-                                │  HTTP (API call)      │
-                                └──────────┬───────────┘
-                                           │
-                                    ┌──────┴──────┐
-                                    ▼             ▼
-                            ┌────────────┐ ┌────────────┐
-                            │ Audit Log  │ │ Chat Panel │
-                            │ (JSONL)    │ │ (Markdown) │
-                            └────────────┘ └────────────┘
+User selection in Burp              Context action triggered
+        │                                      │
+        ▼                                      ▼
+┌────────────────┐                 ┌──────────────────────┐
+│ Request / Issue │──────────────► │ ContextCollector      │
+└────────────────┘                 └──────────┬───────────┘
+                                              │
+                                              ▼
+                                   ┌──────────────────────┐
+                                   │ Redaction Pipeline    │
+                                   │ STRICT/BALANCED/OFF  │
+                                   └──────────┬───────────┘
+                                              │
+                                              ▼
+                                   ┌──────────────────────┐
+                                   │ Prompt Composition    │
+                                   │ Template + context    │
+                                   └──────────┬───────────┘
+                                              │
+                                              ▼
+                                   ┌──────────────────────┐
+                                   │ Backend Adapter       │
+                                   │ CLI or HTTP           │
+                                   └──────┬─────────┬─────┘
+                                          │         │
+                                          ▼         ▼
+                                  ┌────────────┐ ┌────────────┐
+                                  │ Audit Log  │ │ Chat Panel │
+                                  └────────────┘ └────────────┘
 ```
 
-## Step-by-Step
+## BountyPrompt Flow (Request/Response Actions)
 
-1.  **User selects context**: Right-click on a request/response in Proxy, Repeater, or Site Map; or on an issue in the Scanner panel.
-2.  **Context collection**: `ContextCollector` captures the selected request/response or issue data as raw text plus metadata (URL, method, severity, confidence, remediation).
-3.  **Redaction**: The `Redaction` module applies the active privacy mode:
-    *   **STRICT**: Strips cookies, redacts auth tokens, anonymizes hostnames using SHA-256(salt + host).
-    *   **BALANCED**: Strips cookies, redacts auth tokens, preserves hostnames.
-    *   **OFF**: No modification.
-4.  **Prompt bundle**: The redacted context is combined with the selected prompt template. If determinism is enabled, context ordering is stabilized. A SHA-256 hash of the bundle is computed for audit integrity.
-5.  **Backend processing**: The prompt is sent to the configured AI backend (CLI subprocess or HTTP API). The response streams back in real time.
-6.  **Audit logging**: If enabled, the prompt bundle, context hashes, backend metadata, and streamed response chunks are written to `~/.burp-ai-agent/audit.jsonl`.
-7.  **Display**: The AI response is rendered as Markdown in the chat panel. For scanner findings, issues may be created automatically.
+```
+User selects BountyPrompt action
+            │
+            ▼
+┌───────────────────────────────┐
+│ BountyPrompt Loader           │
+│ - reads curated JSON prompts  │
+│ - filters by enabled IDs      │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Tag Resolver                  │
+│ - applies privacy redaction   │
+│ - resolves [HTTP_*] tokens    │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Prompt Composer               │
+│ - systemPrompt + user task    │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Backend + Chat Stream         │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Output Parser (if issue type) │
+│ - JSON extraction / fallback   │
+│ - NONE guard                   │
+│ - confidence threshold         │
+└───────────────┬───────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ Burp Issue Creation           │
+│ [AI][BountyPrompt] prefix     │
+└───────────────────────────────┘
+```
+
+## Step-by-Step Sequence
+
+1. User selects context (request/response or issue).
+2. `ContextCollector` extracts raw context plus metadata.
+3. Redaction applies active privacy mode.
+4. Action prompt is composed.
+5. Backend processes prompt and streams output.
+6. Audit logging records invocation/output events if enabled.
+7. Response is rendered in chat.
+8. For eligible BountyPrompt outputs, parser and confidence gate decide issue creation.
 
 ## Passive Scanner Flow
 
 ```
-Proxy traffic ──► MIME filter ──► Scope filter ──► Size filter ──► Rate limiter ──► AI Analysis ──► Findings
-                                                                                                     │
-                                                                                        (confidence ≥ 85%)
-                                                                                                     │
-                                                                                                     ▼
-                                                                                         Burp Issues [AI Passive]
-                                                                                                     │
-                                                                                          (if auto-queue enabled)
-                                                                                                     │
-                                                                                                     ▼
-                                                                                            Active Scanner Queue
+Proxy traffic -> MIME filter -> Scope filter -> Size filter -> Rate limiter -> AI analysis -> Findings
+                                                                                           │
+                                                                                   confidence >= 85%
+                                                                                           │
+                                                                                           ▼
+                                                                                   Burp Issues [AI]
+                                                                                           │
+                                                                                 (optional auto-queue)
+                                                                                           │
+                                                                                           ▼
+                                                                                     Active queue
 ```
 
 ## Active Scanner Flow
 
 ```
-Target request ──► Injection Point Extraction ──► Payload Selection ──► Send Payloads ──► Response Analysis
-                        │                              │                                        │
-                   URL params               Risk level + scan mode                     Detection method
-                   Body params              Vuln class filter                          (error/blind/time/
-                   Headers                                                              reflection/OOB)
-                   Cookies                                                                      │
-                   JSON fields                                                                  ▼
-                   XML elements                                                        Confirmed findings
-                   Path segments                                                       with [AI Active] prefix
+Target request -> Injection point extraction -> Payload selection -> Send payloads -> Response analysis
+                       │                             │                                      │
+                       ▼                             ▼                                      ▼
+             params/headers/body/path       risk level + mode                         confirmed findings
 ```
 
 ## MCP Tool Flow
 
 ```
-External AI Agent ──► SSE/STDIO ──► Token Auth (external only) ──► Tool Gating ──► Request Limiter ──► Tool Handler
-        │                                                                                    │
-   (Claude Desktop,                                                                   Burp API call
-    custom scripts)                                                                  (history, repeater,
-                                                                                      scanner, etc.)
-                                                                                          │
-                                                                                          ▼
-                                                                                   Privacy filter
-                                                                                          │
-                                                                                          ▼
-                                                                                   Response to agent
+External MCP client -> SSE/STDIO -> auth/gating -> limiter -> tool handler -> Burp API -> response
 ```

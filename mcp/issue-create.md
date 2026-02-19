@@ -1,6 +1,6 @@
 # Issue Creation (MCP)
 
-The `issue_create` MCP tool allows AI agents to programmatically create Burp audit issues. This is one of the most important tools for agentic workflows, enabling the AI to document its findings directly in Burp.
+The `issue_create` MCP tool allows AI agents to create Burp audit issues programmatically. It is commonly used in MCP workflows to document findings directly in Burp.
 
 ## Tool Details
 
@@ -31,7 +31,7 @@ The `issue_create` MCP tool allows AI agents to programmatically create Burp aud
 | `targetPort` | Int | No | Port for the attached request (default 443). |
 | `usesHttps` | Boolean | No | Whether the attached request uses HTTPS (default true). |
 
-## Best Practices
+## Recommended Practices
 
 ### When to Create Issues
 
@@ -41,7 +41,7 @@ The `issue_create` MCP tool allows AI agents to programmatically create Burp aud
 
 ### Issue Formatting
 
-*   **Title prefix**: Use `[AI]` prefix for easy identification (e.g., `[AI] Reflected XSS in search parameter`).
+*   **Title prefix**: Use `[AI]` prefix for identification (e.g., `[AI] Reflected XSS in search parameter`).
 *   **Evidence**: Include specific request/response excerpts, parameter names, and payload details.
 *   **Reproduction steps**: Number each step so a human can follow along.
 *   **Remediation**: Provide actionable fix recommendations, not generic advice.
@@ -64,7 +64,7 @@ An MCP client (like Claude Desktop) might call the tool like this:
 
 ## Integration with Workflows
 
-The `issue_create` tool is typically the final step in an agentic workflow:
+The `issue_create` tool is typically the final step in an MCP workflow:
 
 1.  AI browses proxy history (`proxy_http_history_regex`).
 2.  AI identifies suspicious endpoint.
@@ -72,4 +72,4 @@ The `issue_create` tool is typically the final step in an agentic workflow:
 4.  AI analyzes responses for vulnerability indicators.
 5.  AI creates an issue (`issue_create`) with full evidence.
 
-See [Typical Workflows](../examples/typical-workflows.md) for complete examples.
+See [Typical Workflows](../examples/typical-workflows.md) for workflow examples.
