@@ -1,59 +1,87 @@
-# Overview
+# Backends Overview
 
-Burp AI Agent is model-agnostic. It uses a Supervisor to manage connections to multiple AI providers. Choose a backend based on your security, cost, and performance requirements.
+Burp AI Agent is backend-agnostic. You can run local models, cloud CLI providers, or OpenAI-compatible HTTP providers.
+
+## Backend Selection Guide
+
+```mermaid
+flowchart TD
+    Start[Choose backend]
+    Privacy{Need maximum privacy?}
+    Cli{Prefer CLI provider workflow?}
+    OwnApi{Using your own API/provider endpoint?}
+
+    Start --> Privacy
+    Privacy -->|Yes| Local[Local backends\nOllama or LM Studio]
+    Privacy -->|No| Cli
+
+    Cli -->|Yes| CloudCli[Gemini CLI / Claude CLI / Codex CLI / OpenCode CLI]
+    Cli -->|No| OwnApi
+
+    OwnApi -->|Yes| Generic[Generic OpenAI-compatible]
+    OwnApi -->|No| Local
+```
 
 ## Supported Backends
 
-| Backend        | Type  | Privacy | Typical Use                                       |
-| -------------- | ----- | ------- | ---------------------------------------------- |
-| **Ollama**     | Local | High    | Offline analysis, strict privacy requirements. |
-| **LM Studio**  | Local | High    | GUI-based model management, Windows users.     |
-| **Generic (OpenAI-compatible)** | HTTP | Medium | Any OpenAI-compatible provider (Z.AI, KILO, etc.). |
-| **Gemini CLI** | Cloud | Medium  | Large context window analysis.                 |
-| **Claude CLI** | Cloud | Medium  | Reasoning and logic analysis.                  |
-| **Codex CLI**  | Cloud | Medium  | Code analysis and PoC generation.              |
-| **OpenCode**   | Cloud | Medium  | Multi-provider support via single CLI.         |
+| Backend | Type | Privacy Posture | Typical Use |
+| :--- | :--- | :--- | :--- |
+| **Ollama** | Local HTTP | High | Offline or strict data control. |
+| **LM Studio** | Local HTTP | High | Local models with GUI management. |
+| **Generic (OpenAI-compatible)** | HTTP | Medium | Any compatible provider endpoint. |
+| **Gemini CLI** | Cloud CLI | Medium | Large-context cloud workflows. |
+| **Claude CLI** | Cloud CLI | Medium | Reasoning-heavy analysis. |
+| **Codex CLI** | Cloud CLI | Medium | Code/security analysis and PoCs. |
+| **OpenCode CLI** | Cloud CLI | Medium | Multi-provider via one CLI. |
 
-## General Configuration
+## Setup Path
 
-1. Navigate to the **AI Backend** tab in the bottom settings panel.
-2. **Preferred Backend**: Choose the backend you want to use for _new_ chat sessions. The dropdown only shows backends that are available on your machine.
-3. **Command / URL / Headers**:
-   * **CLI Backends**: Provide the shell command (e.g., `gemini`, `claude`). Ensure these tools are installed and authenticated in your OS terminal. On Windows with npm-installed CLIs, use the full shim path with double backslashes (e.g., `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`).
-   * **HTTP Backends**: Provide the URL (e.g., `http://127.0.0.1:11434` for Ollama) plus optional API key and extra headers.
+1. Open the **AI Backend** tab in Settings.
+2. Select **Preferred Backend** for new sessions.
+3. Configure command/URL/model/auth fields for that backend.
+4. Use **Test connection** where available.
+5. Start with [Privacy Modes](../privacy/privacy-modes.md) set appropriately.
 
-![Screenshot: Backend settings](../.gitbook/assets/backend-settings.png)
+{% tabs %}
+{% tab title="CLI Backends" %}
+Configure executable command and ensure authentication is already completed in the same runtime environment as Burp.
 
-## Backend Types
+Windows tip: with npm-installed tools, prefer full shim paths like `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`.
+{% endtab %}
 
-### CLI Backends
+{% tab title="HTTP Backends" %}
+Configure base URL, model, optional API key, and extra headers.
 
-CLI backends (Gemini, Claude, Codex, OpenCode) are launched as subprocesses. The extension's **Supervisor** manages their lifecycle, including health checks, auto-restart on crash, and session binding.
+For local servers, verify the service is running and port is reachable from Burp.
+{% endtab %}
 
-### HTTP Backends
+{% tab title="Custom Drop-in" %}
+Drop custom backend JARs implementing `AiBackendFactory` into:
 
-HTTP backends (Ollama, LM Studio, Generic OpenAI-compatible) communicate via direct HTTP API calls. No subprocess is spawned. The extension connects to an already-running server, or can optionally auto-start it (where supported).
+`~/.burp-ai-agent/backends/`
 
-## Custom Backends (Drop-in JARs)
+Restart Burp to load them.
+{% endtab %}
+{% endtabs %}
 
-The extension supports **external backend plugins** via Java's ServiceLoader mechanism. To add a custom backend:
+## Cross-Platform CLI Detection
 
-1. Implement the `AiBackendFactory` interface in a JAR.
-2. Include a `META-INF/services` file pointing to your implementation.
-3. Drop the JAR into `~/.burp-ai-agent/backends/`.
-4. Restart Burp Suite. The new backend will appear in the dropdown.
+CLI backends depend on environment inheritance from the Burp process.
 
-This allows teams to integrate proprietary or enterprise AI services without modifying the extension's source code.
+* If Burp starts from GUI, shell `PATH` and env vars may differ.
+* Use explicit command paths when detection fails.
+* For Windows + WSL bridge patterns, see backend-specific pages and [Troubleshooting](../reference/troubleshooting.md).
 
-## Burp Pro vs Community
+## Burp Edition Notes
 
-All backends work with both Burp Suite Community and Professional editions. However, some MCP tools exposed to backends (like Scanner-related tools) are only available on Burp Pro.
+Backends are available in both Community and Professional editions. MCP tool availability still depends on Burp edition and tool safety gates.
 
+## Next Steps
 
-## HTTP Backend Internals
-
-Implementation highlights:
-
-- Ollama, LM Studio, and OpenAI-compatible backends now share HTTP client/retry/history logic.
-- Shared conversation history is bounded (20 messages) for deterministic memory behavior.
-- Retry behavior is standardized across HTTP backends for common transient connection errors.
+* [Ollama (Local)](ollama.md)
+* [LM Studio (Local)](lm-studio.md)
+* [Generic (OpenAI-compatible)](openai-compatible.md)
+* [Gemini CLI](gemini-cli.md)
+* [Claude CLI](claude-cli.md)
+* [Codex CLI](codex-cli.md)
+* [OpenCode CLI](opencode-cli.md)

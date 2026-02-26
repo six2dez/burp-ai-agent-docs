@@ -2,13 +2,13 @@
 
 The Active AI Scanner performs **dynamic, targeted tests** against the application. Unlike the Passive Scanner, which only observes, the Active Scanner sends new HTTP requests to probe for vulnerabilities.
 
-> **WARNING: DANGEROUS OPERATIONS**
->
-> The Active Scanner sends traffic that can modify data, trigger actions, or disrupt services.
->
-> * **Do not use** on production systems unless authorized.
-> * **Do not use** "DANGEROUS" risk level without explicit permission.
-> * Always ensure the target is within your **Scope**.
+{% hint style="danger" %}
+The Active Scanner sends traffic that can modify data, trigger actions, or disrupt services.
+
+* **Do not use** on production systems unless authorized.
+* **Do not use** `DANGEROUS` risk level without explicit permission.
+* Always ensure the target is within your **Scope**.
+{% endhint %}
 
 ## How It Works
 
@@ -65,6 +65,23 @@ Configure these options in the **AI Active Scanner** tab of the bottom settings 
 ## Vulnerability Classes
 
 The Active Scanner tests for **62 vulnerability classes** organized by category.
+
+```mermaid
+mindmap
+  root((62 Vulnerability Classes))
+    Injection
+    Access Control
+    Authentication Failures
+    Security Misconfiguration
+    Integrity Failures
+    Insecure Design
+    Cryptographic Failures
+    Cache Attacks
+    Information Disclosure
+    Cloud and Infrastructure
+    API Security
+    Other
+```
 
 ### Injection (17 classes)
 
@@ -240,6 +257,7 @@ On Burp Suite Professional, the Active AI Scanner integrates with the native sca
 4. **Human in the Loop**: Use the `[AI Active]` findings as leads. Always verify them manually using Repeater before reporting.
 5. **Monitor Rate Limits**: If the target has WAF or rate limiting, increase the **Request Delay** and reduce **Max Concurrent Scans**.
 6. **Use Scope**: Always enable **Scope Only** to prevent accidental scanning of third-party assets.
+7. **Collaborator workflows**: For OAST checks, follow the full flow in [Burp Integration](../user-guide/burp-integration.md).
 
 
 ## Queue Safety and Backpressure

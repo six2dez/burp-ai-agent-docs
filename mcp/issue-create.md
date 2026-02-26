@@ -1,6 +1,6 @@
 # Issue Creation (MCP)
 
-The `issue_create` MCP tool allows AI agents to create Burp audit issues programmatically. It is commonly used in MCP workflows to document findings directly in Burp.
+The `issue_create` MCP tool lets an AI client create Burp issues programmatically.
 
 ## Tool Details
 
@@ -12,64 +12,70 @@ The `issue_create` MCP tool allows AI agents to create Burp audit issues program
 | **Default enabled** | Yes |
 | **Pro only** | No |
 
+## Workflow Sequence
+
+```mermaid
+sequenceDiagram
+    participant User as Operator
+    participant Client as MCP Client
+    participant MCP as Burp MCP Server
+    participant Burp as Burp Issue API
+
+    User->>Client: Confirm finding and request issue creation
+    Client->>MCP: issue_create(name, detail, severity, confidence, baseUrl, ...)
+    MCP->>MCP: Validate input and sanitize text fields
+    MCP->>Burp: Create issue with optional request/response attachments
+    Burp-->>MCP: Issue created or validation error
+    MCP-->>Client: Result payload
+    Client-->>User: Confirmation and issue reference
+```
+
 ## Input Parameters
 
 | Parameter | Type | Required | Description |
 | :--- | :--- | :--- | :--- |
-| `name` | String | Yes | Issue title (e.g., "SQL Injection in login parameter"). |
-| `detail` | String | Yes | Full description with evidence, steps, and technical details. |
-| `severity` | String | Yes | One of: `INFORMATION`, `LOW`, `MEDIUM`, `HIGH`. |
-| `confidence` | String | Yes | One of: `CERTAIN`, `FIRM`, `TENTATIVE`. |
-| `baseUrl` | String | Yes | The URL where the issue was found. |
-| `remediation` | String | No | Recommended fix for the vulnerability. |
-| `background` | String | No | Background information for the issue. |
-| `remediationBackground` | String | No | Background information for remediation. |
-| `typicalSeverity` | String | No | Typical severity (defaults to `severity`). |
-| `httpRequest` | String | No | Raw HTTP request to attach to the issue. |
-| `httpResponseContent` | String | No | Raw HTTP response to attach to the issue. |
-| `targetHostname` | String | No | Hostname for the attached request. |
-| `targetPort` | Int | No | Port for the attached request (default 443). |
-| `usesHttps` | Boolean | No | Whether the attached request uses HTTPS (default true). |
+| `name` | String | Yes | Issue title (for example, `SQL Injection in login parameter`). |
+| `detail` | String | Yes | Full evidence and technical narrative. |
+| `severity` | String | Yes | `INFORMATION`, `LOW`, `MEDIUM`, `HIGH`. |
+| `confidence` | String | Yes | `CERTAIN`, `FIRM`, `TENTATIVE`. |
+| `baseUrl` | String | Yes | URL where issue was found. |
+| `remediation` | String | No | Recommended remediation. |
+| `background` | String | No | Optional issue background. |
+| `remediationBackground` | String | No | Optional remediation background. |
+| `typicalSeverity` | String | No | Typical severity override (defaults to `severity`). |
+| `httpRequest` | String | No | Raw HTTP request attachment. |
+| `httpResponseContent` | String | No | Raw HTTP response attachment. |
+| `targetHostname` | String | No | Host for attachment context. |
+| `targetPort` | Int | No | Port for attachment context (default `443`). |
+| `usesHttps` | Boolean | No | HTTPS flag for attachment context (default `true`). |
 
 ## Recommended Practices
 
-### When to Create Issues
-
-*   **High confidence**: Only create issues when the AI has strong evidence of a vulnerability. Use `TENTATIVE` confidence for suspected but unconfirmed findings.
-*   **After verification**: Ideally, the AI should verify the finding (e.g., by sending test requests via `http1_request`) before creating an issue.
-*   **Avoid duplicates**: Check existing issues (via `scanner_issues` on Pro) before creating a new one.
-
-### Issue Formatting
-
-*   **Title prefix**: Use `[AI]` prefix for identification (e.g., `[AI] Reflected XSS in search parameter`).
-*   **Evidence**: Include specific request/response excerpts, parameter names, and payload details.
-*   **Reproduction steps**: Number each step so a human can follow along.
-*   **Remediation**: Provide actionable fix recommendations, not generic advice.
-*   **Plain text**: Issue fields are sanitized to plain text (Markdown formatting removed) before they are stored in Burp.
+* Create issues after evidence is verified.
+* Use `TENTATIVE` for suspected-only findings.
+* Check duplicates before creating a new issue.
+* Keep detail field evidence-based and reproducible.
 
 ## Example Usage
-
-An MCP client (like Claude Desktop) might call the tool like this:
 
 ```json
 {
   "name": "[AI] SQL Injection in user_id parameter",
-  "detail": "The user_id parameter in GET /api/users is vulnerable to error-based SQL injection. Payload: user_id=1' OR '1'='1 produced a MySQL syntax error in the response body: 'You have an error in your SQL syntax near...' This indicates unsanitized user input is being interpolated directly into SQL queries.",
+  "detail": "The user_id parameter in GET /api/users is vulnerable to error-based SQL injection...",
   "severity": "HIGH",
   "confidence": "FIRM",
   "baseUrl": "https://example.com/api/users?user_id=1",
-  "remediation": "Use parameterized queries (prepared statements) instead of string concatenation for SQL queries. Apply input validation to reject non-numeric values for user_id."
+  "remediation": "Use parameterized queries and strict server-side validation."
 }
 ```
 
-## Integration with Workflows
+## Integration Pattern
 
-The `issue_create` tool is typically the final step in an MCP workflow:
+Typical chain:
 
-1.  AI browses proxy history (`proxy_http_history_regex`).
-2.  AI identifies suspicious endpoint.
-3.  AI sends test requests (`http1_request`) to verify.
-4.  AI analyzes responses for vulnerability indicators.
-5.  AI creates an issue (`issue_create`) with full evidence.
+1. Search/collect candidate requests (`proxy_http_history_regex`).
+2. Validate behavior (`http1_request` / `http2_request`).
+3. Summarize exploit evidence.
+4. Create issue (`issue_create`).
 
-See [Typical Workflows](../examples/typical-workflows.md) for workflow examples.
+See [Typical Workflows](../examples/typical-workflows.md).

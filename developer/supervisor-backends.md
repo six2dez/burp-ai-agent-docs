@@ -1,112 +1,83 @@
 # Supervisor & Backends
 
-The Supervisor is the internal component responsible for managing the lifecycle of AI backend processes and the MCP server.
+The supervisors coordinate backend process lifecycle, health state, and MCP server runtime.
 
 ## Agent Supervisor
 
-The `AgentSupervisor` manages CLI and HTTP backend connections.
+The `AgentSupervisor` controls CLI and HTTP backend sessions.
 
 ### Responsibilities
 
-*   **Start or attach** to a backend for a new session.
-*   **Monitor health** via periodic checks (every 2 seconds).
-*   **Auto-restart** on failure with exponential backoff.
-*   **Track crash count** and suppress restarts after repeated failures.
-*   **Expose status** to the UI (Running, Crashed, Stopped).
-*   **Emit audit events** for session start/stop.
+* Start or attach backend sessions.
+* Run health checks and expose backend state.
+* Auto-restart crashed backends when policy allows it.
+* Emit operational events used by diagnostics and audit flows.
 
 ### Lifecycle
 
-```
-startOrAttach()
-    │
-    ├── Backend already alive? ──► Reuse existing connection
-    │
-    └── Build launch config from settings
-            │
-            ▼
-        Launch backend
-            │
-            ├── CLI: Spawn subprocess with env vars
-            │       └── Generate session ID: "session-{UUID}"
-            │
-            └── HTTP: Connect to running server
-                    └── Verify with health check
-            │
-            ▼
-        Session binding (session ID ↔ backend ID)
-            │
-            ▼
-        Health monitoring loop (2s interval)
-            │
-            ├── Process alive? ──► Continue monitoring
-            │
-            └── Process exited? ──► Status = "Crashed"
-                    │
-                    ├── Auto-restart enabled? ──► Re-launch with backoff
-                    │
-                    └── Auto-restart disabled? ──► Stay stopped
+```mermaid
+flowchart TD
+    Start[startOrAttach()] --> Alive{Backend already alive?}
+    Alive -->|Yes| Reuse[Reuse existing backend session]
+    Alive -->|No| Config[Build launch config from settings]
+    Config --> Kind{Backend type}
+    Kind -->|CLI| Cli[Spawn subprocess and bind session ID]
+    Kind -->|HTTP| Http[Connect to remote endpoint and run health check]
+    Cli --> Bind[Session binding]
+    Http --> Bind
+    Bind --> Loop[Health monitoring loop]\n2s interval
+    Loop --> Healthy{Healthy?}
+    Healthy -->|Yes| Loop
+    Healthy -->|No| Crash[Set status: Crashed]
+    Crash --> Restart{Auto-restart enabled and budget available?}
+    Restart -->|Yes| Backoff[Exponential backoff and relaunch]
+    Backoff --> Loop
+    Restart -->|No| Stopped[Remain stopped until manual restart]
 ```
 
 ### Session Management
 
-Each backend launch generates a unique session ID (`session-{UUID}`). This ID:
-*   Ties the chat session to a specific backend instance.
-*   Appears in audit logs for traceability.
-*   Allows multiple backends to run in parallel across different sessions.
+Each launch gets a unique session ID (`session-{UUID}`) so chat history, diagnostics, and backend state remain correlated.
 
 ## MCP Supervisor
 
-The `McpSupervisor` manages the MCP server lifecycle separately from the AI backend.
+`McpSupervisor` manages the MCP server independently from AI backends.
 
 ### Features
 
-*   **Health checks** with automatic restart (up to 4 retries).
-*   **Existing server detection**: If port is occupied, requests shutdown before starting.
-*   **Dual transport support**: HTTP (SSE via Ktor/Netty) and STDIO bridge.
-*   **TLS support**: Loopback trust bypass for local connections.
-*   **State machine**: Starting → Running/Failed → Stopped.
+* Health checks with bounded restart attempts.
+* Existing-server detection and safe handover on occupied ports.
+* SSE and STDIO transport lifecycle.
+* Optional TLS with local loopback trust handling.
+* Explicit state transitions: `Starting -> Running/Failed -> Stopped`.
 
 ## Backend Types
 
 ### CLI Backends
-*   Spawned as subprocesses via the configured shell command.
-*   Output collected from process stdout/stderr.
-*   Environment variables injected for backend communication.
-*   Supported: Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI.
+
+* Run as subprocesses from configured commands.
+* Use stdout/stderr streaming for response and diagnostics.
+* Include Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI.
 
 ### HTTP Backends
-*   Direct HTTP API calls to a running server.
-*   No subprocess management needed.
-*   Optional auto-start if the server isn't running.
-*   Supported: Ollama, LM Studio, Generic (OpenAI-compatible).
 
-## Launch Modes
-
-The supervisor runs CLI backend processes internally (embedded mode). Output streams directly to the extension's chat panel.
+* Connect to HTTP APIs of running servers.
+* Optionally auto-start local services (provider-dependent).
+* Include Ollama, LM Studio, and Generic OpenAI-compatible.
 
 ## Failure Handling
 
-*   **Immediate exit**: If a CLI backend exits within seconds of launch, the supervisor marks it as "Crashed" and does **not** auto-restart (likely a configuration error).
-*   **Runtime crash**: If a backend crashes after running successfully, auto-restart is attempted with exponential backoff.
-*   **Crash suppression**: After multiple consecutive crashes, auto-restart is disabled to prevent restart loops.
-*   **Manual restart**: The user can always restart a backend manually from the UI.
+* **Immediate startup exit**: marked as crashed; usually indicates config/auth/command errors.
+* **Runtime crash**: restart attempts follow backoff policy.
+* **Crash suppression**: repeated failures disable restart loops.
+* **Manual control**: restart remains available from UI.
 
-## Backend Diagnostics
+## Diagnostics
 
-The `BackendDiagnostics` module logs diagnostic information when backends fail:
-*   Exit code from the process.
-*   Last lines of stdout/stderr output.
-*   Environment variables used for launch.
+Backend diagnostics include:
 
-This information is available in the Burp extension output tab.
+* process exit code,
+* last stdout/stderr lines,
+* launch configuration details.
 
-
-## Current Supervisor and Backend Notes
-
-Current implementation details:
-
-- Supervisor lifecycle transitions (`start/stop/restart`) are lock-protected for stronger consistency.
-- Embedded CLI environment setup was deduplicated into shared helper logic.
-- External backend classloader lifecycle is explicit; registry closes classloader on reload/shutdown.
-- HTTP backends now rely on shared support utilities for retry behavior and bounded conversation history.
+Use Burp's extension output/errors tabs for investigation.

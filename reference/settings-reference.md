@@ -2,6 +2,8 @@
 
 This page documents configurable settings in the extension, organized by settings tab.
 
+For tuning model spend, also see [Token Usage & Cost Management](../user-guide/token-management.md).
+
 ## AI Backend
 
 | Setting | Type | Default | Description |
@@ -74,8 +76,21 @@ This page documents configurable settings in the extension, organized by setting
 | **Enabled** | Toggle | Off | Enable background passive analysis. |
 | **Rate Limit** | Number | `5` | Minimum seconds between analysis requests (range: 1-60). |
 | **Scope Only** | Toggle | On | Analyze only targets in Burp scope. |
-| **Max Size (KB)** | Number | `96` | Maximum request+response size sent to backend (range: 16-1024). |
+| **Max Size (KB)** | Number | `96` | Maximum response size eligible for passive analysis (range: 16-1024). |
 | **Min Severity** | Dropdown | `LOW` | Ignore findings below selected severity. |
+| **Endpoint dedup (min)** | Number | `30` | Skip repeated equivalent endpoint analysis inside window (range: 1-240). |
+| **Response dedup (min)** | Number | `30` | Skip repeated response-fingerprint analysis inside window (range: 1-240). |
+| **Prompt cache TTL (min)** | Number | `30` | Reuse parsed AI results for identical prompts inside window (range: 1-240). |
+| **Prompt cache entries** | Number | `500` | Maximum prompt-result cache entries (range: 50-5000). |
+| **Endpoint cache entries** | Number | `5000` | Maximum endpoint dedup cache entries (range: 100-50000). |
+| **Fingerprint cache entries** | Number | `5000` | Maximum response-fingerprint dedup cache entries (range: 100-50000). |
+| **Req body chars (AI)** | Number | `2000` | Maximum request body chars included in passive AI metadata (range: 256-20000). |
+| **Resp body chars (AI)** | Number | `4000` | Maximum response body chars included in passive AI metadata (range: 512-40000). |
+| **Max headers** | Number | `40` | Maximum filtered headers included in passive AI metadata (range: 5-120). |
+| **Max params** | Number | `15` | Maximum parameters included in passive AI metadata (range: 5-100). |
+| **Req body chars (manual)** | Number | `4000` | Maximum request body chars included by manual context actions (range: 256-40000). |
+| **Resp body chars (manual)** | Number | `8000` | Maximum response body chars included by manual context actions (range: 512-80000). |
+| **Manual context JSON** | Toggle | On (compact) | Use compact JSON serialization for context-menu actions. |
 
 ## Active AI Scanner
 
@@ -150,6 +165,6 @@ Some limits are operational constants rather than direct UI controls:
 * **Active scanner queue max**: `2000` targets.
 * **Active dedup window**: `1 hour`.
 * **Passive analysis wait timeout**: `90s`.
-* **HTTP backend conversation history cap**: `20` messages.
+* **HTTP backend conversation history cap**: `20` messages and `40000` total characters (minimum 2 latest messages retained).
 * **CLI history cap**: `10` messages or `20000` characters.
 * **Large prompt threshold for Claude CLI fallback path**: `32000` characters.

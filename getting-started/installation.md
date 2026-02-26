@@ -2,94 +2,89 @@
 
 ## Prerequisites
 
-Before installing, ensure you have the following:
+1. **Burp Suite** Community or Professional (`2023.12+` recommended).
+2. **Java 21** for building from source.
 
-1. **Burp Suite**: Community or Professional edition (version 2023.12 or higher recommended).
-2. **Java 21**: The extension is built for Java 21 (Temurin or Oracle JDK).
-   * _Note_: Recent Burp Suite versions ship with a bundled Java runtime. You only need a separate Java installation if you are building from source or running the CLI backends in a specific environment.
+> Recent Burp versions include bundled Java runtime for extension execution. Separate Java is mainly needed for local builds.
 
-## Option A: Download from GitHub Releases
+## Install Path
 
-1. Go to the [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases) page.
-2. Download the latest `Burp-AI-Agent-<version>.jar` file.
+{% tabs %}
+{% tab title="Download from Releases" %}
+1. Open [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases).
+2. Download latest `Burp-AI-Agent-<version>.jar`.
+{% endtab %}
 
-## Option B: Build from Source
+{% tab title="Build from Source" %}
+1. Clone repository:
 
-If you prefer to build from source:
+```bash
+git clone https://github.com/six2dez/burp-ai-agent.git
+cd burp-ai-agent
+```
 
-1. **Prerequisites**: Install **Java 21** (Temurin or Oracle JDK) and ensure `JAVA_HOME` is set.
-2.  Clone the repository:
+2. Build fat JAR:
 
-    ```bash
-    git clone https://github.com/six2dez/burp-ai-agent.git
-    cd burp-ai-agent
-    ```
-3.  Build the fat JAR using the Gradle Shadow plugin (make sure Gradle runs with Java 21, e.g. `JAVA_HOME` points to a JDK 21 install):
+```bash
+./gradlew clean shadowJar
+```
 
-    ```bash
-    ./gradlew clean shadowJar
-    ```
-4.  The output JAR will be at:
+3. Output path:
 
-    ```
-    build/libs/Burp-AI-Agent-<version>.jar
-    ```
-
-> **Note**: The Shadow plugin produces a fat JAR that bundles all dependencies. The Burp Montoya API is `compileOnly` and provided by Burp at runtime.
+```text
+build/libs/Burp-AI-Agent-<version>.jar
+```
+{% endtab %}
+{% endtabs %}
 
 ## Load into Burp Suite
 
-1. Open Burp Suite.
-2. Navigate to the **Extensions** tab.
-3. Click on the **Installed** sub-tab.
-4. Click the **Add** button.
-5. In the "Extension Details" dialog:
-   * **Extension type**: Select `Java`.
-   * **Extension file**: Click "Select file..." and choose the `.jar` you downloaded.
-6. Click **Next**.
+1. Open **Extensions -> Installed -> Add**.
+2. Select extension type `Java`.
+3. Choose the JAR file.
+4. Complete load wizard.
 
 ![Screenshot: Burp extensions add](../.gitbook/assets/burp-extensions-add.png)
 
 ## Verify Installation
 
-Once loaded, you should see the following:
+Expected indicators:
 
-* **Output tab**: The extension should load without errors. You might see a "Extensions loaded" message.
-* **Top-level Tab**: A new tab named **AI Agent** will appear in the main Burp navigation bar.
+* extension loads without startup errors,
+* **AI Agent** tab appears in Burp main navigation.
 
-<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/installation-ai-agent-tab.png" alt="Burp with AI Agent tab visible after extension load"><figcaption></figcaption></figure>
 
-## The `~/.burp-ai-agent/` Directory
+## Runtime Directory
 
-On first launch, the extension automatically creates a directory at `~/.burp-ai-agent/` with the following structure:
+On first start, `~/.burp-ai-agent/` is created:
 
-```
+```text
 ~/.burp-ai-agent/
-├── audit.jsonl          # Audit log (created when audit logging is enabled)
-├── bundles/             # Prompt bundle JSON files (determinism mode)
-├── contexts/            # Context snapshot JSON files
-├── backends/            # Drop-in backend JAR files (custom backends via ServiceLoader)
-├── certs/               # Auto-generated TLS certificates for MCP server
+├── audit.jsonl
+├── bundles/
+├── contexts/
+├── backends/
+├── certs/
 │   └── mcp-keystore.p12
-└── AGENTS/              # Agent profile Markdown files (auto-installed)
-    ├── default          # Text file containing the active profile name
-    ├── pentester.md     # Pentester profile (default)
-    ├── bughunter.md     # Bug bounty profile
-    └── auditor.md       # Compliance auditor profile
+└── AGENTS/
+    ├── default
+    ├── pentester.md
+    ├── bughunter.md
+    └── auditor.md
 ```
 
-The extension creates all subdirectories automatically on startup and auto-installs the bundled agent profiles. This provides three default profiles: `pentester`, `bughunter`, and `auditor`.
+Custom additions:
 
-To add your own, drop additional `*.md` files in `~/.burp-ai-agent/AGENTS/` (see [Agent Profiles](../user-guide/agent-profiles.md)).
-
-You may also want to place custom backend JARs in `backends/` (see [Adding a Backend](../developer/adding-backend.md)).
+* profiles: `~/.burp-ai-agent/AGENTS/*.md` ([Agent Profiles](../user-guide/agent-profiles.md))
+* backend plugins: `~/.burp-ai-agent/backends/` ([Adding a Backend](../developer/adding-backend.md))
 
 ## Troubleshooting
 
-* **"Error loading extension"**: Check the "Errors" tab in the Extensions window. Common causes include incompatible Java versions (ensure you are using Java 21+ features).
-* **Tab not appearing**: Ensure the extension is checked/enabled in the "Installed" list.
-* **Permission errors**: Ensure your user has write access to `~/.burp-ai-agent/`.
+* Extension load failure: inspect Burp Errors/Output tabs and Java version.
+* Tab missing: ensure extension is enabled.
+* Permission errors: ensure write access to `~/.burp-ai-agent/`.
 
 ## Next Steps
 
-Now that you are installed, proceed to the [Quick Start](quick-start.md) guide to run your first analysis.
+Continue with [Quick Start](quick-start.md).

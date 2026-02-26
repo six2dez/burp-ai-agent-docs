@@ -1,67 +1,72 @@
 # Codex CLI
 
-OpenAI's Codex CLI provides access to GPT-4o and other OpenAI models. It is the default backend and offers reliable, versatile performance for general security analysis.
+Codex CLI provides OpenAI model access for general security analysis and code-oriented workflows.
+
+## Requirements
+
+* `codex` CLI installed.
+* `OPENAI_API_KEY` available in the Burp runtime environment.
 
 ## Setup
 
-1.  **Install the CLI**: Follow the official [OpenAI Codex documentation](https://github.com/openai/codex).
+1. Install CLI:
 
-    ```bash
-    npm install -g @openai/codex
-    ```
-2.  **Set your API key**:
+```bash
+npm install -g @openai/codex
+```
 
-    ```bash
-    export OPENAI_API_KEY="sk-..."
-    ```
-3.  **Verify it works**: Test in your terminal:
+2. Export API key:
 
-    ```bash
-    codex "hello"
-    ```
-4. **Configure in Burp**: Open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
+```bash
+export OPENAI_API_KEY="sk-..."
+```
 
-| Setting               | Value                              |
-| --------------------- | ---------------------------------- |
-| **Preferred Backend** | `Codex CLI` (select from dropdown) |
-| **Codex CLI Command** | `codex chat` (default)             |
+3. Verify locally:
 
-To specify a model, include the flag in the command field:
+```bash
+codex "hello"
+```
 
-| Setting               | Value                   |
-| --------------------- | ----------------------- |
-| **Codex CLI Command** | `codex --model gpt-5.2` |
+4. Configure in **AI Backend** settings tab.
 
-## Windows + WSL (Codex CLI in WSL)
+## Configuration
 
-If Burp runs on Windows but you want Codex to run inside WSL on the same machine, point Burp to a Windows `.cmd` wrapper that forwards the args into WSL.
+| Setting | Value |
+| :--- | :--- |
+| **Preferred Backend** | `Codex CLI` |
+| **Codex CLI Command** | `codex chat` (default) |
 
-1. Create a wrapper file, e.g. `D:\Docs\BugBounty\Burp\codex\codex.cmd`:
+Model example:
 
-    ```bat
-    @echo off
-    setlocal
-    wsl.exe -d Ubuntu -- script -q -c "bash -lc 'codex %*'" /dev/null 2>nul | findstr /V /R /C:"^OpenAI Codex v" /C:"^--------" /C:"^workdir:" /C:"^model:" /C:"^provider:" /C:"^approval:" /C:"^sandbox:" /C:"^reasoning" /C:"^session id:" /C:"^user$" /C:"^mcp startup:" /C:"^thinking$"
-    exit /b %ERRORLEVEL%
-    ```
+```bash
+codex --model gpt-5.2
+```
 
-2. In Burp: **Burp AI Agent → AI Backend tab in the bottom settings panel**
+## Notes
 
-| Setting               | Value                                                                 |
-| --------------------- | --------------------------------------------------------------------- |
-| **Preferred Backend** | `Codex CLI`                                                           |
-| **Codex CLI Command** | `D:\Docs\BugBounty\Burp\codex\codex.cmd chat`                          |
+### Windows + WSL bridge
 
-Notes:
+If Burp runs on Windows and Codex runs in WSL, set **Codex CLI Command** to a `.cmd` wrapper that forwards args into WSL.
 
-* Replace `Ubuntu` with your WSL distro name.
-* Ensure Codex is installed and authenticated inside WSL.
-* Set `OPENAI_API_KEY` in the WSL environment (not only in Windows) if you use API-key auth.
-* If you use this setup, also see **reference/troubleshooting.md** for the full Windows + WSL walkthrough.
+Wrapper example:
+
+```bat
+@echo off
+setlocal
+wsl.exe -d Ubuntu -- script -q -c "bash -lc 'codex %*'" /dev/null 2>nul | findstr /V /R /C:"^OpenAI Codex v" /C:"^--------" /C:"^workdir:" /C:"^model:" /C:"^provider:" /C:"^approval:" /C:"^sandbox:" /C:"^reasoning" /C:"^session id:" /C:"^user$" /C:"^mcp startup:" /C:"^thinking$"
+exit /b %ERRORLEVEL%
+```
 
 ## Troubleshooting
 
-* **"command not found"**: Ensure `codex` is installed and in your system PATH.
-* **Windows (npm install + PATH issues)**: If Burp cannot find `codex`, set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`. Burp may not inherit your shell PATH.
-* **Authentication errors**: Verify your `OPENAI_API_KEY` environment variable is set.
-* **Rate limiting**: OpenAI applies rate limits based on your plan tier. Check usage at [platform.openai.com](https://platform.openai.com).
+{% hint style="tip" %}
+* `command not found`: use full binary path or npm shim path.
+* Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`.
+* Auth errors: verify `OPENAI_API_KEY` in Burp runtime env.
+* Rate limits: check provider quota/tier.
+{% endhint %}
+
+## Related Pages
+
+* [Backends Overview](overview.md)
+* [Troubleshooting](../reference/troubleshooting.md)

@@ -1,44 +1,104 @@
 # Privacy Modes
 
-Privacy modes define what data can leave Burp when the extension calls AI backends.
+Privacy mode controls what request/response data can leave Burp when the extension calls AI backends or returns MCP tool output.
 
-Configure them in **Privacy & Logging** in the bottom settings panel.
+Configure it in the **Privacy & Logging** tab in the Settings panel.
 
-## Modes
+{% hint style="warning" %}
+Default value is `OFF`. For real engagements, set privacy mode intentionally before sending any prompts.
+{% endhint %}
+
+## Mode Comparison
+
+| Mode | Cookies | Auth Tokens | Hostnames | Typical Use |
+| :--- | :--- | :--- | :--- | :--- |
+| `STRICT` | Stripped | Redacted | Anonymized | Cloud backends with sensitive targets. |
+| `BALANCED` | Stripped | Redacted | Preserved | Mixed workflows where host context is needed. |
+| `OFF` | Preserved | Preserved | Preserved | Controlled internal testing only. |
+
+## Decision Guide
+
+```mermaid
+flowchart TD
+    Start[Choose privacy mode]
+    Cloud{Using cloud backend?}
+    Sensitive{Sensitive target or data?}
+    NeedHost{Need real hostnames in model output?}
+
+    Start --> Cloud
+    Cloud -->|Yes| Sensitive
+    Cloud -->|No| NeedHost
+
+    Sensitive -->|Yes| Strict[Use STRICT]
+    Sensitive -->|No| NeedHost
+
+    NeedHost -->|Yes| Balanced[Use BALANCED]
+    NeedHost -->|No| Strict
+
+    Balanced --> Review[Review redaction behavior before sending prompts]
+    Strict --> Review
+    Review --> Off{Only in isolated internal test?}
+    Off -->|Yes| OffMode[Use OFF temporarily]
+    Off -->|No| Done[Keep selected mode]
+```
+
+## What Changes in Practice
 
 ### STRICT
 
-Designed for high-sensitivity engagements.
-
-* **Hostnames**: Anonymized with stable pseudonyms.
-* **Auth tokens**: Redacted.
-* **Cookies**: Stripped/redacted.
-
-Typical use: cloud backends where host identity must not be exposed.
+* Hostnames are replaced with deterministic pseudonyms.
+* Auth tokens are redacted.
+* Cookies are stripped.
 
 ### BALANCED
 
-Balances context quality and basic hygiene.
-
-* **Hostnames**: Preserved.
-* **Auth tokens**: Redacted.
-* **Cookies**: Stripped/redacted.
-
-Typical use: local or approved environments where hostnames can be shared.
+* Hostnames stay visible.
+* Auth tokens are redacted.
+* Cookies are stripped.
 
 ### OFF
 
-No redaction.
+* Raw context is eligible for transmission.
+* No automatic redaction is applied.
 
-* Full raw request/response context is eligible for transmission.
+## Before/After Example
 
-Typical use: controlled internal testing where maximum context is required.
+Raw request headers:
 
-![Screenshot: Privacy settings](../.gitbook/assets/privacy-settings.png)
+```http
+Host: api.company.tld
+Authorization: Bearer eyJhbGciOi...
+Cookie: sessionid=abc123; csrftoken=xyz
+```
 
-## Important Notes
+`STRICT` output:
 
-* Privacy mode governs prompt context sent to AI backends.
-* Active scanning still sends real traffic to real targets.
-* Determinism mode preserves stable redaction mapping behavior.
-* BountyPrompt actions apply redaction before tag resolution, so each `[HTTP_*]` segment inherits the active privacy policy.
+```http
+Host: host-a3f2c1.local
+Authorization: Bearer [REDACTED]
+Cookie: [STRIPPED]
+```
+
+`BALANCED` output:
+
+```http
+Host: api.company.tld
+Authorization: Bearer [REDACTED]
+Cookie: [STRIPPED]
+```
+
+## Important Boundaries
+
+{% hint style="danger" %}
+Privacy mode does not prevent active scanner traffic from reaching the real target. It only controls prompt/tool data sent to AI clients.
+{% endhint %}
+
+* BountyPrompt tag resolution runs after redaction, so tags inherit current privacy policy.
+* MCP tool responses are filtered by the same privacy mode.
+* Determinism mode and salt handling affect reproducibility and anonymization stability.
+
+## Related Pages
+
+* [Redaction Pipeline](../developer/redaction-pipeline.md)
+* [Determinism & Salt](determinism-salt.md)
+* [Audit Logging](audit-logging.md)

@@ -1,43 +1,64 @@
 # Audit Logging
 
-Audit logs provide a tamper-evident, reproducible record of interactions between Burp and the AI backend. This supports audits, compliance workflows, and debugging.
+Audit logs provide a tamper-evident record of interactions between Burp context and AI backend outputs.
 
-## What is Logged?
+## Event Chain
 
-Each event is recorded as a JSON object containing:
-*   **Timestamp**: Precise time of the event.
-*   **Event Type**: `prompt`, `agent_chunk`, `prompt_complete`, or scanner/audit events.
-*   **Prompt Bundle**: The exact text sent to the AI (after redaction), plus hashes.
-*   **Backend Metadata**: Backend ID, model settings, and determinism state.
-*   **Response Chunks**: Streaming output captured as `agent_chunk` events.
+```mermaid
+sequenceDiagram
+    participant User as User Action
+    participant App as Burp AI Agent
+    participant Hash as SHA-256 Hasher
+    participant Log as audit.jsonl
 
-## Log Format: JSONL
-Logs are stored in **JSON Lines (.jsonl)** format. Each line is a standalone JSON object, which can be parsed with tools like `jq` or imported into a SIEM.
+    User->>App: Trigger action (chat/scanner/MCP)
+    App->>App: Build redacted prompt bundle
+    App->>Hash: Hash payload/event data
+    Hash-->>App: Digest
+    App->>Log: Append JSONL event line
+    App->>Log: Append streaming chunks/events
+    App->>Log: Append completion event
+```
+
+## What Is Logged
+
+Each event entry can include:
+
+* timestamp,
+* event type (`prompt`, `agent_chunk`, `prompt_complete`, scanner/MCP events),
+* redacted prompt bundle and hashes,
+* backend metadata,
+* streamed response chunks.
+
+## Log Format
+
+Logs use **JSON Lines (`.jsonl`)**; each line is a standalone JSON object.
 
 ## Security & Integrity
-To make logs tamper-evident:
-*   Each event includes a SHA-256 hash of the payload.
-*   When "Determinism Mode" is enabled, prompt bundles are stable for identical inputs, allowing hash comparison across runs.
+
+* Each event includes SHA-256 payload hashing.
+* With determinism enabled, identical inputs are easier to compare across runs.
 
 ## How to Enable
 
-1.  Navigate to **Settings** → **Privacy & Logging**.
-2.  Toggle **Audit Logging** to **ON**.
+1. Open **Privacy & Logging** tab in Settings.
+2. Toggle **Audit Logging** ON.
 
 ## File Locations
 
-When audit logging is enabled, files are written to:
-
 | Path | Contents |
 | :--- | :--- |
-| `~/.burp-ai-agent/audit.jsonl` | Main audit log. Each line is a JSON object with timestamp, event type, payload, and SHA-256 hash. |
-| `~/.burp-ai-agent/bundles/` | Prompt bundle JSON files containing the full prompt text, context, backend config, and integrity hashes. |
-| `~/.burp-ai-agent/contexts/` | Context snapshot JSON files (request/response data sent to the AI, indexed by SHA-256). |
-
-The log path is not configurable. All files are stored under `~/.burp-ai-agent/`.
+| `~/.burp-ai-agent/audit.jsonl` | Main append-only event log. |
+| `~/.burp-ai-agent/bundles/` | Prompt bundle snapshots. |
+| `~/.burp-ai-agent/contexts/` | Context snapshot files indexed by hash. |
 
 ## Use Cases
 
-*   **Compliance**: Demonstrating to a client that no PII was sent to a cloud AI.
-*   **Reproducibility**: "Replaying" a complex AI-guided exploit to verify the steps.
-*   **Quality Control**: Reviewing AI performance across a team of testers.
+* Compliance evidence.
+* Reproducibility and review of AI-assisted findings.
+* Team quality control and diagnostics.
+
+## Related Pages
+
+* [Privacy Modes](privacy-modes.md)
+* [Determinism & Salt](determinism-salt.md)

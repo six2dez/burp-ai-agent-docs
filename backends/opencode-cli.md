@@ -1,44 +1,56 @@
 # OpenCode CLI
 
-OpenCode is an open-source CLI that supports multiple AI providers through a unified interface. It allows you to use models from Anthropic, OpenAI, Google, and other providers with a single tool.
+OpenCode CLI offers a single CLI with multiple provider backends.
+
+## Requirements
+
+* `opencode` installed.
+* Provider credentials (Anthropic/OpenAI/Google/etc).
+* Default model configured or explicit `--model` in command.
 
 ## Setup
 
-1.  **Install the CLI**: Follow the [OpenCode documentation](https://github.com/opencode-ai/opencode).
-2.  **Set API keys** for your chosen provider:
-    ```bash
-    # For Anthropic models:
-    export ANTHROPIC_API_KEY="sk-ant-..."
-    # For OpenAI models:
-    export OPENAI_API_KEY="sk-..."
-    # For Google models:
-    export GOOGLE_API_KEY="..."
-    ```
-3.  **Choose a default model**: Either set a default model in your `opencode.json` (recommended) or pass `--model` in the command. Without a default model, OpenCode can fail with `process has not exited`.
-4.  **Verify it works**: Test in your terminal:
-    ```bash
-    opencode "hello"
-    ```
-5.  **Configure in Burp**: Open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
+1. Install OpenCode CLI.
+2. Set provider API keys.
+3. Verify local command works.
+4. Configure in **AI Backend** settings tab.
+
+Example environment setup:
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+export OPENAI_API_KEY="sk-..."
+export GOOGLE_API_KEY="..."
+```
+
+## Configuration
 
 | Setting | Value |
 | :--- | :--- |
-| **Preferred Backend** | `OpenCode CLI` (select from dropdown) |
+| **Preferred Backend** | `OpenCode CLI` |
 | **OpenCode CLI Command** | `opencode --model anthropic/claude-sonnet-4-5` |
 
-The model flag must be included in the command field unless you set a default model in `opencode.json`. Examples:
+Other model examples:
 
-```
-opencode --model anthropic/claude-sonnet-4-5
+```text
 opencode --model openai/gpt-4o
 opencode --model google/gemini-1.5-pro
 ```
 
+## Notes
+
+If no default model is configured and no `--model` is provided, embedded runs can fail with `process has not exited`.
+
 ## Troubleshooting
 
-*   **"command not found"**: Ensure `opencode` is installed and in your system PATH.
-*   **Windows (npm install + PATH issues)**: If Burp cannot find `opencode`, set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\opencode.cmd`. Burp may not inherit your shell PATH.
-*   **Windows `.exe`**: If installed via npm, use `opencode` (without `.exe`). The extension normalizes bare `.exe` names to the correct launcher.
-*   **Provider errors**: Verify the API key for your chosen provider is configured correctly.
-*   **Model not available**: Check that the model identifier follows the `provider/model` format.
-*   **"AI backend error (opencode-cli): process has not exited"**: Set a default model in `opencode.json` or add `--model` to the command field.
+{% hint style="tip" %}
+* `command not found`: use full binary/shim path.
+* Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\opencode.cmd`.
+* Provider errors: verify the API key for selected provider.
+* `process has not exited`: configure a default model or add `--model`.
+{% endhint %}
+
+## Related Pages
+
+* [Backends Overview](overview.md)
+* [Troubleshooting](../reference/troubleshooting.md)

@@ -1,60 +1,58 @@
 # Quick Start
 
-This guide will get you from "Installed" to "First Vulnerability Found" in under 5 minutes.
+This walkthrough gets from installation to first AI analysis quickly.
 
-## 1. Enable the MCP Server (Optional but Recommended)
+## 1. Enable MCP (Optional but Recommended)
 
-The Model Context Protocol (MCP) server allows the plugin to expose tools.
-
-* Click the **MCP** toggle in the top bar of the **AI Agent** tab.
-* The status indicator should turn green/active.
+* Click **MCP** toggle in the top bar of the **AI Agent** tab.
+* Verify indicator turns active.
 
 ![Screenshot: Top bar toggles](../.gitbook/assets/top-bar-toggles.png)
 
-## 2. Agent Profiles (Recommended)
+## 2. Select Agent Profile (Recommended)
 
-On first run, the extension auto-installs the bundled profiles into `~/.burp-ai-agent/AGENTS/`. This enables role-specific AI instructions (pentester, bughunter, auditor).
+Bundled profiles are installed automatically into `~/.burp-ai-agent/AGENTS/`.
 
-To add a custom profile, drop a `*.md` file in `~/.burp-ai-agent/AGENTS/` and click **Refresh** next to the **Agent profile** dropdown in the **AI Backend** tab of the bottom settings panel.
+To add custom profiles, place `*.md` files in that directory and refresh profiles in **AI Backend** settings.
 
-## 3. Configure Your AI Backend
+## 3. Configure AI Backend
 
-You need to tell the extension which AI model to use.
+1. Open **AI Backend** tab in Settings.
+2. Choose backend.
+3. Set CLI command or HTTP URL/model fields.
 
-1. Go to the **AI Backend** tab in the bottom settings panel.
-2. Select your preferred backend from the dropdown:
-   * **Cloud**: `Gemini CLI`, `Claude CLI`, `Codex CLI` (requires API keys).
-   * **Local**: `Ollama` or `LM Studio` (free, private).
-3. Type the CLI command or URL in the corresponding field. See the [Backends](../backends/overview.md) section for exact values per backend.
+{% hint style="warning" %}
+If using cloud CLIs, required credentials must exist in the runtime environment where Burp is launched. GUI launchers often do not inherit shell env vars.
+{% endhint %}
 
-> **Important**: If you use cloud backends (Gemini, Claude, Codex), make sure the CLI tool is installed, authenticated, and that any required environment variables (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, etc.) are set in the environment where Burp Suite is running — not just in your terminal profile. If you launch Burp from a GUI shortcut, those variables may not be inherited.
->
-> If you run Burp on Windows but Codex in WSL, see **reference/troubleshooting.md** for the exact `.cmd` wrapper and configuration.
+For backend-specific values, see [Backends Overview](../backends/overview.md).
 
 ![Screenshot: Backend selection](../.gitbook/assets/backend-selection.png)
 
 ## 4. Analyze a Request
 
-1. Go to **Proxy** → **HTTP History** (or **Repeater**).
-2. Right-click on any request you want to analyze.
-3. Select **Extensions** → **Burp AI Agent** → **Find vulnerabilities**.
+1. Go to **Proxy -> HTTP History**.
+2. Right-click a request.
+3. Select **Extensions -> Burp AI Agent -> Find vulnerabilities**.
 
 ![Screenshot: Context menu on request](../.gitbook/assets/context-menu-request.png)
 
-## 5. Review the Analysis
+## 5. Review Response
 
-* The **AI Agent** tab will open (or focus).
-* A new chat session will start.
-* The AI will stream its analysis of the request, highlighting potential security issues like SQLi, XSS, or IDOR.
+A new chat session opens and streams AI analysis.
 
 ![Screenshot: Chat response](../.gitbook/assets/chat-response.png)
 
-## 6. (Advanced) Enable Background Scanning
+## 6. Enable Background Scanning (Advanced)
 
-If you want the AI to work for you automatically:
+1. Toggle **Passive** ON in top bar.
+2. Browse target traffic.
+3. Review findings in passive scanner view and Burp issues.
 
-1. Toggle **Passive** to **ON** in the top bar.
-2. Browse your target application.
-3. Check the **Target** → **Issues** tab (or the findings view in the **AI Passive Scanner** tab) for `[AI Passive]` prefixed issues.
+<figure><img src="../.gitbook/assets/quick-start-passive-toggle.png" alt="Passive scanner toggle enabled in top bar"><figcaption></figcaption></figure>
 
-<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+## Next Steps
+
+* [UI Tour](../user-guide/ui-tour.md)
+* [Context Menus](../user-guide/context-menus.md)
+* [Passive AI Scanner](../scanners/passive.md)

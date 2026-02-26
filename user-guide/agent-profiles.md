@@ -14,6 +14,23 @@ If you delete them, simply re-run Burp or drop the files back into the directory
 2. The extension writes the active profile name to `~/.burp-ai-agent/AGENTS/default`.
 3. When a chat session or context menu action runs, the extension loads the corresponding `.md` file and prepends its instructions to the AI prompt.
 
+```mermaid
+flowchart TD
+    Action[Action triggered]
+    Lookup[Lookup matching profile section]
+    Found{Section found?}
+    UseSection[Inject section + global content]
+    Default{DEFAULT exists?}
+    UseDefault[Inject DEFAULT + global content]
+    GlobalOnly[Inject global section only]
+
+    Action --> Lookup --> Found
+    Found -->|Yes| UseSection
+    Found -->|No| Default
+    Default -->|Yes| UseDefault
+    Default -->|No| GlobalOnly
+```
+
 ## Profile File Format
 
 Profile files use a simple section-based format with `[SECTION_NAME]` headers:
@@ -106,3 +123,8 @@ The settings UI validates profile tool references against currently enabled MCP 
 - If a profile references tools that are disabled, unsafe-gated, or unavailable in current edition, a warning is shown.
 - Validation checks tool references from bullet lists and common call formats (`/tool ...`, JSON tool calls).
 - This helps prevent silent profile/tool mismatches during sessions.
+
+## Related Pages
+
+* [Prompt Defaults](../reference/prompt-defaults.md)
+* [Prompt Templates](prompt-templates.md)

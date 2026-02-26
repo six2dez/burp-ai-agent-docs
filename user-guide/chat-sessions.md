@@ -9,9 +9,14 @@ Each chat session is an independent conversation with the AI. Sessions store:
 * **Title**: Auto-generated from the first prompt or the context menu action used.
 * **Creation time**: Timestamp for reference.
 * **Last backend used**: The most recent backend used in that session.
-* **Usage stats**: Message count and character totals, visible in the sidebar summary.
+* **Usage stats**: Message count, character totals, per-backend distribution, and estimated token usage (input/output), visible in the sidebar summary.
 
 Session context is preserved per session. Follow-up prompts in the same session reuse the conversation history so the AI can keep track of previous responses and decisions.
+
+History is trimmed to keep runtime bounded:
+
+* HTTP backends: up to `20` messages and `40000` total characters (minimum latest 2 messages retained).
+* CLI backends: up to `10` messages or `20000` total characters.
 
 ### Parallel Sessions
 
@@ -78,3 +83,5 @@ The **Tools** button opens a menu of available MCP tools. Selecting a tool inser
 * **Iterate**: If the first response isn't detailed enough, ask follow-up questions in the same session — the AI keeps the conversation context per session.
 * **Compare backends**: Try the same analysis with different backends to see which gives better results for your specific use case.
 * **Use passive scanner for volume**: For large-scope assessments, let the passive scanner work in the background and use chat for deep-dive analysis on specific findings.
+
+For token and cost tuning, see [Token Usage & Cost Management](token-management.md).

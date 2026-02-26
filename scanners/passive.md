@@ -1,122 +1,167 @@
 # Passive AI Scanner
 
-The passive scanner analyzes proxy traffic in the background and can create issues automatically. It observes HTTP responses as they pass through the Burp proxy without sending any additional requests.
+The passive scanner analyzes proxy traffic in the background and can create Burp issues automatically. It observes existing traffic only and does not send extra requests by itself.
 
 ## How It Works
 
-1. As you browse the target application, all proxy traffic passes through the passive scanner.
-2. Responses are filtered by MIME type, scope, and size limits.
-3. Qualifying responses are queued for AI analysis.
-4. The AI analyzes the request/response pair for security issues using pattern matching and contextual reasoning.
-5. Findings with confidence >= 85% are automatically promoted to Burp issues with an `[AI Passive]` prefix.
+1. Proxy traffic is captured as you browse.
+2. Requests/responses are filtered (scope, MIME, size, stream patterns).
+3. Local checks run before AI calls.
+4. Dedup and prompt-result cache reduce repeated analysis.
+5. Qualified items are sent to the selected backend.
+6. Findings with confidence `>= 85%` can become `[AI Passive]` issues.
+
+## Passive-to-Active Handoff
+
+```mermaid
+flowchart LR
+    Traffic[Proxy traffic]
+    Prefilter[Scope, MIME, size, stream filters]
+    Local[Local checks]
+    Dedup[Endpoint and fingerprint dedup]
+    Cache{Prompt cache hit?}
+    Hit[Reuse cached parsed findings]
+    AI[Run AI analysis]
+    Gate{Confidence >= 85% and severity gate?}
+    Issue[Create [AI Passive] issue]
+    Auto{Auto-Queue from Passive enabled?}
+    Active[Queue in Active Scanner]
+
+    Traffic --> Prefilter --> Local --> Dedup --> Cache
+    Cache -->|Yes| Hit --> Gate
+    Cache -->|No| AI --> Gate
+    Gate -->|No| End[No issue]
+    Gate -->|Yes| Issue --> Auto
+    Auto -->|Yes| Active
+    Auto -->|No| End2[Passive only]
+```
 
 ## Configuration
 
-| Setting           | Default   | Description                                                                                  |
-| ----------------- | --------- | -------------------------------------------------------------------------------------------- |
-| **Enabled**       | Off       | Toggle in the top bar or the AI Passive Scanner tab in the bottom settings panel.                                                     |
-| **Rate Limit**    | 5 seconds | Minimum time between analysis requests (range: 1–60s). Prevents overwhelming the AI backend. |
-| **Scope Only**    | On        | Only analyze requests to targets in Burp's scope.                                            |
-| **Max Size (KB)** | 96 KB     | Maximum **response** size for analysis (range: 16–1024 KB).                                  |
-| **Min Severity**  | LOW       | Ignore findings below this severity level (`LOW`, `MEDIUM`, `HIGH`, `CRITICAL`).             |
+### Core Controls
 
-> **Trade-off**: Higher **Max Size** values (e.g., 500 KB) allow analysis of large JSON responses but significantly increase token costs for cloud backends or slow down local inference. The default of 96 KB covers most API endpoints.
+| Setting | Default | Description |
+| :--- | :--- | :--- |
+| **Enabled** | Off | Toggle in top bar or in the `AI Passive Scanner` settings tab. |
+| **Rate Limit** | `5s` | Minimum delay between analysis requests (range: 1–60). |
+| **Scope Only** | On | Analyze only in-scope targets. |
+| **Max Size (KB)** | `96` | Maximum response size eligible for passive analysis (range: 16–1024). |
+| **Min Severity** | `LOW` | Ignore findings below selected severity. |
+
+### Token/Performance Controls
+
+| Setting | Default | Description |
+| :--- | :--- | :--- |
+| **Endpoint dedup (min)** | `30` | Skip equivalent method/path analyses inside window. |
+| **Response dedup (min)** | `30` | Skip repeated response fingerprints inside window. |
+| **Prompt cache TTL (min)** | `30` | Reuse parsed results for identical prompts. |
+| **Prompt cache entries** | `500` | Maximum prompt-result cache entries. |
+| **Endpoint cache entries** | `5000` | Maximum endpoint dedup entries. |
+| **Fingerprint cache entries** | `5000` | Maximum response-fingerprint dedup entries. |
+| **Req body chars (AI)** | `2000` | Max request body chars in passive metadata. |
+| **Resp body chars (AI)** | `4000` | Max response body chars in passive metadata. |
+| **Max headers** | `40` | Max filtered headers in passive metadata. |
+| **Max params** | `15` | Max request params in passive metadata. |
+| **Req body chars (manual)** | `4000` | Max request body chars for manual context actions. |
+| **Resp body chars (manual)** | `8000` | Max response body chars for manual context actions. |
+| **Manual context JSON** | On (compact) | Compact JSON for context-menu payloads. |
+
+{% hint style="tip" %}
+If cloud cost is high, lower `Resp body chars (AI)`, `Max headers`, `Max params`, and `Max Size (KB)` before disabling passive scanning entirely.
+{% endhint %}
 
 ![Screenshot: Passive scanner settings](../.gitbook/assets/passive-scanner.png)
 
 ## MIME Type Filtering
 
-The scanner only processes responses with the following content types:
+The scanner processes text-like content types:
 
 * `text/html`
 * `application/json`
 * `application/javascript` / `text/javascript`
 * `application/xml` / `text/xml`
 * `text/plain`
-* `unknown` (unrecognized content types)
+* `unknown` (unrecognized textual responses)
 
-Binary content (images, fonts, video, etc.) is automatically skipped.
+Binary assets are skipped.
 
-## Detection Rules
-
-The passive scanner uses pattern-based detection for common security issues before sending context to the AI:
+## Detection Rules (Local Checks)
 
 ### CSRF Token Detection
 
-Identifies missing or weak CSRF tokens by searching for patterns: `csrf`, `xsrf`, `anti_csrf`, `csrfmiddlewaretoken`, `__requestverificationtoken`, `token`
+Patterns include: `csrf`, `xsrf`, `anti_csrf`, `csrfmiddlewaretoken`, `__requestverificationtoken`, `token`.
 
 ### Dangerous File Upload Extensions
 
-Flags upload endpoints accepting dangerous extensions: `php`, `phtml`, `php5`, `asp`, `aspx`, `jsp`, `jspx`, `cgi`, `pl`, `py`, `rb`, `jar`, `war`, `ear`, `exe`, `dll`
+Examples: `php`, `jsp`, `aspx`, `cgi`, `py`, `jar`, `war`, `exe`, `dll`.
 
 ### Authentication Header Detection
 
-Identifies endpoints using authentication headers: `Authorization`, `X-API-Key`, `X-Auth-Token`, `X-Access-Token`
+Examples: `Authorization`, `X-API-Key`, `X-Auth-Token`, `X-Access-Token`.
 
 ### Session Cookie Detection
 
-Identifies session-related cookies by pattern matching: `session`, `auth`, `token`, `sid`, `jwt`, `remember`
+Session-like cookie keys: `session`, `auth`, `token`, `sid`, `jwt`, `remember`.
 
 ### Header Injection Points
 
-The scanner checks for injectable headers from a curated allowlist: `Host`, `Origin`, `Referer`, `X-Forwarded-Host`, `X-Forwarded-For`, `X-Host`, `X-Original-Host`
+Header allowlist used for injection contexts:
+
+* `Host`
+* `Origin`
+* `Referer`
+* `X-Forwarded-Host`
+* `X-Forwarded-For`
+* `X-Host`
+* `X-Original-Host`
+
+## Token and Noise Reduction Pipeline
+
+To reduce model spend while preserving useful evidence:
+
+* Security-focused header filtering (noise headers are dropped).
+* Parameter compaction with cache-busting key removal.
+* Adaptive body compaction:
+  * JSON array sampling,
+  * HTML focus on head/forms/inline scripts,
+  * bounded raw-text excerpts.
+* Endpoint dedup + fingerprint dedup + prompt cache.
 
 ## Output
 
 ### Findings View
 
-All passive analysis results are available via **AI Passive Scanner tab in the bottom settings panel → View findings**. Each finding includes:
+Open **AI Passive Scanner tab -> View findings** to inspect:
 
-* **Timestamp**: When the analysis occurred.
-* **URL**: The analyzed endpoint.
-* **Title**: Short description of the finding.
-* **Severity**: `INFORMATION`, `LOW`, `MEDIUM`, `HIGH`, or `CRITICAL`.
-* **Detail**: Full AI analysis with evidence.
-* **Reasoning**: Model-provided analysis logic when present in scanner JSON output.
-* **Confidence**: Percentage score (0–100%).
+* timestamp,
+* URL,
+* title,
+* severity,
+* detail,
+* reasoning (if model provided it),
+* confidence.
 
 ### Issue Creation
 
-Findings are automatically promoted to Burp issues when:
+Automatic issue creation requires all conditions:
 
-* Confidence score >= **85%**
-* Severity meets or exceeds the configured minimum.
-* Issues are prefixed with `[AI Passive]` for identification in the Issues panel.
+* confidence `>= 85%`,
+* severity passes `Min Severity`,
+* finding is not duplicate-equivalent for same base URL + canonical name.
 
-Additional behaviors:
-* Issue details are sanitized to plain text (Markdown formatting removed).
-* If the title can be mapped to a known vulnerability class, the issue name is normalized to `[AI Passive] <VULN_CLASS>`.
-* Duplicate issues with the same name and base URL are consolidated (existing issue is kept).
+Issues are prefixed with `[AI Passive]`.
 
 ## Status Tracking
 
-The scanner tracks operational metrics:
+Passive runtime view includes:
 
-* **Requests Analyzed**: Total number of request/response pairs processed.
-* **Issues Found**: Total findings created.
-* **Last Analysis Time**: Timestamp of the most recent analysis.
-* **Queue Size**: Number of requests waiting for analysis.
+* requests analyzed,
+* issues found,
+* last analysis time,
+* queue size.
 
-## Passive-to-Active Pipeline
+## Related Pages
 
-When **Auto-Queue from Passive** is enabled in the **Active AI Scanner** settings, the passive scanner feeds confirmed findings into the active scanner:
-
-1. Passive scanner identifies a potential injection point or vulnerability pattern.
-2. The finding is automatically queued for active testing.
-3. The [Active AI Scanner](active.md) sends targeted payloads to verify the finding.
-4. Confirmed vulnerabilities are reported as separate Burp issues.
-
-This two-stage pipeline maximizes coverage while minimizing unnecessary active traffic.
-
-
-## Reliability and Parsing Behavior
-
-The passive scanner includes reliability and parsing hardening:
-
-- Backend startup now uses bounded readiness polling instead of a fixed sleep.
-- Response completion waiting uses latch synchronization instead of polling loops.
-- AI JSON output parsing uses Jackson-based parsing for nested/escaped content support.
-- Request metadata sent to AI is redaction-aware before prompt generation.
-- Passive analysis completion has a bounded timeout window (90 seconds).
-
-These changes are internal and keep the user-facing workflow unchanged.
+* [Active AI Scanner](active.md)
+* [Settings Reference](../reference/settings-reference.md)
+* [Troubleshooting](../reference/troubleshooting.md)

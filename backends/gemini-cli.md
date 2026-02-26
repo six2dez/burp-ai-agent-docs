@@ -1,40 +1,50 @@
 # Gemini CLI
 
-Google's Gemini CLI provides access to the Gemini family of models, which support large context windows (1M+ tokens) and multimodal input.
+Gemini CLI is useful for large-context cloud analysis and agent-style workflows.
+
+## Requirements
+
+* `gemini` CLI installed.
+* Authentication completed with `gemini auth login`.
 
 ## Setup
 
-1. **Install the CLI**: Follow the official [Google Gemini CLI documentation](https://geminicli.com/docs/).
-2.  **Authenticate**: Run this in your terminal:
+1. Install/verify the CLI from the official docs.
+2. Authenticate:
 
-    ```bash
-    gemini auth login
-    ```
-3.  **Verify it works**: Test in your terminal:
+```bash
+gemini auth login
+```
 
-    ```bash
-    gemini "hello"
-    ```
-4. **Configure in Burp**: Open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
+3. Verify locally:
 
-| Setting                | Value                                                      |
-| ---------------------- | ---------------------------------------------------------- |
-| **Preferred Backend**  | `Gemini CLI` (select from dropdown)                        |
+```bash
+gemini "hello"
+```
+
+4. Configure in **AI Backend** settings tab.
+
+## Configuration
+
+| Setting | Value |
+| :--- | :--- |
+| **Preferred Backend** | `Gemini CLI` |
 | **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash --yolo` |
 
-To specify a model, include the flag in the command field:
+## Notes
 
-| Setting                | Value                             |
-| ---------------------- | --------------------------------- |
-| **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash --yolo` |
-
-> **Why `--yolo` by default?**  
-> Gemini may block MCP tool execution with approval policy prompts in embedded mode. Using `--yolo` avoids interactive approval friction for Burp MCP workflows.
+`--yolo` is used by default to avoid interactive approval prompts that can block embedded MCP workflows.
 
 ## Troubleshooting
 
-* **"command not found"**: Ensure `gemini` is installed and in your system PATH. Try using the full path to the binary.
-* **Windows (npm install + PATH issues)**: If Burp cannot find `gemini`, set the full path to the npm shim using double backslashes, for example `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`. Burp may not inherit your shell PATH.
-* **Authentication errors**: Run `gemini auth login` in your terminal and follow the OAuth flow.
-* **Model errors**: If you see `ModelNotFoundError` or `RESOURCE_EXHAUSTED`, choose an available model from `gemini` → **Manual** and set it with `--model`.
-* **Rate limiting**: The free tier has rate limits. Consider upgrading to a paid tier for heavy scanning use.
+{% hint style="tip" %}
+* `command not found`: use full executable path if needed.
+* Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`.
+* `ModelNotFoundError` / `RESOURCE_EXHAUSTED`: choose available model and update `--model`.
+* Auth errors: re-run `gemini auth login`.
+{% endhint %}
+
+## Related Pages
+
+* [Backends Overview](overview.md)
+* [Troubleshooting](../reference/troubleshooting.md)

@@ -1,12 +1,29 @@
 # Redaction Pipeline
 
-The redaction pipeline is the core privacy mechanism of the extension. It transforms raw Burp data into privacy-safe prompts before any data is sent to an AI backend or MCP client.
+The redaction pipeline transforms raw Burp context into privacy-safe payloads before data is sent to AI backends or external MCP clients.
+
+## Pipeline Overview
+
+```mermaid
+flowchart LR
+    Raw[Raw request/response context]
+    Cookie[Cookie stripping]
+    Token[Auth/token redaction]
+    Host{Privacy mode}
+    Strict[Host anonymization]\nSTRICT only
+    Keep[Preserve hostnames]\nBALANCED and OFF
+    Clean[Redaction output]
+
+    Raw --> Cookie --> Token --> Host
+    Host -->|STRICT| Strict --> Clean
+    Host -->|BALANCED or OFF| Keep --> Clean
+```
 
 ## Design Goals
 
-*   **Prevent data leakage**: Ensure sensitive information (tokens, cookies, hostnames) does not reach unauthorized AI providers.
-*   **Maintain analytical value**: Redacted data should still be useful for security analysis (e.g., the AI can see there *is* a Bearer token, even though the value is hidden).
-*   **Deterministic output**: When determinism mode is enabled, the same input always produces the same redacted output, enabling reproducible audit trails.
+* Prevent sensitive values from leaving Burp unexpectedly.
+* Preserve enough structure for useful security analysis.
+* Support deterministic outputs when reproducibility is required.
 
 ## Privacy Modes
 
@@ -19,51 +36,35 @@ The redaction pipeline is the core privacy mechanism of the extension. It transf
 ## Redaction Steps
 
 ### 1. Cookie Stripping
-Removes `Cookie:` and `Set-Cookie:` header values entirely.
-*   **Applies in**: STRICT, BALANCED
-*   **Skipped in**: OFF
+
+Removes `Cookie:` and `Set-Cookie:` values.
+
+* Applies to: `STRICT`, `BALANCED`
+* Skipped in: `OFF`
 
 ### 2. Auth Token Redaction
-Redacts values from authentication-related headers:
 
-| Header | Replacement |
-| :--- | :--- |
-| `Authorization` | `Bearer [REDACTED]` or `Basic [REDACTED]` |
-| `Proxy-Authorization` | `[REDACTED]` |
-| `X-API-Key` | `[REDACTED]` |
-| `API-Key` | `[REDACTED]` |
+Redacts values from authentication headers (`Authorization`, `Proxy-Authorization`, `X-API-Key`, `API-Key`) and JWT-like tokens.
 
-JWT tokens (matching `eyJ...` patterns) are replaced with `[JWT_REDACTED]`.
-
-*   **Applies in**: STRICT, BALANCED
-*   **Skipped in**: OFF
+* Applies to: `STRICT`, `BALANCED`
+* Skipped in: `OFF`
 
 ### 3. Host Anonymization
-Replaces hostnames with deterministic pseudonyms using HMAC-style hashing:
 
-```
+In `STRICT`, hostnames are pseudonymized using a salt-based hash.
+
+```text
 pseudonym = "host-" + SHA256(salt + ":" + hostname)[0:6] + ".local"
 ```
 
-Example: `bank-of-america.com` → `host-a3f2c1.local`
-
-The mapping is **stable** for a given salt: the same hostname always maps to the same pseudonym until you rotate the salt, so the AI can correlate findings across multiple requests to the same host.
-
-A **reverse mapping** is maintained internally so the extension can translate pseudonyms back to real hosts when executing MCP tool actions.
-
-*   **Applies in**: STRICT
-*   **Skipped in**: BALANCED, OFF
+The mapping is stable for the same salt and can be rotated per engagement.
 
 ## Important Notes
 
-*   **Active Scanner bypass**: The active scanner always sends traffic to real targets. Redaction only applies to the *prompt* sent to the AI, not to the payloads sent to the target application.
-*   **MCP integration**: Data returned by MCP tools is also filtered through the redaction pipeline before being sent to external clients.
-*   **Salt rotation**: Rotate the host anonymization salt between engagements to prevent cross-engagement correlation.
+* Redaction applies to prompt/tool output data, not to active scanner network traffic.
+* MCP tool results are also filtered by the active privacy policy.
+* Rotate salt between engagements to reduce cross-project correlation.
 
 ## Testing
 
-The redaction pipeline has dedicated unit tests in `RedactionTest.kt` that verify:
-*   Cookie stripping behavior across all privacy modes.
-*   Token redaction patterns (Bearer, Basic, JWT, API keys).
-*   Host anonymization stability (deterministic output with the same salt).
-*   Edge cases (empty headers, malformed tokens, URLs in various formats).
+`RedactionTest.kt` covers cookie stripping, token redaction patterns, hostname anonymization stability, and malformed input edge cases.

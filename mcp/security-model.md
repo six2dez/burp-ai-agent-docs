@@ -1,36 +1,49 @@
 # MCP Security Model
 
-The MCP server in Burp AI Agent is designed with a **"Security by Default"** philosophy. Since the Model Context Protocol allows external applications to interact with Burp, we implement multiple layers of defense.
+The MCP server follows a default-deny posture because external clients can request actions inside Burp.
 
 ## 1. Local-Only Binding
-By default, the MCP server binds to `127.0.0.1`. This ensures that only processes running on your local machine (like Claude Desktop or a local script) can connect. External network access is blocked unless you explicitly change the bind address (not recommended).
+
+By default, server bind address is `127.0.0.1`. Only local processes can connect unless you explicitly enable external access.
 
 ## 2. Token Authentication
-External requests to the MCP server must include a secret **Token**.
-*   The token is auto-generated on the first run.
-*   You can view or rotate the token in **MCP Server tab in the bottom settings panel**.
-*   **Localhost access** does not require a token.
-*   **External access** requires `Authorization: Bearer <token>` on every request.
 
-## 3. Tool Gating (Safe vs. Unsafe)
-Tools are categorized based on their potential impact:
+External access requires `Authorization: Bearer <token>`.
 
-*   **Safe Tools**: Read-only operations (e.g., `proxy_http_history`, `site_map`). These are enabled by default.
-*   **Unsafe Tools**: Operations that can modify state or send network traffic (e.g., `http1_request`, `repeater_tab`).
-    *   **Disabled by default**: You must check the "Enable Unsafe Tools" box in settings.
-    *   **Pro-Only**: Some tools (like Scanner-related tools) require Burp Suite Professional.
+* Token is auto-generated on first run.
+* Token can be rotated in **MCP Server** settings.
+* Local loopback access does not require token by default.
 
-## 4. Origin & Host Validation
-To prevent Cross-Site Request Forgery (CSRF) or Cross-Origin attacks:
-*   The server validates the `Host` header.
-*   It rejects requests with suspicious `Origin` headers that don't match the allowed configuration.
+## 3. Tool Gating (Safe vs Unsafe)
+
+* **Safe tools**: read-only operations, enabled by default.
+* **Unsafe tools**: state/traffic modifying operations, disabled by default.
+
+{% hint style="warning" %}
+Unsafe tools can modify Burp state and generate outbound traffic. Enable only when needed and only for trusted clients.
+{% endhint %}
+
+## 4. Origin and Host Validation
+
+The server validates `Host` and checks suspicious `Origin` headers to reduce CSRF/cross-origin abuse paths.
 
 ## 5. Privacy Mode Integration
-The MCP server is **Privacy-Aware**.
-*   If your Privacy Mode is set to `STRICT`, any data returned by an MCP tool (like a request body) is redacted *before* it is sent to the MCP client.
-*   This ensures that even if you connect a cloud-based AI agent via MCP, your sensitive data remains protected according to your policy.
 
-## 6. TLS Encryption (Optional)
-For added security, especially if you enable external access, you can enable **TLS**.
-*   Supports auto-generated self-signed certificates.
-*   Supports custom keystores for enterprise environments.
+MCP output is filtered through active privacy mode before leaving Burp.
+
+* `STRICT`: host anonymization + sensitive token/cookie filtering.
+* `BALANCED`: token/cookie filtering with real hostnames.
+* `OFF`: no redaction.
+
+## 6. TLS (Optional)
+
+TLS can be enabled for external access:
+
+* auto-generated self-signed certificates, or
+* custom PKCS12 keystores for enterprise environments.
+
+## Related Pages
+
+* [MCP Overview](overview.md)
+* [MCP Tools Reference](tools-reference.md)
+* [Privacy Modes](../privacy/privacy-modes.md)

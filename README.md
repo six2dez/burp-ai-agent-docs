@@ -13,7 +13,7 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 * **Curated BountyPrompt Actions**: Optional, tag-aware context menu actions loaded from JSON prompt files.
 * **Audit Logging**: JSONL-based logging with SHA-256 integrity hashing for compliance and reproducibility.
 
-<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/overview-main.png" alt="Burp AI Agent main tab with chat and settings"><figcaption></figcaption></figure>
 
 ## Key Features
 
@@ -26,6 +26,7 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 | **3 Privacy Modes** | `STRICT` (zero trust), `BALANCED` (pragmatic), and `OFF` (raw data). |
 | **9 Prompt Templates** | Editable templates for request and issue context menu actions. |
 | **8 Curated BountyPrompt Actions** | Detection, recon, and advisory prompts with selective context tags. |
+| **Token-Aware Controls** | Passive scanner and manual context caps, dedup windows, and prompt-result caching to reduce model spend. |
 | **Burp Pro Integration** | Native `ScanCheck`, Collaborator OAST, and scanner issue actions. |
 
 ## Use Cases
@@ -50,18 +51,16 @@ Burp AI Agent is an extension for Burp Suite that integrates AI capabilities int
 * [**Scanners**](scanners/passive.md): Passive and Active AI scanning.
 * [**MCP Reference**](mcp/overview.md): Connect external agents safely.
 * [**Privacy**](privacy/privacy-modes.md): Redaction behavior and data protection boundaries.
+* [**Token & Cost Management**](user-guide/token-management.md): Usage telemetry and spend control.
 * [**Examples**](examples/typical-workflows.md): Typical workflows and sample prompts.
 * [**Reference**](reference/settings-reference.md): Full settings, glossary, and troubleshooting.
 * [**Developer**](developer/architecture.md): Architecture, data flow, and extension internals.
 
 ## Operational Guarantees
 
-* Passive scanner state handling is atomic and bounded.
-* Active scanner queue has a hard cap to prevent unbounded growth.
-* HTTP backends share common retry/client/history behavior.
-* Scanner settings persist through type-safe enums with backward-safe loading.
-* AGENTS profiles are validated against enabled MCP tools.
-* Settings UI sections are modularized into dedicated panel classes.
-* Passive scanner issue details include model reasoning when supplied.
-* Prompt defaults follow structured role/task/scope/output formatting.
-* Unit tests cover scanner parsing/generation/analyzers and backend conversation behavior.
+* Your settings persist across restarts and are migrated safely between versions.
+* Passive and active scanners enforce queue/size limits to avoid runaway resource usage.
+* Privacy policies are applied before prompt data leaves Burp.
+* MCP tools are safety-gated with safe/unsafe controls and per-tool toggles.
+* Session history and context size controls help limit token/cost growth.
+* Audit logging provides tamper-evident JSONL records for reproducibility workflows.

@@ -1,41 +1,53 @@
 # Ollama (Local)
 
-Ollama is a popular tool for running LLMs locally. It is the recommended backend for users who cannot send data to the cloud due to privacy or compliance/NDA reasons.
+Ollama is the recommended local backend when privacy constraints prevent cloud usage.
 
-## HTTP Mode (Recommended)
+## Requirements
 
-Connects directly to the Ollama HTTP API. This is faster and more reliable.
+* Ollama installed.
+* At least one model pulled locally.
 
-**Setup**:
+## Setup
 
 1. Install Ollama from [ollama.com](https://ollama.com).
-2.  Pull a model:
+2. Pull a model:
 
-    ```bash
-    ollama pull qwen2.5:14b-instruct
-    ```
-3.  Start the server (or let the desktop app run):
+```bash
+ollama pull qwen2.5:14b-instruct
+```
 
-    ```bash
-    ollama serve
-    ```
-4. Configure in Burp: open **Burp AI Agent → AI Backend tab in the bottom settings panel** and set:
+3. Start server:
 
-| Setting               | Value                                 |
-| --------------------- | ------------------------------------- |
-| **Preferred Backend** | `Ollama` (select from dropdown)       |
-| **Ollama URL**        | `http://127.0.0.1:11434` (default)    |
-| **Ollama Model**      | `qwen2.5:14b-instruct` (or any model) |
-| **Ollama API Key**    | *(optional)* `Bearer` token           |
-| **Ollama Headers**    | *(optional)* Extra headers            |
+```bash
+ollama serve
+```
 
-Optional: enable **Ollama Auto-Start** and set **Ollama Serve Command** to `ollama serve` so the extension starts the server automatically.
+4. Configure in **AI Backend** settings tab.
 
-If your Ollama-compatible server requires authentication, set **Ollama API Key** and/or add **Ollama Headers** (one per line: `Header: value`).
+## Configuration
 
-> **Note**: The **Ollama CLI Command** field is used to detect the default model (e.g., from `ollama run qwen2.5:14b-instruct`) and for launch validation. The active backend communicates with the Ollama HTTP API.
+| Setting | Value |
+| :--- | :--- |
+| **Preferred Backend** | `Ollama` |
+| **Ollama URL** | `http://127.0.0.1:11434` |
+| **Ollama Model** | e.g. `qwen2.5:14b-instruct` |
+| **Ollama API Key** | optional |
+| **Ollama Headers** | optional |
+| **Ollama Auto-Start** | optional (`ollama serve`) |
+
+## Notes
+
+The active backend path is HTTP-based. CLI command fields are primarily used for validation/default-model detection.
 
 ## Troubleshooting
 
-* **Empty responses**: Ensure the model is actually downloaded (`ollama list`).
-* **Slow performance**: Local inference depends heavily on your GPU/RAM. If you lack a GPU, stick to smaller models (7B or lower).
+{% hint style="tip" %}
+* Empty responses: run `ollama list` and verify model exists.
+* Connection issues: confirm server process and URL.
+* Slow output: reduce model size on limited hardware.
+{% endhint %}
+
+## Related Pages
+
+* [Backends Overview](overview.md)
+* [Troubleshooting](../reference/troubleshooting.md)

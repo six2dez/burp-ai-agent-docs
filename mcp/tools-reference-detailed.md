@@ -1,5 +1,7 @@
 # MCP Tools Detailed Reference
 
+For category overview and default tool exposure, see [MCP Tools Reference](tools-reference.md).
+
 ## Burp Control
 ### proxy_intercept
 - **Title**: Set proxy intercept state

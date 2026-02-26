@@ -17,6 +17,7 @@
 * [BountyPrompt Actions](user-guide/bountyprompt-actions.md)
 * [Agent Profiles](user-guide/agent-profiles.md)
 * [Burp Integration](user-guide/burp-integration.md)
+* [Token Usage & Cost Management](user-guide/token-management.md)
 
 ## Scanners
 
@@ -58,6 +59,8 @@
 
 * [Settings Reference](reference/settings-reference.md)
 * [Prompt Defaults](reference/prompt-defaults.md)
+* [FAQ](reference/faq.md)
+* [Changelog](reference/changelog.md)
 * [Glossary](reference/glossary.md)
 * [Troubleshooting](reference/troubleshooting.md)
 * [Release Checklist](reference/release-checklist.md)
@@ -68,6 +71,8 @@
 * [Data Flow](developer/data-flow.md)
 * [Redaction Pipeline](developer/redaction-pipeline.md)
 * [Supervisor & Backends](developer/supervisor-backends.md)
+* [Feature Coverage (0.3.0)](developer/feature-coverage-0.3.md)
 * [Adding a Backend](developer/adding-backend.md)
 * [Adding MCP Tools](developer/adding-mcp-tools.md)
 * [Testing & Debugging](developer/testing.md)
+* [Release Checklist](developer/release-checklist.md)

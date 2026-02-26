@@ -1,63 +1,87 @@
 # Burp Integration
 
-The extension integrates deeply with Burp Suite's existing tools and workflows.
+The extension integrates directly with Burp tools and workflows so AI analysis stays close to real testing data.
 
 ## Supported Burp Tools
 
-| Burp Tool              | Integration                                                                                                      |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| **Proxy History**      | Right-click context menus on HTTP requests. Passive scanner monitors all proxy traffic.                          |
-| **Repeater**           | Context menus available on requests/responses. MCP tools can create Repeater tabs.                               |
-| **Intruder**           | MCP tools can send requests to Intruder and configure insertion points.                                          |
-| **Scanner** (Pro)      | Issue context menus for analysis. AI ScanCheck integrates with native scanner. Active scanner uses Collaborator. |
-| **Site Map**           | Context menus on entries. MCP tools can browse and search the site map.                                          |
-| **Target Scope**       | Scanners respect in-scope filters. MCP tools can check/modify scope.                                             |
-| **Comparer** (Pro)     | MCP tools can send items to Comparer for diff analysis.                                                          |
-| **Collaborator** (Pro) | Active scanner generates Collaborator payloads for out-of-band detection.                                        |
+| Burp Tool | Integration |
+| :--- | :--- |
+| **Proxy History** | Request context menus and passive scanner monitoring. |
+| **Repeater** | Context actions on requests/responses and MCP Repeater tools. |
+| **Intruder** | MCP tools can create and run Intruder setups. |
+| **Scanner** (Pro) | Issue context menus, active checks, and ScanCheck integration. |
+| **Site Map** | Context menus and MCP site map search/query tools. |
+| **Target Scope** | Scope-aware scanner and MCP scope tools. |
+| **Comparer** (Pro) | MCP `comparer_send` workflow support. |
+| **Collaborator** (Pro) | Active scanner OAST payload generation and polling. |
 
 ## Burp Pro vs Community Edition
 
-| Feature                         | Community           | Professional                         |
-| ------------------------------- | ------------------- | ------------------------------------ |
-| Context menu actions (requests) | Yes                 | Yes                                  |
-| Context menu actions (issues)   | No                  | Yes                                  |
-| Chat & sessions                 | Yes                 | Yes                                  |
-| All AI backends                 | Yes                 | Yes                                  |
-| MCP server (53+ tools)          | Yes (non-Pro tools) | Yes (all tools)                      |
-| Passive AI Scanner              | Yes                 | Yes                                  |
-| Active AI Scanner               | Manual queue only   | Full integration with native scanner |
-| Scanner MCP tools               | No                  | Yes                                  |
-| Collaborator (OAST)             | No                  | Yes                                  |
-| Scan reports via MCP            | No                  | Yes                                  |
+| Feature | Community | Professional |
+| :--- | :--- | :--- |
+| Context menu actions (requests) | Yes | Yes |
+| Context menu actions (issues) | No | Yes |
+| Chat & sessions | Yes | Yes |
+| All AI backends | Yes | Yes |
+| MCP server | Yes (non-Pro tools) | Yes (all tools) |
+| Passive AI Scanner | Yes | Yes |
+| Active AI Scanner | Manual queue path | Native scanner integration + queue |
+| Scanner MCP tools | No | Yes |
+| Collaborator OAST | No | Yes |
+| Scan reports via MCP | No | Yes |
 
-The extension gracefully detects the Burp edition at startup and disables Pro-only features on Community Edition.
+The extension detects Burp edition at startup and disables unsupported capabilities automatically.
 
 ## MCP Tool Toggles
 
-The MCP server exposes 53+ tools to external AI agents. For security, you control which tools are available:
+You control MCP exposure from **Burp Integration** and **MCP Server** tabs.
 
-### Safe vs Unsafe Tools
+### Safe vs Unsafe
 
-* **Safe tools** (enabled by default): Read-only operations like browsing proxy history, site map, scope checks, and utility functions.
-* **Unsafe tools** (disabled by default): Operations that modify state or send traffic — HTTP requests, Repeater tab creation, Intruder, scope modification, scanner control.
+* **Safe**: read-only operations, enabled by default.
+* **Unsafe**: state-changing or traffic-generating operations, disabled by default.
 
 ### Managing Tool Access
 
-1. Navigate to the **Burp Integration** tab in the bottom settings panel.
-2. Use the **Tool Toggles** checkboxes to enable/disable individual tools.
-3. Use **Select All** / **Deselect All** for quick management.
-4. If needed, enable **Unsafe Tools** in the **MCP Server** tab to unlock unsafe tool toggles.
+1. Open the **Burp Integration** tab in Settings.
+2. Enable/disable tools by category.
+3. Use **Select All / Deselect All** when needed.
+4. Enable **Unsafe Tools** in the **MCP Server** tab if unsafe tool toggles must be active.
 
 ![Screenshot: MCP tool toggles](../.gitbook/assets/mcp-tool-toggles.png)
 
-> **Security recommendation**: Only enable unsafe tools when actively working with an MCP client you trust. Disable them when not in use.
+{% hint style="warning" %}
+Enable unsafe tools only for trusted MCP clients and only while actively using those workflows.
+{% endhint %}
+
+## Collaborator Workflow (Pro)
+
+When **Use Collaborator (OAST)** is enabled in Active Scanner settings, the workflow is:
+
+1. Active scanner builds a targeted OAST payload using a Burp Collaborator interaction domain.
+2. Payload is inserted into selected injection points (based on risk level and scan mode).
+3. Requests are sent to the target and polling runs at configured intervals.
+4. DNS/HTTP callbacks are correlated to the originating scan item.
+5. Confirmed OAST behavior contributes to scanner evidence and issue creation.
+
+Typical use cases:
+
+* blind SSRF confirmation,
+* blind command injection confirmation,
+* out-of-band deserialization indicators.
 
 ## Native Scanner Integration (Pro)
 
-On Burp Suite Professional, the extension registers an `AiScanCheck` with Burp's built-in active scanner. This means:
+On Burp Pro, an `AiScanCheck` is registered into Burp's scanner pipeline.
 
-* AI-powered scan checks run alongside Burp's default checks during active scans.
-* Findings are reported as native Burp issues with `[AI Active]` prefix.
-* The AI scanner respects Burp's scan configuration and scope settings.
+* AI checks run alongside native checks.
+* Findings appear as Burp issues (`[AI Active]` naming convention).
+* Burp scope/configuration rules still apply.
 
-On Community Edition, this integration is silently skipped and the AI scanner operates independently.
+On Community edition, this path is skipped and the extension uses manual queue execution.
+
+## Related Pages
+
+* [Active AI Scanner](../scanners/active.md)
+* [Context Menus](context-menus.md)
+* [MCP Security Model](../mcp/security-model.md)

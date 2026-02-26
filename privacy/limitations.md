@@ -2,6 +2,10 @@
 
 AI is a useful tool, but it is not a replacement for human judgment. Users must be aware of its limitations.
 
+{% hint style="danger" %}
+Never report an AI finding without manual verification and reproducible evidence.
+{% endhint %}
+
 ## Trust but Verify
 
 **Never report a finding from the AI without manual verification.**

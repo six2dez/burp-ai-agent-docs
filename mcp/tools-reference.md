@@ -1,5 +1,24 @@
 # MCP Tools Reference
 
+High-level index of tool categories and defaults. For parameter-level details, use [Tools Reference (Detailed)](tools-reference-detailed.md).
+
+```mermaid
+mindmap
+  root((MCP Tools))
+    Burp Control
+    Collaborator
+    Config
+    Editor
+    Issues
+    Extension
+    History
+    Requests
+    Scanner
+    Scope
+    Site Map
+    Utilities
+```
+
 ## Burp Control
 | Tool | Unsafe | Default enabled | Pro only | Description |
 |---|---|---|---|---|
@@ -100,3 +119,7 @@
 | random_string | No | Yes | No | Generates a random string of specified length and character set. |
 | url_decode | No | Yes | No | URL decodes the input string. |
 | url_encode | No | Yes | No | URL encodes the input string. |
+
+## Next Step
+
+Use [Tools Reference (Detailed)](tools-reference-detailed.md) for inputs/outputs and examples per tool.

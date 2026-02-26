@@ -72,11 +72,21 @@ When you right-click scanner issues, these actions are available:
 2. Trigger a context menu action.
 3. The extension collects selection context.
 4. Privacy mode redaction is applied.
-5. Action prompt/template is composed.
-6. The prompt is sent to the selected AI backend.
-7. Response streams into a chat session.
+5. Context payload size controls are applied (manual request/response body truncation + optional compact JSON serialization).
+6. Action prompt/template is composed.
+7. The prompt is sent to the selected AI backend.
+8. Response streams into a chat session.
 
 For BountyPrompt actions, tag resolution runs after redaction and before prompt composition.
+
+## Context Size Controls for Manual Actions
+
+The **AI Passive Scanner** settings tab includes manual context controls that also affect context-menu actions:
+
+* **Req body chars (manual)** and **Resp body chars (manual)** bound the request/response body content captured for prompt context.
+* **Manual context JSON** toggles compact vs pretty JSON serialization for the context envelope.
+
+These controls reduce token usage for non-local models while keeping request/response headers and core metadata intact.
 
 ## Multiple Selections
 
@@ -94,3 +104,9 @@ For active scan actions, the context flow enforces safety and visibility:
 * Target validation before enqueue.
 * Queue state visibility (current and maximum queue size).
 * Explicit warning when no target is queued (filtered target or full queue).
+
+## Next Steps
+
+* [Chat & Sessions](chat-sessions.md)
+* [Passive AI Scanner](../scanners/passive.md)
+* [Active AI Scanner](../scanners/active.md)

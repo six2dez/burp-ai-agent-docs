@@ -105,7 +105,10 @@ Additional behavior:
 
 * Only curated IDs are loaded.
 * Only IDs listed in **Enabled prompt IDs** are allowed.
-* Large per-tag sections are truncated to bounded lengths before model submission.
+* Per-tag context is truncated before model submission:
+  * **Detection**: `2500` chars per chunk, `10000` chars per tag.
+  * **Recon**: `3500` chars per chunk, `14000` chars per tag.
+  * **Advisory**: `3000` chars per chunk, `12000` chars per tag.
 * Up to 20 selected request/response items are attached to created issues.
 
 ## Troubleshooting

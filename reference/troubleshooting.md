@@ -25,6 +25,14 @@ Common issues and practical resolution steps.
 * Confirm provider authentication is already completed.
 * Verify model identifiers are correct.
 * Check extension output for exit code/error text.
+* Use backend **Test connection** in the **AI Backend** settings tab.
+
+### Backend status is `AI: Degraded` or `AI: Offline`
+
+* Run **Test connection** in backend settings.
+* Check local service reachability for HTTP backends.
+* For CLI backends, test the exact configured command in terminal.
+* Review extension output for health check diagnostics.
 
 ### Empty or low-value responses
 
@@ -70,6 +78,14 @@ If Burp runs on Windows and Codex runs in WSL, use a `.cmd` wrapper that forward
 * Ensure targets are in scope when scope-only is enabled.
 * Verify min severity filter is not too strict.
 * Confirm backend is available.
+
+### Passive scanner token usage is too high
+
+* Increase **Rate Limit** and keep **Scope Only** enabled.
+* Lower **Resp body chars (AI)** and **Req body chars (AI)**.
+* Reduce **Max headers** and **Max params** if prompts are still noisy.
+* Keep dedup/cache controls enabled (`Endpoint dedup`, `Response dedup`, `Prompt cache TTL`).
+* Lower **Max Size (KB)** when scanning endpoints with large responses.
 
 ### Active scanner does not run
 
@@ -132,5 +148,6 @@ If Burp runs on Windows and Codex runs in WSL, use a `.cmd` wrapper that forward
 ### High memory usage
 
 * Reduce scanner max size.
+* Reduce passive dedup/cache entry sizes if running with very large traffic volumes.
 * Disable passive scanner when idle.
 * Close unused chat sessions.
