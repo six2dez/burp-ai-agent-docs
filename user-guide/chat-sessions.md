@@ -114,6 +114,8 @@ The extension polls `api.project().id()` every 30 seconds. When a project change
 4. Clears the ScanKnowledgeBase to prevent cross-project data leakage.
 5. Shuts down active chat backend connections.
 
+This handler is driven from `MainTab` and runs regardless of whether the chat panel is open. If you switch projects rapidly (within the 30-second window) the poll collapses to a single transition, so you will never see half-merged session lists. Active scanner queues and MCP sessions are not reset at this point — only per-project in-memory state.
+
 ### Clear Chat Behavior
 
 The **Clear Chat** action fully resets the current session: messages, attached context, token counters, input drafts, tool call state, and all persisted data for that session.

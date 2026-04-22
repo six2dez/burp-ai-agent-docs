@@ -53,7 +53,7 @@ The extension sets `max_tokens` automatically per request type to ensure complet
 
 ## Retry Behavior
 
-If a request fails due to a transient network error, the extension retries automatically with exponential backoff up to 6 attempts. Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md).
+If a request fails due to a transient network error, the extension retries automatically up to 6 attempts using a bounded stepped backoff (500/1000/1500/2000/3000/4000 ms). A circuit breaker opens after 5 consecutive failures and resets after 30 s. Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md). See [Backends Overview → Retry Behavior](overview.md#retry-behavior).
 
 ## Related Pages
 

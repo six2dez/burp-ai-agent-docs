@@ -8,11 +8,9 @@ By default, server bind address is `127.0.0.1`. Only local processes can connect
 
 ## 2. Token Authentication
 
-External access requires `Authorization: Bearer <token>`.
-
-* Token is auto-generated on first run.
-* Token can be rotated in **MCP Server** settings.
-* Local loopback access does not require token by default.
+* Token is auto-generated on first run with `SecureRandom` (32 bytes, base64) and can be rotated in **MCP Server** settings.
+* When **External Access** is enabled, every request must include `Authorization: Bearer <token>`.
+* When external access is disabled (default), loopback clients are **not** required to send the bearer token — the server instead rejects the request when the `Host`/`Origin`/`Referer` look browser-originated or non-local (see §4). The bearer token is still mandatory for the `POST /__mcp/shutdown` administrative endpoint in both modes.
 
 ## 3. Tool Gating (Safe vs Unsafe)
 
@@ -25,7 +23,12 @@ Unsafe tools can modify Burp state and generate outbound traffic. Enable only wh
 
 ## 4. Origin and Host Validation
 
-The server validates `Host` and checks suspicious `Origin` headers to reduce CSRF/cross-origin abuse paths.
+The server validates `Host`, `Origin`, `Referer` and rejects browser `User-Agent` strings (configurable via **Allowed Origins**) to reduce CSRF and cross-origin abuse paths, even for loopback clients.
+
+### Administrative Endpoints
+
+* `GET /__mcp/health` — returns `"ok"` and the `X-Burp-AI-Agent: mcp` header. Used internally by the MCP Supervisor to detect another live Custom AI Agent MCP instance on the same port (takeover probe).
+* `POST /__mcp/shutdown` — requires `Authorization: Bearer <token>`. Used by a new MCP server instance to ask a colliding older instance to release the port during a graceful takeover.
 
 ## 5. Privacy Mode Integration
 
@@ -39,12 +42,22 @@ MCP output is filtered through active privacy mode before leaving Burp.
 
 TLS can be enabled for external access:
 
-* auto-generated self-signed certificates, or
-* custom PKCS12 keystores for enterprise environments.
+* Auto-generated self-signed certificate (default), or
+* Custom PKCS12 keystores for enterprise environments.
+
+When auto-generation is active, the extension shells out to the JDK-bundled `keytool` (no BouncyCastle dependency) and produces a PKCS12 keystore with:
+
+* 2048-bit RSA key
+* `SHA256withRSA` signature
+* 365-day validity
+* Subject `CN=burp-mcp`
+* Stored at `~/.burp-ai-agent/certs/mcp-keystore.p12`
+
+This implementation works on JDK 8 through JDK 25+ without additional dependencies.
 
 ### Credential Storage
 
-Both the MCP bearer token and the TLS keystore password are persisted in Burp's preferences store (keys `mcp.bearer.token` and `mcp.tls.keystore.password`). Burp preferences are stored in the user's project file and are only as protected as that file.
+Both the MCP bearer token and the TLS keystore password are persisted in Burp's preferences store (keys `mcp.token` and `mcp.tls.keystore.password`). Burp preferences are stored in the user's project file and are only as protected as that file.
 
 * If the project file or a preferences export could leak (shared backups, multi-user hosts), treat both the bearer token and the TLS keystore as compromised and rotate them.
 * The MCP bearer token is generated with `SecureRandom` (32 bytes, base64). Rotate it whenever an external client is decommissioned.

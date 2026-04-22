@@ -12,7 +12,11 @@ If you delete them, simply re-run Burp or drop the files back into the directory
 
 1. The **Agent profile** dropdown lists all `*.md` files in `~/.burp-ai-agent/AGENTS/` (use **Refresh** to reload).
 2. The extension writes the active profile name to `~/.burp-ai-agent/AGENTS/default`.
-3. When a chat session or context menu action runs, the extension loads the corresponding `.md` file and prepends its instructions to the AI prompt.
+3. When a chat session or context menu action runs, the extension loads the corresponding `.md` file and picks the matching section.
+4. **Delivery depends on the backend:**
+   * **HTTP backends** that advertise `supportsSystemRole = true` (Burp AI, Ollama, LM Studio, Generic OpenAI-compatible, NVIDIA NIM) receive the profile text as a dedicated **system-role message** at the start of the conversation, separate from the user prompt.
+   * **CLI backends** (Gemini, Claude, Codex, Copilot, OpenCode) do not have a system-role channel, so the profile text is **prepended to the user prompt** before the command is invoked.
+   * For either path, the text is labeled `System instructions (AGENTS):` so it is auditable in logs.
 
 ```mermaid
 flowchart TD
@@ -113,7 +117,7 @@ The profile loader caches the parsed profile and checks the file modification ti
 * Keep global instructions concise (2-3 sentences) to avoid consuming too much of the model's context window.
 * Use section-specific instructions for detailed guidance per action type.
 * The `[DEFAULT]` section is a good place for general output formatting preferences.
-* Profile instructions appear as "System instructions (AGENTS):" in the prompt sent to the AI.
+* Profile instructions appear as `System instructions (AGENTS):` in the payload sent to the backend (inside the system-role message on HTTP backends, at the top of the combined text on CLI backends).
 
 
 ## Profile Validation

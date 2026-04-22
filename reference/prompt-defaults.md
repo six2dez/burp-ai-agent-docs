@@ -2,6 +2,10 @@
 
 These are the built-in prompt templates used by context menu actions. You can customize them in **Prompt Templates tab in the bottom settings panel**.
 
+{% hint style="info" %}
+Snapshot synced with plugin source as of **v0.6.0**. If you are running a newer release, cross-check against `config/AgentSettings.kt` (the `default*Prompt()` helpers) — user-edited prompts in **Settings** always win over both the defaults and this page.
+{% endhint %}
+
 ## Request-Based Prompts
 
 ### Find Vulnerabilities

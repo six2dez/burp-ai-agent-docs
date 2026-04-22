@@ -50,7 +50,7 @@ Available models include: `claude-sonnet-4.6`, `claude-sonnet-4.5`, `claude-haik
 
 ### Large Prompt Fallback
 
-For very large prompts (threshold: `32000` chars), the extension uses a file-based fallback path instead of direct argument passing. This reduces CLI argument/STDIN size failures on long contexts.
+For prompts above `32_000` characters, the extension writes the combined prompt to a `burp_uv_prompt_*.txt` temp file (POSIX `0600` where supported) and passes its path to Copilot with an instruction to read the file. The temp file is deleted in a `finally` block once the response is consumed. This avoids OS-level argv/stdin length limits on long contexts.
 
 ### Non-Interactive Mode
 

@@ -60,11 +60,15 @@ tail -n 500 ~/.burp-ai-agent/audit.jsonl \
 
 Every operation generates a trace ID that links all related log entries:
 
-* **Chat interactions**: `chat-turn-{UUID}` — links the prompt, any tool chain steps, and the final response.
-* **Agent supervisor calls**: `agent-turn-{UUID}` — links prompt dispatch and result.
-* **Scanner jobs**: `scanner-job-{UUID}` — links analysis dispatch and outcome.
+| Trace ID pattern | Emitted by | Links |
+| :--- | :--- | :--- |
+| `chat-turn-{UUID}` | `ChatPanel` | The prompt, any MCP tool chain steps, and the final response. |
+| `agent-turn-{UUID}` | `AgentSupervisor` | Prompt dispatch and result outside the chat flow. |
+| `scanner-job-{UUID}` | Active and passive scanner (single-request) | Scanner analysis dispatch and outcome. |
+| `scanner-batch-{UUID}` | Passive scanner batch analysis (`BatchAnalysisQueue`) | A single AI call covering 3–5 grouped requests, with per-request dispatch events sharing the ID. |
+| `adaptive-payload-{VULN_CLASS}` | `AdaptivePayloadEngine` | AI-driven context-aware payload generation, cached by `{vulnClass}:{techStack}` for 30 minutes. |
 
-Trace IDs are visible in both the audit log entries and the [AI Request Logger](ai-request-logger.md) UI.
+Trace IDs are visible in both the audit log entries and the [AI Request Logger](ai-request-logger.md) UI. The trace ID can be overridden at the supervisor level when re-driving a cached conversation, so the same UUID may appear across multiple dispatches.
 
 ## Log Format
 
@@ -72,9 +76,10 @@ Logs use **JSON Lines (`.jsonl`)**; each line is a standalone JSON object.
 
 ## Security & Integrity
 
-* Each event includes SHA-256 payload hashing.
-* MCP tool calls include argument and result hashes (`argsSha256`, `resultSha256`).
-* With determinism enabled, identical inputs are easier to compare across runs.
+* Each event carries a **per-event SHA-256 hash** of the serialized payload in the `payloadSha256` field. The hash is independent per record — there is no Merkle chain linking entries.
+* MCP tool calls include argument and result hashes (`argsSha256`, `resultSha256`) so tampering with either the request or the response can be detected when the log line is inspected later.
+* With determinism enabled, identical inputs are easier to compare across runs (see [Determinism & Salt](determinism-salt.md)).
+* Because the file is append-only plaintext, rely on filesystem ACLs or disk encryption if stronger tamper-evidence is required; the hashes catch payload edits but not line deletion.
 
 ## How to Enable
 

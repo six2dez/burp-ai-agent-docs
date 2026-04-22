@@ -60,7 +60,7 @@ The extension now sets `num_predict` automatically per request type. Previously,
 
 ## Retry Behavior
 
-If a request to Ollama fails due to a transient network error (connection timeout, connection refused), the extension retries automatically with exponential backoff up to 6 attempts. Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md) with the attempt number and delay.
+If a request to Ollama fails due to a transient network error (connection timeout, connection refused), the extension retries automatically up to 6 attempts using a bounded stepped backoff schedule (500/1000/1500/2000/3000/4000 ms). Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md) with the attempt number and delay. After 5 consecutive failures a circuit breaker opens for 30 seconds before allowing a half-open probe — see [Backends Overview → Retry Behavior](overview.md#retry-behavior).
 
 ## Related Pages
 

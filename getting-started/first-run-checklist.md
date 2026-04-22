@@ -5,8 +5,9 @@ Use this checklist after installation before starting a real assessment.
 ## Essential Setup
 
 * [ ] **Extension loaded**: `AI Agent` tab is visible.
+* [ ] **Burp AI prerequisite checked** — if you plan to use the built-in **Burp AI** backend, open Burp's **Settings → Burp AI** and confirm *Use AI for extensions* is **ON** (Burp Pro only). Without this, the backend stays `Offline` and cannot be selected. See [Burp AI (Built-in)](../backends/burp-ai.md).
 * [ ] **Backend selected**: backend set in **AI Backend** tab.
-* [ ] **Backend configured**: command/URL/model/auth values are valid.
+* [ ] **Backend configured**: command/URL/model/auth values are valid (or leave blank when using Burp AI built-in).
 * [ ] **Backend healthy**: top status indicator shows active state.
 * [ ] **Context menus available**: request right-click menu shows Custom AI Agent actions.
 

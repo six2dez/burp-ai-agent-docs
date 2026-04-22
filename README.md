@@ -6,13 +6,13 @@
 
 Custom AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
 
-* **Pluggable Backends**: Use local models (Ollama, LM Studio), NVIDIA NIM, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs.
+* **Pluggable Backends**: Use the built-in Burp AI backend (Burp Pro with *Use AI for extensions* enabled), local models (Ollama, LM Studio), NVIDIA NIM, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs.
 * **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) default to **Balanced**; cookies, auth headers, inline Bearer/Basic/JWT tokens, and sensitive URL query parameters are stripped before data leaves Burp. A preview dialog shows the exact payload before any auto-captured context is sent.
 * **MCP Server**: An embedded Model Context Protocol (MCP) server with 53+ tools for Burp history, Repeater, Scanner, scope, and issue workflows.
 * **AI Scanners**: Passive and Active scanners that analyze traffic automatically across 62 vulnerability classes.
 * **Curated BountyPrompt Actions**: Optional, tag-aware context menu actions loaded from JSON prompt files.
 * **Custom Prompt Library**: Save free-form prompts tagged per context (HTTP request or scanner issue), managed from Settings, surfaced in a right-click **Custom prompts** submenu, with an ad-hoc editor for one-offs.
-* **Audit Logging**: JSONL-based logging with SHA-256 integrity hashing for compliance and reproducibility.
+* **Audit Logging**: JSONL-based logging with per-event SHA-256 payload hashes for compliance and reproducibility.
 * **AI Request Logger**: Real-time activity log with trace ID correlation, preset filters, rolling JSONL persistence, and full metadata for prompts, responses, MCP calls, retries, and scanner operations.
 * **Auto Tool Chaining**: Automatic multi-step MCP tool execution where the AI autonomously chains up to 8 tool calls to complete complex tasks.
 
@@ -22,7 +22,7 @@ Custom AI Agent is an extension for Burp Suite that integrates AI capabilities i
 
 | Feature | Description |
 | :--- | :--- |
-| **9 Built-in Backends** | Ollama, LM Studio, NVIDIA NIM, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
+| **10 Built-in Backends** | Burp AI (built-in), Ollama, LM Studio, NVIDIA NIM, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
 | **53+ MCP Tools** | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more. |
 | **Auto Tool Chaining** | AI autonomously chains up to 8 MCP tool calls per interaction to complete multi-step tasks. |
 | **AI Request Logger** | Real-time activity log with trace ID correlation, preset filters, and optional rolling JSONL persistence. |

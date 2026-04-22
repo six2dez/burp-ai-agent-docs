@@ -18,6 +18,15 @@ Common issues and practical resolution steps.
 
 ## Backend Issues
 
+### Burp AI (built-in) shows `Offline`
+
+The built-in Burp AI backend depends on Burp Pro's native AI feature. If the top bar shows `AI: Offline` while this backend is selected:
+
+1. Open **Burp Settings → Burp AI → Use AI for extensions** and ensure it is **ON**.
+2. Confirm your Burp Pro license has active AI credits.
+3. Re-run **Test connection** in **AI Backend** settings. A healthy backend reports `Healthy`; otherwise the response includes the text `"Burp AI is not enabled. Enable 'Use AI' in Burp Suite settings."`.
+4. This backend is not available on Burp Community — pick a different backend (see [Backends Overview](../backends/overview.md)).
+
 ### Backend status is `Crashed`
 
 * Verify CLI command is valid in a normal terminal.
@@ -60,6 +69,15 @@ All HTTP backends now set `max_tokens` (OpenAI-compatible, LM Studio) or `num_pr
 ### Scanner uses wrong backend after picker change
 
 If the scanner logs show a different backend than what you selected, re-select the backend in the top bar picker. The picker now auto-saves on change. Older sessions from before this fix may need a manual re-selection.
+
+### `command not found` only when Burp is launched from the GUI
+
+When Burp is launched from Finder / Dock / Start Menu, it inherits a minimal `PATH` that often does not include directories where CLI tools live (Homebrew, `~/.local/bin`, npm global install prefix, etc.). The extension mitigates this automatically via a two-strategy **PATH discovery**:
+
+1. **Login-shell capture** — on first launch the extension runs your login shell (`$SHELL` → `/bin/zsh` → `/usr/bin/zsh` → `/bin/bash` → `/usr/bin/bash` → `/bin/sh`) with `-l -c "echo ___BURP_PATH___$PATH"` and captures the printed `PATH`. Timeout: 5 seconds. The result is cached globally for the lifetime of the extension.
+2. **Zsh re-source fallback** — if strategy 1 returns an unusable PATH and your shell is zsh, the extension retries with `-c "source ~/.zshrc 2>/dev/null; ..."` to pick up PATH mutations from rc files that login-shell mode skipped.
+
+If both strategies fail (for example, you use an uncommon shell without an rc file), set the full absolute path to the CLI in **Settings → AI Backend** instead of relying on PATH lookup.
 
 ### Windows CLI: CreateProcess error=193
 

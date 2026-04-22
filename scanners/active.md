@@ -115,6 +115,7 @@ mindmap
   root((62 Vulnerability Classes))
     Injection
     Access Control
+    Access Control Bypass
     Authentication Failures
     Security Misconfiguration
     Integrity Failures
@@ -149,11 +150,10 @@ mindmap
 | `HOST_HEADER_INJECTION`  | Host Header Injection                                        |
 | `EMAIL_HEADER_INJECTION` | Email Header Injection                                       |
 
-### Access Control (10 classes)
+### Access Control (9 classes)
 
 | Class                   | Description                          |
 | ----------------------- | ------------------------------------ |
-| `ACCESS_CONTROL_BYPASS` | 403 Forbidden Bypass via headers, path manipulation, and method switching |
 | `IDOR`                  | Insecure Direct Object Reference     |
 | `BOLA`                  | Broken Object Level Authorization    |
 | `BFLA`                  | Broken Function Level Authorization  |
@@ -163,6 +163,12 @@ mindmap
 | `SSRF`                  | Server-Side Request Forgery          |
 | `CORS_MISCONFIGURATION` | CORS Misconfiguration (passive-only) |
 | `DIRECTORY_LISTING`     | Directory Listing Enabled            |
+
+### Access Control Bypass (1 class)
+
+| Class                   | Description                          |
+| ----------------------- | ------------------------------------ |
+| `ACCESS_CONTROL_BYPASS` | 403 Forbidden Bypass via IP spoofing headers, path manipulation, and HTTP method switching |
 
 ### Authentication Failures (7 classes)
 

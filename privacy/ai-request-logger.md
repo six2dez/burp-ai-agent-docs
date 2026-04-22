@@ -44,7 +44,9 @@ Every operation generates a trace ID that links related log entries together:
 | :--- | :--- | :--- |
 | Chat / context menu | `chat-turn-{UUID}` | Prompt → tool chain steps → final response. |
 | Agent supervisor | `agent-turn-{UUID}` | Prompt → response/error. |
-| Passive scanner | `scanner-job-{UUID}` | Analysis dispatch → outcome. |
+| Passive and active scanner (single request) | `scanner-job-{UUID}` | Analysis dispatch → outcome. |
+| Passive scanner batch analysis | `scanner-batch-{UUID}` | One AI call covering 3–5 grouped requests. Per-request events share the same trace ID so findings can be mapped back to originators. |
+| Adaptive payload generation | `adaptive-payload-{VULN_CLASS}` | AI-driven context-aware payload generation. Identifier is the vulnerability class (e.g. `adaptive-payload-SQLI`) rather than a UUID so repeated generations for the same class share a trace. |
 
 Use the **Trace** filter in the AI Logger tab to isolate all entries for a single operation. This is especially useful for debugging multi-step tool chains where a single user prompt triggers multiple MCP tool calls and follow-up AI requests.
 

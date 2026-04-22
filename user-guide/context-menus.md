@@ -114,7 +114,7 @@ Examples:
 * SSTI
 * XXE
 * Open Redirect
-* **Custom...** — Opens a multi-select dialog with all 55+ vulnerability classes. Includes Select All / Deselect All buttons for quick selection. *Not to be confused with the `Custom…` entry under the `Custom prompts` submenu, which opens a free-form prompt editor; see [Custom Prompt Library](#custom-prompt-library).*
+* **Custom...** — Opens a multi-select dialog with all 62 vulnerability classes. Includes Select All / Deselect All buttons for quick selection. *Not to be confused with the `Custom…` entry under the `Custom prompts` submenu, which opens a free-form prompt editor; see [Custom Prompt Library](#custom-prompt-library).*
 
 ## Issue Actions (Burp Pro)
 

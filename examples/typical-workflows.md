@@ -72,5 +72,15 @@ Produce a verifiable record of all AI interactions for compliance.
 3.  Enable **Determinism Mode** for reproducible prompts.
 4.  Perform your assessment normally using context menus and chat.
 5.  After the assessment, review `~/.burp-ai-agent/audit.jsonl` for the full interaction log.
-6.  Use the SHA-256 hashes in the audit log to verify that context data hasn't been modified.
+6.  Use the per-event SHA-256 payload hashes (`payloadSha256`) in the audit log to detect edits to individual records. Note that there is no Merkle chain — deletion of entire lines cannot be detected from the file alone.
 7.  Export prompt bundles via the audit logger's ZIP export for archival.
+
+## Terminal-First Workflow (Burp Scan Skill)
+
+Drive Burp from a terminal-based AI (Claude Code, Gemini CLI, etc.) while keeping the UI out of the loop.
+
+1.  Enable **MCP** in the extension, note the bearer token, and confirm `/__mcp/health` responds on `127.0.0.1:9876`.
+2.  Install the `/burp-scan` skill ([Burp Scan Skill](../user-guide/burp-scan-skill.md)) into your terminal AI's skills directory.
+3.  From the terminal, invoke `/burp-scan` — the skill instructs the AI to call MCP tools like `proxy_http_history`, `http1_request`, `scanner_issues`, and `issue_create`.
+4.  The AI narrates each step; confirmed findings land as Burp issues via `issue_create` and appear in Burp's Target view without you leaving the terminal.
+5.  Audit log entries are tagged with `chat-turn-*` / `scanner-job-*` trace IDs so the entire terminal-driven run is reproducible alongside UI work. See [Audit Logging](../privacy/audit-logging.md).

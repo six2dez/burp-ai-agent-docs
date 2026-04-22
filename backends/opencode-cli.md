@@ -53,7 +53,12 @@ The extension filters OpenCode CLI output to extract the actual AI response:
 
 ### Idle Timeout
 
-The extension waits up to 30 seconds of idle output before considering the OpenCode process complete. This allows sufficient time for model inference on large prompts without premature termination.
+OpenCode has two timeouts that can end a run:
+
+* **Idle timeout** (`OPENCODE_IDLE_TIMEOUT_MS = 30_000`, 30 seconds): the process is force-killed if it produces no new stdout after initial status lines. Runs that take longer than 30 s to start producing output will look blank.
+* **Hard CLI timeout** (120 seconds, shared with other CLI backends): an overall ceiling that terminates the process regardless of output activity.
+
+Both are intentionally short to prevent runaway processes in the chat UI. For very large prompts, prefer a faster model or split the request.
 
 ### Windows
 

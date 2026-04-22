@@ -54,6 +54,20 @@ Use these settings in **AI Passive Scanner** tab:
 * Different providers tokenize text differently.
 * Use your provider billing dashboard for final spend validation.
 
+## Token Estimation Calibration
+
+When a backend response includes official token counts (e.g., `usage.prompt_tokens`/`usage.completion_tokens` on OpenAI-compatible providers), the logger records them verbatim. When token counts are not surfaced by the backend, the extension estimates them by dividing character count by a per-backend calibration factor:
+
+| Backend family | Factor (chars / token) |
+| :--- | :-: |
+| OpenAI-compatible, NVIDIA NIM | `3.6` |
+| Ollama, LM Studio | `3.8` |
+| Claude CLI | `3.5` |
+| Gemini CLI | `3.7` |
+| Others (Codex, Copilot, OpenCode, Burp AI) | `4.0` |
+
+The factors are empirical defaults that match common tokenizer behavior — cross-check against your provider's billing dashboard before relying on estimates for budget decisions. When both provider-reported and estimated values exist in the same session, the logger prefers the reported value.
+
 ## Related Pages
 
 * [Chat & Sessions](chat-sessions.md)

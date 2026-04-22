@@ -48,7 +48,22 @@ claude --model sonnet
 
 ### Large Prompt Fallback
 
-For very large prompts (threshold: `32000` chars), the extension uses a file-based fallback path instead of direct argument passing. This reduces CLI argument/STDIN size failures on long contexts.
+For prompts above `32_000` characters (the internal `LARGE_PROMPT_THRESHOLD`), the extension avoids passing the full text on the command line. Instead it:
+
+1. Writes the combined prompt to a temp file named `burp_uv_prompt_*.txt` with POSIX permissions `0600` where supported.
+2. Invokes Claude with an instruction such as *"Please process the instructions and data provided in the following file: &lt;path&gt;"*, passing the path as an argument.
+3. Deletes the temp file in a `finally` block after the response is consumed.
+
+This avoids OS-level argv/stdin length limits on long contexts while keeping the prompt on-host.
+
+### Session Resume
+
+Claude CLI sessions are kept sticky across turns:
+
+* The first turn is launched with `--session-id <uuid>`.
+* Subsequent turns on the same chat session use `--resume <uuid>` so conversation history is reconstructed inside Claude rather than replayed by the extension. The session ID is held in a thread-safe `AtomicReference` with CAS updates.
+
+If the process is killed or `Clear Chat` is used, the session ID is released and a new `--session-id` is minted on the next turn.
 
 ### Windows
 

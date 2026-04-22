@@ -2,6 +2,15 @@
 
 This walkthrough gets from installation to first AI analysis quickly.
 
+## 0. Pick a Backend (Prerequisites)
+
+* **Using Burp AI built-in (Burp Pro only)**: open Burp's **Settings → Burp AI**, enable **Use AI for extensions**, and confirm there are AI credits available. No URL or key is needed on the extension side. See [Burp AI (Built-in)](../backends/burp-ai.md).
+* **Using Ollama / LM Studio**: install the server locally and pull at least one model.
+* **Using NVIDIA NIM / Generic OpenAI-compatible**: have the base URL, model name, and API key handy.
+* **Using a CLI backend (Gemini, Claude, Codex, Copilot, OpenCode)**: the CLI must already be installed and authenticated in the same shell environment that launches Burp.
+
+If you skip this step, the backend will show `Offline` in the top bar until the prerequisite is satisfied.
+
 ## 1. Enable MCP (Optional but Recommended)
 
 * Click **MCP** toggle in the top bar of the **AI Agent** tab.

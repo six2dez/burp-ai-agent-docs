@@ -8,7 +8,8 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. All registered backends are shown regardless of CLI availability; errors are reported at usage time via health check. |
+| **Preferred Backend** | Dropdown | `burp-ai` | Backend used for new chat sessions. All registered backends are shown regardless of CLI availability; errors are reported at usage time via health check. Defaults to the built-in Burp AI backend when Burp Pro exposes AI capability; otherwise pick another backend explicitly. |
+| **Burp AI (built-in)** | Dropdown selection | *(auto-detected)* | In-process backend available only when Burp Pro is running with **Use AI for extensions** enabled. No URL, model, or credentials are required — configuration lives in Burp's own AI settings. See [Burp AI (Built-in)](../backends/burp-ai.md). |
 | **Codex CLI Command** | Text | `codex chat` | Shell command used to launch Codex CLI. |
 | **Gemini CLI Command** | Text | `gemini --output-format text --model gemini-2.5-flash --yolo` | Shell command used to launch Gemini CLI. |
 | **Claude CLI Command** | Text | `claude` | Shell command used to launch Claude CLI. |
@@ -21,7 +22,7 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **Ollama Auto-Start** | Toggle | On | Auto-start `ollama serve` when backend is selected. |
 | **Ollama Serve Command** | Text | `ollama serve` | Command used for Ollama server startup. |
 | **Ollama Timeout** | Number | `120` | Timeout in seconds (range: 30-3600). |
-| **Ollama Context Window** | Number | `8192` | Context window size (range: 2048-128000). |
+| **Ollama Context Window** | Number | `8192` | Context window size (persisted in range `2048-128000`; loaded values up to `256000` are accepted). |
 | **LM Studio URL** | Text | `http://127.0.0.1:1234` | Base URL for LM Studio API. |
 | **LM Studio Model** | Text | `lmstudio` | Model identifier sent to LM Studio. |
 | **LM Studio API Key** | Text | *(empty)* | Optional bearer token for OpenAI-compatible servers. |
@@ -34,6 +35,11 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **OpenAI-Compatible API Key** | Text | *(empty)* | Optional bearer token. |
 | **OpenAI-Compatible Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
 | **OpenAI-Compatible Timeout** | Number | `120` | Timeout in seconds (range: 30-3600). |
+| **NVIDIA NIM URL** | Text | `https://integrate.api.nvidia.com` | Base URL for NVIDIA NIM endpoints. |
+| **NVIDIA NIM Model** | Text | *(empty)* | Model identifier (e.g. `moonshotai/kimi-k2.5`). |
+| **NVIDIA NIM API Key** | Text | *(empty)* | Bearer token for NVIDIA NIM. |
+| **NVIDIA NIM Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
+| **NVIDIA NIM Timeout** | Number | `60` | Timeout in seconds (range: 30-3600). |
 | **Auto-Restart** | Toggle | On | Automatically restart crashed CLI backends. |
 | **Agent Profile** | Dropdown | `pentester` | Active profile from `~/.burp-ai-agent/AGENTS/*.md`. |
 
@@ -52,19 +58,36 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Enable MCP** | Toggle | On | Start MCP SSE server when extension loads. |
+| **Enable MCP** | Toggle | Off | Start MCP SSE server when extension loads. Off by default — turn it on before connecting external clients. |
 | **Host** | Text | `127.0.0.1` | Bind address. |
 | **Port** | Number | `9876` | TCP port for MCP server. |
-| **External Access** | Toggle | Off | Allow non-loopback connections. Requires TLS. |
+| **External Access** | Toggle | Off | Allow non-loopback connections. Requires TLS and a bearer token. |
 | **STDIO Bridge** | Toggle | Off | Enable stdio transport in addition to SSE. |
-| **Token** | Text | *(auto-generated)* | Bearer token for external access mode. |
+| **Token** | Text | *(auto-generated)* | Bearer token used for external access and for the `POST /__mcp/shutdown` endpoint. Persisted under preferences key `mcp.token`. |
+| **Allowed Origins** | Multiline | *(empty)* | Comma-, semicolon-, or newline-separated list of `Origin`/`Host` patterns to accept in addition to loopback. Leave empty to restrict to loopback. |
 | **TLS Enabled** | Toggle | Off | Enable HTTPS for MCP server. |
-| **Auto-Generate Certificate** | Toggle | On | Generate self-signed PKCS12 keystore automatically. |
-| **Keystore Path** | Text | *(auto-populated)* | Custom PKCS12 path for TLS mode. |
-| **Keystore Password** | Text | *(auto-generated)* | Password used by custom keystore. |
+| **Auto-Generate Certificate** | Toggle | On | Generate self-signed PKCS12 keystore automatically via JDK `keytool` (RSA 2048, 365 days, `CN=burp-mcp`). |
+| **Keystore Path** | Text | `~/.burp-ai-agent/certs/mcp-keystore.p12` | Custom PKCS12 path for TLS mode. |
+| **Keystore Password** | Text | *(auto-generated)* | Password used by custom keystore. Persisted under preferences key `mcp.tls.keystore.password`. |
 | **Max Concurrent Requests** | Number | `4` | Max parallel MCP tool calls (range: 1-64). |
 | **Max Body Bytes** | Number | `2097152` | Max body bytes returned by MCP tools. |
+| **Scan Task TTL (min)** | Number | `120` | Retention for completed scan task references surfaced via MCP (range: 5-1440). |
+| **Collaborator Client TTL (min)** | Number | `60` | Retention for Collaborator secret keys allocated by MCP (range: 5-1440). |
 | **Enable Unsafe Tools** | Toggle | Off | Master switch for tools marked unsafe. |
+
+### MCP Proxy History Preprocessing
+
+Applies to MCP tools that surface Burp proxy history (`proxy_http_history`, `proxy_http_history_regex`, `response_body_search`).
+
+| Setting | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **Preprocess proxy history** | Toggle | On | Master switch for the preprocessing pipeline. |
+| **Filter binary content** | Toggle | On | Drop responses whose content type is binary (images, archives, fonts, etc.). |
+| **Max response body size (KB)** | Number | `20` | Truncate responses above this size before returning them to MCP clients (range: 1-10240). |
+| **Allowed content types** | Multiline | `text/`, `application/json`, `application/xml`, `application/javascript`, `application/x-www-form-urlencoded`, `multipart/form-data` | Content types that bypass the binary filter. |
+| **Max items per request** | Number | `20` | Upper bound on proxy history entries returned per tool call (range: 1-500). |
+| **Newest first** | Toggle | On | Return the most recent proxy entries first. |
+| **Allow unpreprocessed history** | Toggle | On | Expose a raw variant of the tool alongside the preprocessed one for clients that need the original payloads. |
 
 ## Burp Integration
 
@@ -165,7 +188,7 @@ The extension stores runtime files under `~/.burp-ai-agent/`.
 
 | File/Directory | Purpose |
 | :--- | :--- |
-| `~/.burp-ai-agent/audit.jsonl` | JSONL audit entries with SHA-256 chaining. |
+| `~/.burp-ai-agent/audit.jsonl` | JSONL audit entries with a per-event SHA-256 hash over the serialized payload (no chain). |
 | `~/.burp-ai-agent/bundles/` | Prompt bundle snapshots for deterministic workflows. |
 | `~/.burp-ai-agent/contexts/` | Context snapshot JSON files indexed by hash. |
 | `~/.burp-ai-agent/certs/` | Auto-generated TLS artifacts for MCP server. |
@@ -187,7 +210,8 @@ Some limits are operational constants rather than direct UI controls:
 * **HTTP backend conversation history cap**: `20` messages and `40000` total characters (minimum 2 latest messages retained).
 * **CLI history cap**: `10` messages or `20000` characters.
 * **Large prompt threshold for Claude CLI / Copilot CLI fallback path**: `32000` characters.
-* **Backend retry attempts**: `6` with exponential backoff (HTTP backends).
+* **HTTP backend retry schedule**: `6` attempts with a fixed stepped backoff — `500 / 1000 / 1500 / 2000 / 3000 / 4000 ms` (not exponential, capped at 4 s).
+* **HTTP backend circuit breaker**: opens after `5` consecutive failures, resets to half-open after `30000 ms`, single half-open probe before closing or reopening.
 * **OpenCode CLI idle timeout**: `30s` before process termination after last output.
 * **`CHAT_MAX_OUTPUT_TOKENS`**: `4096` — max output tokens for chat responses.
 * **`SCANNER_MAX_OUTPUT_TOKENS`**: `2048` — max output tokens for single scanner analysis.

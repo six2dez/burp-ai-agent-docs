@@ -36,6 +36,7 @@
 ## Backends
 
 * [Overview](backends/overview.md)
+* [Burp AI (Built-in)](backends/burp-ai.md)
 * [Ollama (Local)](backends/ollama.md)
 * [LM Studio (Local)](backends/lm-studio.md)
 * [NVIDIA NIM](backends/nvidia-nim.md)
@@ -66,8 +67,10 @@
 * [FAQ](reference/faq.md)
 * [Changelog](reference/changelog.md)
 * [Glossary](reference/glossary.md)
+* [Naming & Paths](reference/naming-and-paths.md)
+* [Configuration Directory](reference/configuration-directory.md)
+* [Upgrade & Migration Guide](reference/upgrade-migration.md)
 * [Troubleshooting](reference/troubleshooting.md)
-* [Release Checklist](reference/release-checklist.md)
 
 ## Developer
 
@@ -75,7 +78,8 @@
 * [Data Flow](developer/data-flow.md)
 * [Redaction Pipeline](developer/redaction-pipeline.md)
 * [Supervisor & Backends](developer/supervisor-backends.md)
-* [Feature Coverage](developer/feature-coverage-0.3.md)
+* [Settings Migration](developer/settings-migration.md)
+* [Feature Coverage](developer/feature-coverage.md)
 * [Adding a Backend](developer/adding-backend.md)
 * [Adding MCP Tools](developer/adding-mcp-tools.md)
 * [Testing & Debugging](developer/testing.md)

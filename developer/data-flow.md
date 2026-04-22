@@ -191,4 +191,4 @@ flowchart LR
     Next -->|same traceId| Tool
 ```
 
-Trace IDs are generated at the entry point and propagated through the entire call chain. Scanner jobs generate their own trace IDs (`scanner-job-{UUID}`).
+Trace IDs are generated at the entry point and propagated through the entire call chain. Scanner jobs generate `scanner-job-{UUID}`, batch passive analyses share `scanner-batch-{UUID}` across all requests in the batch, and adaptive payload generation uses `adaptive-payload-{VULN_CLASS}` so the same identifier is reused for repeated generations of the same class. See [Audit Logging → Trace ID Correlation](../privacy/audit-logging.md#trace-id-correlation) for the full list.

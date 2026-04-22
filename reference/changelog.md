@@ -6,6 +6,9 @@ For full technical detail, see the project changelog in the plugin repository.
 
 ## Unreleased
 
+<!-- Add new entries for the next release here. The release workflow copies this section into the GitHub release body when the tag is cut. Keep the heading in place even when the section is empty so contributors know where to append. -->
+
+
 ## 0.6.0 (2026-04-21)
 
 Highlights:
