@@ -18,6 +18,7 @@
 * [Agent Profiles](user-guide/agent-profiles.md)
 * [Burp Integration](user-guide/burp-integration.md)
 * [Token Usage & Cost Management](user-guide/token-management.md)
+* [Burp Scan Skill](user-guide/burp-scan-skill.md)
 
 ## Scanners
 
@@ -29,6 +30,7 @@
 * [Privacy Modes](privacy/privacy-modes.md)
 * [Limitations & Hallucinations](privacy/limitations.md)
 * [Audit Logging](privacy/audit-logging.md)
+* [AI Request Logger](privacy/ai-request-logger.md)
 * [Determinism & Salt](privacy/determinism-salt.md)
 
 ## Backends
@@ -36,10 +38,12 @@
 * [Overview](backends/overview.md)
 * [Ollama (Local)](backends/ollama.md)
 * [LM Studio (Local)](backends/lm-studio.md)
+* [NVIDIA NIM](backends/nvidia-nim.md)
 * [Generic (OpenAI-compatible)](backends/openai-compatible.md)
 * [Gemini CLI](backends/gemini-cli.md)
 * [Claude CLI](backends/claude-cli.md)
 * [Codex CLI](backends/codex-cli.md)
+* [Copilot CLI](backends/copilot-cli.md)
 * [OpenCode CLI](backends/opencode-cli.md)
 
 ## MCP Server
@@ -71,7 +75,7 @@
 * [Data Flow](developer/data-flow.md)
 * [Redaction Pipeline](developer/redaction-pipeline.md)
 * [Supervisor & Backends](developer/supervisor-backends.md)
-* [Feature Coverage (0.3.0)](developer/feature-coverage-0.3.md)
+* [Feature Coverage](developer/feature-coverage-0.3.md)
 * [Adding a Backend](developer/adding-backend.md)
 * [Adding MCP Tools](developer/adding-mcp-tools.md)
 * [Testing & Debugging](developer/testing.md)

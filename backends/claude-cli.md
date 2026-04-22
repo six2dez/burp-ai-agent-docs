@@ -50,11 +50,15 @@ claude --model sonnet
 
 For very large prompts (threshold: `32000` chars), the extension uses a file-based fallback path instead of direct argument passing. This reduces CLI argument/STDIN size failures on long contexts.
 
+### Windows
+
+npm-installed CLI shims are resolved automatically on Windows. The extension detects `.cmd` siblings and uses them instead of shell script shims that Java cannot execute directly.
+
 ## Troubleshooting
 
 {% hint style="tip" %}
 * `command not found`: use full binary path.
-* Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`.
+* Windows: npm shim paths are resolved automatically. If auto-resolution fails, use the full `.cmd` path: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`.
 * Auth issues: re-run `claude login` or verify `ANTHROPIC_API_KEY`.
 * Empty output: check Burp extension output/errors tabs and model flag validity.
 {% endhint %}

@@ -33,7 +33,7 @@ For backend-specific values, see [Backends Overview](../backends/overview.md).
 
 1. Go to **Proxy -> HTTP History**.
 2. Right-click a request.
-3. Select **Extensions -> Burp AI Agent -> Find vulnerabilities**.
+3. Select **Extensions -> Custom AI Agent -> Find vulnerabilities**.
 
 ![Screenshot: Context menu on request](../.gitbook/assets/context-menu-request.png)
 

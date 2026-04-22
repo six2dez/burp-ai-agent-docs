@@ -27,3 +27,8 @@
 * **Privacy Mode**: Redaction policy level (`STRICT`, `BALANCED`, `OFF`).
 * **Risk Level**: Payload safety level for active scanner (`SAFE`, `MODERATE`, `DANGEROUS`).
 * **Agent Profile**: Markdown-based system instruction set selected from `~/.burp-ai-agent/AGENTS/`.
+* **AI Request Logger**: Real-time activity log capturing prompts, responses, MCP calls, retries, errors, and scanner operations with trace correlation.
+* **Trace ID**: Unique correlation identifier linking related log entries across a single operation (e.g., `chat-turn-{UUID}`).
+* **Auto Tool Chaining**: Mechanism where the AI autonomously executes sequential MCP tool calls (up to 8) to gather information before producing a final response.
+* **Rolling Log**: Rotating JSONL file persistence for the AI Request Logger, with configurable size and file count limits.
+* **Tool Call Parser**: Component that extracts MCP tool invocations from AI model responses in various formats (fenced blocks, raw JSON, OpenAI-style).

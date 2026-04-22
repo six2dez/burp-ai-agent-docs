@@ -57,7 +57,9 @@ Each launch gets a unique session ID (`session-{UUID}`) so chat history, diagnos
 
 * Run as subprocesses from configured commands.
 * Use stdout/stderr streaming for response and diagnostics.
-* Include Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI.
+* Include Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI.
+* **Windows**: npm-installed shims are resolved automatically. The launcher detects `.cmd` siblings for shell script shims and falls back to `cmd /c` wrapping when needed.
+* **Output parsing**: Each CLI backend has a dedicated output parser that strips metadata, status lines, and prompt echoes from raw stdout to extract the AI response.
 
 ### HTTP Backends
 
@@ -78,6 +80,11 @@ Backend diagnostics include:
 
 * process exit code,
 * last stdout/stderr lines,
-* launch configuration details.
+* launch configuration details,
+* retry events with attempt number, backoff delay, and failure reason (logged to [AI Request Logger](../privacy/ai-request-logger.md)).
 
-Use Burp's extension output/errors tabs for investigation.
+Use Burp's extension output/errors tabs and the **AI Logger** tab for investigation.
+
+## Trace ID Propagation
+
+The `AgentSupervisor.send()` and `sendChat()` methods accept an optional `traceId` parameter. If not provided, a trace ID is auto-generated (`agent-turn-{UUID}` or `chat-turn-{UUID}`). This trace ID is attached to all log entries for the operation (prompt, response, error), enabling end-to-end correlation in the AI Request Logger.

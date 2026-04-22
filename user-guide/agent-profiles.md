@@ -124,6 +124,12 @@ The settings UI validates profile tool references against currently enabled MCP 
 - Validation checks tool references from bullet lists and common call formats (`/tool ...`, JSON tool calls).
 - This helps prevent silent profile/tool mismatches during sessions.
 
+### Optional Tool References
+
+Tools referenced only in the catalog section of a profile (the "Available MCP Tools" list) are treated as informational. If these tools are disabled because they require **Unsafe mode** to be enabled, the validation warning is suppressed. This prevents noise from built-in profiles (pentester, bughunter, auditor) that list tools like `http1_request` and `http2_request` as available options without requiring them to be active.
+
+Warnings are only shown for tools that are explicitly referenced in prompts or instructions (e.g., `/tool http1_request` or `"tool": "http1_request"`).
+
 ## Related Pages
 
 * [Prompt Defaults](../reference/prompt-defaults.md)

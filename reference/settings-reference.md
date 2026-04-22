@@ -8,10 +8,11 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. List is filtered to locally available backends. |
+| **Preferred Backend** | Dropdown | `codex-cli` | Backend used for new chat sessions. All registered backends are shown regardless of CLI availability; errors are reported at usage time via health check. |
 | **Codex CLI Command** | Text | `codex chat` | Shell command used to launch Codex CLI. |
 | **Gemini CLI Command** | Text | `gemini --output-format text --model gemini-2.5-flash --yolo` | Shell command used to launch Gemini CLI. |
 | **Claude CLI Command** | Text | `claude` | Shell command used to launch Claude CLI. |
+| **Copilot CLI Command** | Text | `copilot` | Shell command used to launch Copilot CLI. |
 | **OpenCode CLI Command** | Text | `opencode` | Shell command used to launch OpenCode CLI. |
 | **Ollama URL** | Text | `http://127.0.0.1:11434` | Base URL for Ollama API. |
 | **Ollama Model** | Text | `llama3.1` | Model identifier sent to Ollama. |
@@ -40,10 +41,12 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Privacy Mode** | Dropdown | `OFF` | Redaction policy (`STRICT`, `BALANCED`, `OFF`). |
+| **Privacy Mode** | Dropdown | `BALANCED` | Redaction policy (`STRICT`, `BALANCED`, `OFF`). Users who previously chose `OFF` explicitly keep their choice on upgrade. |
 | **Determinism Mode** | Toggle | Off | Stabilizes ordering for reproducible prompt bundles. |
 | **Host Anonymization Salt** | Text | *(auto-generated)* | Secret used to produce stable host pseudonyms in STRICT mode. |
 | **Audit Logging** | Toggle | Off | Enables JSONL audit log at `~/.burp-ai-agent/audit.jsonl`. |
+| **AI Request Logger** | Toggle | On | Enables real-time AI activity logging in the AI Logger tab. |
+| **AI Logger Max Entries** | Number | `500` | Maximum entries in the in-memory logger buffer (range: 10+). |
 
 ## MCP Server
 
@@ -91,6 +94,11 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **Req body chars (manual)** | Number | `4000` | Maximum request body chars included by manual context actions (range: 256-40000). |
 | **Resp body chars (manual)** | Number | `8000` | Maximum response body chars included by manual context actions (range: 512-80000). |
 | **Manual context JSON** | Toggle | On (compact) | Use compact JSON serialization for context-menu actions. |
+| **Excluded extensions** | Text | `css,js,jpg,jpeg,png,gif,svg,ico,woff,woff2,ttf,eot,otf,mp4,mp3,avi,mov,webm,webp,pdf,zip,gz,tar,rar,7z,map,bmp,tif,tiff` | Comma-separated file extensions to skip in passive scanning. Reduces API calls by skipping static assets. |
+| **Batch size (1=off)** | Number | `3` | Group N requests per AI call for batch analysis (range: 1-5). Set to 1 to disable. |
+| **Persistent cache** | Toggle | On | Cache AI results to disk (`~/.burp-ai-agent/cache/`) for reuse across Burp sessions. |
+| **Persistent TTL (hrs)** | Number | `24` | Hours before persistent disk cache entries expire (range: 1-168). |
+| **Persistent max (MB)** | Number | `50` | Maximum disk space for persistent cache in MB (range: 10-500). LRU eviction at 80% capacity. |
 
 ## Active AI Scanner
 
@@ -106,6 +114,7 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **Scan Mode** | Dropdown | `FULL` | Vulnerability-class strategy (`BUG_BOUNTY`, `PENTEST`, `FULL`). |
 | **Auto-Queue from Passive** | Toggle | On | Queue high-confidence passive findings into active scanner. |
 | **Use Collaborator (OAST)** | Toggle | Off | Enable out-of-band tests using Burp Collaborator. |
+| **AI Adaptive Payloads** | Toggle | Off | Generate context-aware payloads using AI based on detected tech stack and error patterns from the Knowledge Base. |
 
 ## Prompt Templates
 
@@ -122,6 +131,12 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **Generate PoC & Validate** | Text area | Prompt for proof-of-concept generation. |
 | **Impact & Severity** | Text area | Prompt for impact and severity assessment. |
 | **Full Report** | Text area | Prompt for complete report generation. |
+
+### Custom Prompt Library
+
+| Setting | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **Custom prompt library** | JSON list (edited via Add/Edit/Dup/Del/Move buttons) | `[]` | Ordered list of saved free-form prompts surfaced in the right-click **Custom prompts** submenu. Each entry stores `id` (UUID), `title`, `promptText`, `tags` (`HTTP_SELECTION` and/or `SCANNER_ISSUE`), and `showInContextMenu`. Persisted as JSON under the preferences key `custom.prompt.library.v1` (settings schema v3). Malformed JSON loads as an empty library. See [Custom Prompt Library](../user-guide/context-menus.md#custom-prompt-library). |
 
 ### BountyPrompt Integration
 
@@ -154,17 +169,47 @@ The extension stores runtime files under `~/.burp-ai-agent/`.
 | `~/.burp-ai-agent/bundles/` | Prompt bundle snapshots for deterministic workflows. |
 | `~/.burp-ai-agent/contexts/` | Context snapshot JSON files indexed by hash. |
 | `~/.burp-ai-agent/certs/` | Auto-generated TLS artifacts for MCP server. |
+| `~/.burp-ai-agent/cache/` | Persistent prompt cache (JSON files keyed by prompt hash). Per-project namespaced. |
+| Burp `extensionData()` | Project-scoped chat session storage (auto-migrated from global `preferences()`). |
 | `~/.burp-ai-agent/backends/` | Drop-in backend JAR discovery directory. |
 | `~/.burp-ai-agent/AGENTS/` | Agent profile markdown files. |
 | `~/.burp-ai-agent/AGENTS/default` | Active profile marker file. |
+| `~/.burp-ai-agent/logs/` | Rolling AI Request Logger JSONL files (opt-in). |
 
 ## Runtime Constants
 
 Some limits are operational constants rather than direct UI controls:
 
+* **Auto tool chain limit**: `8` sequential MCP tool calls per chat interaction.
 * **Active scanner queue max**: `2000` targets.
 * **Active dedup window**: `1 hour`.
 * **Passive analysis wait timeout**: `90s`.
 * **HTTP backend conversation history cap**: `20` messages and `40000` total characters (minimum 2 latest messages retained).
 * **CLI history cap**: `10` messages or `20000` characters.
-* **Large prompt threshold for Claude CLI fallback path**: `32000` characters.
+* **Large prompt threshold for Claude CLI / Copilot CLI fallback path**: `32000` characters.
+* **Backend retry attempts**: `6` with exponential backoff (HTTP backends).
+* **OpenCode CLI idle timeout**: `30s` before process termination after last output.
+* **`CHAT_MAX_OUTPUT_TOKENS`**: `4096` — max output tokens for chat responses.
+* **`SCANNER_MAX_OUTPUT_TOKENS`**: `2048` — max output tokens for single scanner analysis.
+* **`SCANNER_BATCH_MAX_OUTPUT_TOKENS`**: `4096` — max output tokens for batch scanner analysis.
+* **`PAYLOAD_MAX_OUTPUT_TOKENS`**: `1024` — max output tokens for adaptive payload generation.
+
+## Rolling Log Persistence (JVM Properties)
+
+The AI Request Logger can persist entries to rotating JSONL files. This is configured via JVM system properties at Burp startup:
+
+| Property | Default | Description |
+| :--- | :--- | :--- |
+| `burp.ai.logger.rolling.enabled` | `false` | Enable rolling file persistence. |
+| `burp.ai.logger.rolling.dir` | `~/.burp-ai-agent/logs` | Directory for log files. |
+| `burp.ai.logger.rolling.maxBytes` | `1048576` (1 MB) | Maximum size per log file (minimum 10 KB). |
+| `burp.ai.logger.rolling.maxFiles` | `5` | Maximum number of rolled files (range: 1–20). |
+
+Example:
+
+```bash
+java -jar burpsuite.jar \
+  -Dburp.ai.logger.rolling.enabled=true \
+  -Dburp.ai.logger.rolling.maxBytes=2097152 \
+  -Dburp.ai.logger.rolling.maxFiles=10
+```

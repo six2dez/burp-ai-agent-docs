@@ -1,6 +1,6 @@
 # Token Usage & Cost Management
 
-This page explains how Burp AI Agent tracks usage and how to reduce cost/noise when using cloud backends.
+This page explains how Custom AI Agent tracks usage and how to reduce cost/noise when using cloud backends.
 
 ## What Is Tracked
 

@@ -71,8 +71,8 @@ mindmap
 | comparer_send | Yes | No | No | Sends one or more items to Burp Comparer. |
 | diff_requests | No | Yes | No | Produces a line diff between two requests. |
 | find_reflected | No | Yes | No | Finds reflected parameter values in a response. |
-| http1_request | Yes | No | No | Issues an HTTP/1.1 request and returns the response. |
-| http2_request | Yes | No | No | Issues an HTTP/2 request and returns the response. |
+| http1_request | Yes | No | No | Issues an HTTP/1.1 request and returns the response. Optional in agent profiles. |
+| http2_request | Yes | No | No | Issues an HTTP/2 request and returns the response. Optional in agent profiles. |
 | insertion_points | No | Yes | No | Lists insertion point offsets for a request. |
 | intruder | Yes | No | No | Sends a request to Intruder. |
 | intruder_prepare | Yes | No | No | Creates an Intruder tab with explicit insertion points. |
@@ -81,6 +81,10 @@ mindmap
 | repeater_tab_with_payload | Yes | No | No | Creates a Repeater tab after applying placeholder replacements. |
 | request_parse | No | Yes | No | Parses a raw HTTP request into method, path, headers, parameters, and body. |
 | response_parse | No | Yes | No | Parses a raw HTTP response into status, headers, and body. |
+
+{% hint style="info" %}
+`http1_request` and `http2_request` require **Unsafe mode** enabled in the MCP Server tab. Built-in agent profiles (pentester, bughunter, auditor) list these tools as optional — no warning is shown when they are disabled. Custom profiles that explicitly reference these tools will show a validation warning until Unsafe mode is enabled.
+{% endhint %}
 
 ## Scanner
 | Tool | Unsafe | Default enabled | Pro only | Description |

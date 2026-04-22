@@ -1,6 +1,6 @@
 # Architecture
 
-Burp AI Agent is implemented in Kotlin on the JVM using the Burp Montoya API. The architecture is intentionally layered so UI, context collection, redaction, backend execution, scanning, MCP, and audit concerns can evolve independently.
+Custom AI Agent is implemented in Kotlin on the JVM using the Burp Montoya API. The architecture is intentionally layered so UI, context collection, redaction, backend execution, scanning, MCP, and audit concerns can evolve independently.
 
 ## Layered Design
 
@@ -42,6 +42,10 @@ flowchart TD
       AUD[JSONL events and hashes]
     end
 
+    subgraph L9b[9b. AI Request Logger]
+      RQL[Activity buffer, rolling JSONL, trace correlation]
+    end
+
     subgraph L10[10. Alerts]
       ALT[Optional webhook notifications]
     end
@@ -51,8 +55,11 @@ flowchart TD
     CC --> SCN
     RP --> MCP
     BA --> AUD
+    BA --> RQL
     SCN --> AUD
+    SCN --> RQL
     MCP --> AUD
+    MCP --> RQL
     AUD --> ALT
 ```
 
@@ -93,8 +100,10 @@ sequenceDiagram
 
 | Package | Purpose |
 | :--- | :--- |
-| `ui/*` | Swing UI, settings panels, interaction components. |
+| `ui/*` | Swing UI, settings panels, interaction components, AI Logger panel. |
 | `ui/UiActions` | Context menu wiring for request/response and issue actions. |
+| `ui/ToolCallParser` | Extracts MCP tool-call payloads from AI model responses (fenced blocks, raw JSON, OpenAI-style). |
+| `ui/ChatPanel` | Chat orchestration with auto tool chaining (up to 8 iterations) and trace ID propagation. |
 | `context/*` | Context collection from Burp selections. |
 | `redact/*` | Privacy policy and redaction engine. |
 | `prompts/bountyprompt/*` | Curated prompt loader, resolver, parser, and catalog. |
@@ -102,7 +111,7 @@ sequenceDiagram
 | `supervisor/*` | Backend and MCP lifecycle supervision. |
 | `mcp/*` | MCP manager, catalog, limiter, and transports. |
 | `scanner/*` | Passive/active scanner engines and analyzers. |
-| `audit/*` | JSONL writer and integrity hashes. |
+| `audit/*` | JSONL writer, integrity hashes, AI Request Logger (activity buffer, rolling persistence, trace correlation). |
 | `alerts/*` | Optional webhook notifications. |
 | `config/*` | Settings model, persistence, defaults, migration. |
 

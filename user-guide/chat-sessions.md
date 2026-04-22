@@ -9,7 +9,8 @@ Each chat session is an independent conversation with the AI. Sessions store:
 * **Title**: Auto-generated from the first prompt or the context menu action used.
 * **Creation time**: Timestamp for reference.
 * **Last backend used**: The most recent backend used in that session.
-* **Usage stats**: Message count, character totals, per-backend distribution, and estimated token usage (input/output), visible in the sidebar summary.
+* **Usage stats**: Message count, character totals, and per-backend distribution.
+* **Token tracking**: Per-session input/output token counters with visual progress bars showing session vs. global token usage. Bars use color coding (green/yellow/orange) to indicate consumption level relative to global totals.
 
 Session context is preserved per session. Follow-up prompts in the same session reuse the conversation history so the AI can keep track of previous responses and decisions.
 
@@ -75,6 +76,47 @@ The **Tools** button opens a menu of available MCP tools. Selecting a tool inser
 * Force the AI to use a specific MCP tool.
 * Build custom tool call sequences.
 * Explore available tools without memorizing names.
+
+## Auto Tool Chaining
+
+When the AI determines it needs to call an MCP tool to answer a request, it executes the tool automatically and feeds the result back into the conversation. This process repeats until the AI has all the information it needs or the chain limit is reached.
+
+* **Maximum chain depth**: 8 sequential tool calls per interaction.
+* **Transparent execution**: Each tool call is logged in the [AI Request Logger](../privacy/ai-request-logger.md) with a shared trace ID so you can follow the full chain.
+* **Automatic follow-up**: After each tool result, the AI continues reasoning with the original question plus all accumulated tool results. The final response is the complete answer, not intermediate tool output.
+* **Works with all backends**: Tool chaining works with HTTP backends (Ollama, LM Studio, OpenAI-compatible) and CLI backends (Gemini, Claude, Codex, OpenCode).
+
+### How It Works
+
+1. You ask a question (e.g., "Generate a PoC for this issue").
+2. The AI decides it needs data from Burp and calls an MCP tool (e.g., `proxy_http_history`).
+3. The tool result is sent back to the AI along with the original question.
+4. The AI may call another tool or produce the final answer.
+5. Steps 2–4 repeat until the AI responds without a tool call, or 8 iterations are reached.
+
+If the chain reaches the iteration limit, the AI produces a final response with whatever information it has gathered.
+
+## Project-Scoped Storage
+
+Chat sessions are stored in Burp's `extensionData()` API, which is scoped to the current Burp project file. This means each project maintains its own independent set of chat sessions, history, and token counters.
+
+### Auto-Migration
+
+On first open after this change, existing sessions stored in global `preferences()` are automatically migrated into the current project's `extensionData()`. No manual action is required.
+
+### Project Change Detection
+
+The extension polls `api.project().id()` every 30 seconds. When a project change is detected, the extension:
+
+1. Saves the current project's chat sessions.
+2. Clears in-memory chat state (messages, context, counters, drafts, tool state).
+3. Restores sessions from the new project's stored data.
+4. Clears the ScanKnowledgeBase to prevent cross-project data leakage.
+5. Shuts down active chat backend connections.
+
+### Clear Chat Behavior
+
+The **Clear Chat** action fully resets the current session: messages, attached context, token counters, input drafts, tool call state, and all persisted data for that session.
 
 ## Tips for Effective Use
 

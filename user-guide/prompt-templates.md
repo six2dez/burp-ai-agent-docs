@@ -45,6 +45,29 @@ The same tab includes BountyPrompt controls:
 
 See [BountyPrompt Actions](bountyprompt-actions.md) for operational behavior and curated IDs.
 
+## Custom Prompt Library
+
+Next to the canned templates, the same tab exposes a **Custom prompt library** section where you maintain your own reusable free-form prompts.
+
+Each entry stores:
+
+* **Title** — menu label (truncated to 50 chars in the context menu).
+* **Prompt text** — free-form user prompt. No variable substitution in v1.
+* **Tags** — one or both of: HTTP request/response menu, Scanner issue menu.
+* **Show in context menu** — master toggle.
+
+Controls:
+
+* `Add` — create a new entry with a generated UUID.
+* `Edit` — modify the selected entry in place.
+* `Duplicate` — create a copy (new UUID, `" (copy)"` appended to the title).
+* `Delete` — remove the selected entry.
+* `Move Up` / `Move Down` — reorder. List order is the menu order.
+
+The library is persisted globally (not per project) as JSON under settings schema v3. Invalid JSON loads as an empty library with an entry in Burp's extension log.
+
+Custom prompts are invoked from **right-click → Custom prompts** — see [Context Menus → Custom Prompt Library](context-menus.md#custom-prompt-library) for the full flow including launch metadata recorded in the audit log.
+
 ## Guide: Prompt Engineering for Pentesters
 
 ### Role Prompting

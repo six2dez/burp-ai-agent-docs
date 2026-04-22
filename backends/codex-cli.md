@@ -44,6 +44,19 @@ codex --model gpt-5.2
 
 ## Notes
 
+### Windows
+
+The extension automatically resolves npm-installed CLI shims on Windows. When `codex` is configured, the resolver:
+
+1. Checks for a `.cmd` sibling next to the resolved path (e.g., `codex.cmd` alongside `codex`).
+2. Falls back to wrapping the command with `cmd /c` if no `.cmd` sibling is found.
+
+This prevents `CreateProcess error=193` that occurs when Java tries to execute a shell script shim directly on Windows.
+
+{% hint style="info" %}
+You do not need to manually specify `.cmd` extensions. The extension handles this automatically for all npm-installed CLI backends.
+{% endhint %}
+
 ### Windows + WSL bridge
 
 If Burp runs on Windows and Codex runs in WSL, set **Codex CLI Command** to a `.cmd` wrapper that forwards args into WSL.
@@ -61,7 +74,7 @@ exit /b %ERRORLEVEL%
 
 {% hint style="tip" %}
 * `command not found`: use full binary path or npm shim path.
-* Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`.
+* Windows: npm shim paths are resolved automatically. If auto-resolution fails, use the full `.cmd` path: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`.
 * Auth errors: verify `OPENAI_API_KEY` in Burp runtime env.
 * Rate limits: check provider quota/tier.
 {% endhint %}

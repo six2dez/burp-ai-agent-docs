@@ -35,11 +35,17 @@ gemini "hello"
 
 `--yolo` is used by default to avoid interactive approval prompts that can block embedded MCP workflows.
 
+## Notes
+
+### Windows
+
+npm-installed CLI shims are resolved automatically on Windows. The extension detects `.cmd` siblings and uses them instead of shell script shims that Java cannot execute directly.
+
 ## Troubleshooting
 
 {% hint style="tip" %}
 * `command not found`: use full executable path if needed.
-* Windows npm shim example: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`.
+* Windows: npm shim paths are resolved automatically. If auto-resolution fails, use the full `.cmd` path: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\gemini.cmd`.
 * `ModelNotFoundError` / `RESOURCE_EXHAUSTED`: choose available model and update `--model`.
 * Auth errors: re-run `gemini auth login`.
 {% endhint %}

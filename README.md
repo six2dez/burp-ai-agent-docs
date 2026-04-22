@@ -4,27 +4,33 @@
 
 **AI integration for Burp Suite.**
 
-Burp AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
+Custom AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
 
-* **Pluggable Backends**: Use local models (Ollama, LM Studio), generic OpenAI-compatible providers, or cloud providers (Gemini, Claude, OpenAI/Codex, OpenCode). Add custom backends via drop-in JARs.
-* **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) to scrub sensitive data before it leaves Burp.
+* **Pluggable Backends**: Use local models (Ollama, LM Studio), NVIDIA NIM, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs.
+* **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) default to **Balanced**; cookies, auth headers, inline Bearer/Basic/JWT tokens, and sensitive URL query parameters are stripped before data leaves Burp. A preview dialog shows the exact payload before any auto-captured context is sent.
 * **MCP Server**: An embedded Model Context Protocol (MCP) server with 53+ tools for Burp history, Repeater, Scanner, scope, and issue workflows.
 * **AI Scanners**: Passive and Active scanners that analyze traffic automatically across 62 vulnerability classes.
 * **Curated BountyPrompt Actions**: Optional, tag-aware context menu actions loaded from JSON prompt files.
+* **Custom Prompt Library**: Save free-form prompts tagged per context (HTTP request or scanner issue), managed from Settings, surfaced in a right-click **Custom prompts** submenu, with an ad-hoc editor for one-offs.
 * **Audit Logging**: JSONL-based logging with SHA-256 integrity hashing for compliance and reproducibility.
+* **AI Request Logger**: Real-time activity log with trace ID correlation, preset filters, rolling JSONL persistence, and full metadata for prompts, responses, MCP calls, retries, and scanner operations.
+* **Auto Tool Chaining**: Automatic multi-step MCP tool execution where the AI autonomously chains up to 8 tool calls to complete complex tasks.
 
-<figure><img src=".gitbook/assets/overview-main.png" alt="Burp AI Agent main tab with chat and settings"><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/overview-main.png" alt="Custom AI Agent main tab with chat and settings"><figcaption></figcaption></figure>
 
 ## Key Features
 
 | Feature | Description |
 | :--- | :--- |
-| **7 Built-in Backends** | Ollama, LM Studio, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI. |
+| **9 Built-in Backends** | Ollama, LM Studio, NVIDIA NIM, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
 | **53+ MCP Tools** | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more. |
+| **Auto Tool Chaining** | AI autonomously chains up to 8 MCP tool calls per interaction to complete multi-step tasks. |
+| **AI Request Logger** | Real-time activity log with trace ID correlation, preset filters, and optional rolling JSONL persistence. |
 | **62 Vulnerability Classes** | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues. |
 | **3 Scan Modes** | `BUG_BOUNTY`, `PENTEST`, and `FULL` for different engagement styles. |
-| **3 Privacy Modes** | `STRICT` (zero trust), `BALANCED` (pragmatic), and `OFF` (raw data). |
+| **3 Privacy Modes** | `STRICT` (zero trust), `BALANCED` (pragmatic, default), and `OFF` (raw data, local-only). |
 | **9 Prompt Templates** | Editable templates for request and issue context menu actions. |
+| **Custom Prompt Library** | User-defined free-form prompts per context (HTTP request / scanner issue), with ordered menu and audit-tracked launch metadata. |
 | **8 Curated BountyPrompt Actions** | Detection, recon, and advisory prompts with selective context tags. |
 | **Token-Aware Controls** | Passive scanner and manual context caps, dedup windows, and prompt-result caching to reduce model spend. |
 | **Burp Pro Integration** | Native `ScanCheck`, Collaborator OAST, and scanner issue actions. |

@@ -1,6 +1,6 @@
 # Typical Workflows
 
-These workflows show common ways to use Burp AI Agent in security assessments.
+These workflows show common ways to use Custom AI Agent in security assessments.
 
 ## Bug Bounty Triage
 

@@ -7,12 +7,16 @@
 
 > Recent Burp versions include bundled Java runtime for extension execution. Separate Java is mainly needed for local builds.
 
+{% hint style="info" %}
+**JDK 25 Compatibility**: TLS certificate generation for the MCP server uses JDK's built-in `keytool` command, which works on all JDK versions (8-25+) and all platforms (macOS, Linux, Windows) without additional dependencies.
+{% endhint %}
+
 ## Install Path
 
 {% tabs %}
 {% tab title="Download from Releases" %}
 1. Open [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases).
-2. Download latest `Burp-AI-Agent-<version>.jar`.
+2. Download latest `Custom-AI-Agent-<version>.jar`.
 {% endtab %}
 
 {% tab title="Build from Source" %}
@@ -32,7 +36,7 @@ cd burp-ai-agent
 3. Output path:
 
 ```text
-build/libs/Burp-AI-Agent-<version>.jar
+build/libs/Custom-AI-Agent-<version>.jar
 ```
 {% endtab %}
 {% endtabs %}

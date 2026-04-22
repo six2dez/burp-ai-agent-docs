@@ -1,6 +1,6 @@
 # UI Tour
 
-This page explains each major area of the Burp AI Agent interface.
+This page explains each major area of the Custom AI Agent interface.
 
 ## Top Bar
 
@@ -36,7 +36,8 @@ The panel is docked at the bottom of the AI Agent tab and can be resized/collaps
 | **MCP Server** | Host/port/TLS/token/limits/unsafe-tool master switch. |
 | **Burp Integration** | Per-tool MCP toggles by category. |
 | **Prompt Templates** | Built-in template editing and BountyPrompt controls. |
-| **Privacy & Logging** | Privacy mode, determinism, salt, audit logging. |
+| **Privacy & Logging** | Privacy mode, determinism, salt, audit logging, AI request logger. |
+| **AI Logger** | Real-time AI activity log with filters, trace correlation, and export. |
 | **Help** | Quick docs and setup references. |
 
 <figure><img src="../.gitbook/assets/ui-tour-settings-panel.png" alt="Settings panel tabs in the AI Agent UI"><figcaption></figcaption></figure>
@@ -44,6 +45,10 @@ The panel is docked at the bottom of the AI Agent tab and can be resized/collaps
 ## Privacy Indicator
 
 Visual pill indicates active mode (`STRICT`, `BALANCED`, `OFF`) so you can confirm policy before sending prompts.
+
+## Context Preview Dialog
+
+Every right-click action that auto-captures context (proxy item, scanner issue, site-map node, Repeater) opens a modal before anything leaves the plugin. The modal shows the action, current privacy mode, the exact prompt, and the exact redacted JSON that will be sent. Confirm with **Send** or abort with **Cancel**. See [Context Menus → Context Preview Dialog](context-menus.md#context-preview-dialog) for details.
 
 ## Keyboard Shortcuts
 

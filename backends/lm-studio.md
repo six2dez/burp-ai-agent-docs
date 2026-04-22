@@ -31,6 +31,17 @@ LM Studio provides local model execution with an OpenAI-compatible API and a GUI
 
 Use Auto-Start only if your LM Studio server command is stable in the same runtime environment as Burp.
 
+## Output Token Limits
+
+The extension sets `max_tokens` automatically per request type to ensure complete responses:
+
+| Request Type | `max_tokens` |
+| :--- | :--- |
+| **Chat** | 4096 |
+| **Scanner (single request)** | 2048 |
+| **Scanner (batch analysis)** | 4096 |
+| **Payload generation** | 1024 |
+
 ## Troubleshooting
 
 {% hint style="tip" %}
@@ -39,6 +50,10 @@ Use Auto-Start only if your LM Studio server command is stable in the same runti
 * Timeouts: increase timeout or use smaller model.
 * Slow responses: local hardware constraints are expected on CPU-only setups.
 {% endhint %}
+
+## Retry Behavior
+
+If a request fails due to a transient network error, the extension retries automatically with exponential backoff up to 6 attempts. Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md).
 
 ## Related Pages
 

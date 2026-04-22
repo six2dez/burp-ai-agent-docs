@@ -48,6 +48,17 @@ X-Org: myorg
 X-Project: myproj
 ```
 
+## Output Token Limits
+
+The extension sets `max_tokens` automatically per request type to ensure complete responses:
+
+| Request Type | `max_tokens` |
+| :--- | :--- |
+| **Chat** | 4096 |
+| **Scanner (single request)** | 2048 |
+| **Scanner (batch analysis)** | 4096 |
+| **Payload generation** | 1024 |
+
 ## Troubleshooting
 
 {% hint style="tip" %}
@@ -55,6 +66,10 @@ X-Project: myproj
 * `404`: verify provider supports chat completions at resolved path.
 * Timeout: increase timeout or choose smaller/faster model.
 {% endhint %}
+
+## Retry Behavior
+
+If a request fails due to a transient network error, the extension retries automatically with exponential backoff up to 6 attempts. Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md).
 
 ## Related Pages
 

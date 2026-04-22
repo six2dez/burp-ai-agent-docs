@@ -22,6 +22,26 @@ The Active Scanner sends traffic that can modify data, trigger actions, or disru
 
 From the request context menu, **Targeted tests** lets you run focused active checks (SQLi, XSS, SSRF, IDOR, etc.) instead of scanning all classes. This uses the same active scanner pipeline and includes the same safety warnings.
 
+## 403 Bypass Testing
+
+The active scanner includes a dedicated **403 Bypass** mode that tests for access control misconfigurations on endpoints returning HTTP 403 Forbidden.
+
+### Bypass Techniques
+
+| Technique | Details |
+| :--- | :--- |
+| **IP Spoofing Headers** | Sends requests with 9 different headers (`X-Forwarded-For`, `X-Real-IP`, `X-Originating-IP`, `X-Remote-IP`, `X-Remote-Addr`, `X-Client-IP`, `X-Forwarded-Host`, `X-Original-URL`, `X-Rewrite-URL`) set to `127.0.0.1`. Confirmed at 90% confidence. A body delta check (>50 bytes difference from original 403 response) is required to avoid false positives from generic error pages. |
+| **Path Manipulation** | Tests 7 URL variations: trailing slash, trailing dot, double slash, path traversal (`/../path`), URL-encoded space, case swap on last segment, and additional detection paths. A body delta check (>50 bytes difference from original 403 response) is required to confirm a genuine bypass. |
+| **HTTP Method Switching** | Retries with alternative HTTP methods (GET, POST, PUT). Confirmed at 85% confidence. A body delta check (>50 bytes difference from original 403 response) is required to distinguish real bypasses from status-only changes. |
+
+### How to Use
+
+1. Right-click one or more requests that returned **403 Forbidden** in Proxy History or Site Map.
+2. Select **Test 403 Bypass** from the context menu.
+3. Non-403 responses are filtered out automatically.
+4. Queued targets are processed by the active scanner using the bypass techniques above.
+5. Successful bypasses are reported as `[AI Active] ACCESS_CONTROL_BYPASS` issues.
+
 ## Risk Levels
 
 The scanner operates in three risk modes. You must select the appropriate level for your engagement.
@@ -56,11 +76,35 @@ Configure these options in the **AI Active Scanner** tab of the bottom settings 
 * **Scope Only**: **CRITICAL**. Ensure this is checked to prevent scanning out-of-scope assets (e.g., Google Analytics, CDNs).
 * **Scan Mode**: Select `BUG_BOUNTY`, `PENTEST`, or `FULL`.
 * **Use Collaborator (OAST)**: Enable out-of-band checks. The scanner generates Burp Collaborator payloads and polls for DNS/HTTP interactions.
+* **AI Adaptive Payloads**: Generate context-aware payloads using AI based on the target's detected tech stack and error patterns (default: off). See [Adaptive Payloads](#adaptive-ai-payloads) below.
+
+## Adaptive AI Payloads
+
+When enabled, the active scanner uses AI to generate payloads tailored to the target application's technology stack, observed error patterns, and parameter context. These complement the built-in static payloads.
+
+* **How it works**: After local checks, the scanner queries the AI with the target's tech stack (e.g., "MySQL", "Django"), error patterns from the Knowledge Base, and parameter name/value. The AI returns up to 5 payloads specific to that context.
+* **Safety**: All AI-generated payloads are validated against a destructive-command blocklist (`DROP`, `DELETE`, `TRUNCATE`, `ALTER`, `SHUTDOWN`, `rm`, etc.). Rejected payloads are silently discarded.
+* **Prompt hardening**: Tech-stack and error-pattern values come from observed HTTP responses and are therefore attacker-controlled. The generator prompt instructs the model to treat that block as data, not as instructions, and to ignore any embedded attempt to override the requested JSON schema.
+* **Caching**: Generated payloads are cached per `vulnClass:techStack` combination for 30 minutes, so a single AI call covers all injection points on the same host for the same vulnerability class.
+* **Merge strategy**: Static payloads (always included) + context-aware payloads + adaptive AI payloads are combined, deduplicated by value, and capped at `Max Payloads per Point`.
+* **Timeout**: AI payload generation has a 15-second timeout. If it fails, only static and context-aware payloads are used.
+* **Output token limit**: Adaptive payload generation uses a 1024 token output limit to keep responses focused on compact payload lists.
+
+{% hint style="info" %}
+Adaptive payloads require a running AI backend and consume additional tokens. Enable only when you want deeper coverage against specific tech stacks or WAF bypasses.
+{% endhint %}
+
+## Knowledge Base Priority Boost
+
+The active scanner consults the shared `ScanKnowledgeBase` when queueing targets. Endpoints with high-priority signals (Critical/High severity, confidence >= 80%) from the passive scanner receive a +20 priority boost, causing them to be tested earlier in the queue.
+
+Additionally, confirmed findings from the active scanner are recorded back into the Knowledge Base, including database technology hints extracted from error evidence (MySQL, PostgreSQL, MSSQL, Oracle, SQLite). This information feeds into adaptive payload generation for subsequent scans.
 
 ## Issue Creation Behavior
 
 * Issue details are sanitized to plain text (Markdown formatting removed).
 * Issues are named by class (e.g., `[AI Active] SQLI`) and consolidated if an existing issue with the same name and base URL already exists.
+* Findings include byte-range markers in Burp's request/response viewer, highlighting injected payloads in requests and evidence strings in responses.
 
 ## Vulnerability Classes
 
@@ -105,10 +149,11 @@ mindmap
 | `HOST_HEADER_INJECTION`  | Host Header Injection                                        |
 | `EMAIL_HEADER_INJECTION` | Email Header Injection                                       |
 
-### Access Control (9 classes)
+### Access Control (10 classes)
 
 | Class                   | Description                          |
 | ----------------------- | ------------------------------------ |
+| `ACCESS_CONTROL_BYPASS` | 403 Forbidden Bypass via headers, path manipulation, and method switching |
 | `IDOR`                  | Insecure Direct Object Reference     |
 | `BOLA`                  | Broken Object Level Authorization    |
 | `BFLA`                  | Broken Function Level Authorization  |
@@ -196,16 +241,15 @@ mindmap
 | -------------------- | ------------------------------------ |
 | `API_VERSION_BYPASS` | Deprecated/legacy API version access |
 
-### Other (4 classes)
+### Other (3 classes)
 
 | Class              | Description      |
 | ------------------ | ---------------- |
 | `OPEN_REDIRECT`    | Open Redirect    |
 | `HEADER_INJECTION` | Header Injection |
 | `CRLF_INJECTION`   | CRLF Injection   |
-| `RACE_CONDITION`   | Race Condition   |
 
-> **Note**: Classes marked **(passive-only)** are detected through response analysis and cannot be actively tested with payloads.
+> **Note**: Classes marked **(passive-only)** are detected through response analysis and cannot be actively tested with payloads. Race-condition / TOCTOU issues are represented by `RACE_CONDITION_TOCTOU` in the Insecure Design group.
 
 ## Injection Points
 

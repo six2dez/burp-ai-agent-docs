@@ -63,6 +63,6 @@ interface AgentConnection {
 
 ## Tips
 
-*   Follow existing backend implementations as examples (e.g., `OllamaBackendFactory` for HTTP, `CodexCliBackendFactory` for CLI).
+*   Follow existing backend implementations as examples (e.g., `OllamaBackendFactory` for HTTP, `CodexCliBackendFactory` or `CopilotCliBackendFactory` for CLI).
 *   HTTP backends should handle connection errors and timeouts gracefully.
 *   CLI backends should manage process lifecycle (stdin/stdout communication, exit handling).
