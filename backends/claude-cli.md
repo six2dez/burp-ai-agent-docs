@@ -69,6 +69,23 @@ If the process is killed or `Clear Chat` is used, the session ID is released and
 
 npm-installed CLI shims are resolved automatically on Windows. The extension detects `.cmd` siblings and uses them instead of shell script shims that Java cannot execute directly.
 
+### Windows + WSL bridge
+
+If Burp runs on Windows and Claude CLI is installed inside WSL, the simplest setup is to point **Claude CLI Command** at a one-liner that invokes WSL with an interactive shell so `PATH` and auth env vars from `~/.bashrc` / `~/.profile` are loaded:
+
+```
+wsl -d Debian bash -ic "/home/<username>/.local/bin/claude"
+```
+
+Notes:
+
+* Replace `Debian` with the name of your distro (`wsl -l -v` lists installed ones) and `<username>` with your WSL user.
+* `bash -ic` runs an **i**nteractive shell that sources rc files, so `ANTHROPIC_API_KEY` (or whatever `claude login` wrote) is picked up; `-c` then executes the binary.
+* Use the **absolute path** to the `claude` binary inside WSL (`which claude` from WSL prints it). Relying on bare `claude` can fail if the rc files don't put `~/.local/bin` on `PATH` for non-login shells.
+* No `.cmd` wrapper file is required — the extension passes its CLI args through the same way it does for native commands.
+
+If you prefer a wrapper script instead of a single command (e.g. to filter banner output, switch distros, or share the config across machines), the `.cmd` pattern documented for [Codex CLI](codex-cli.md#windows--wsl-bridge) works the same way for Claude.
+
 ## Troubleshooting
 
 {% hint style="tip" %}

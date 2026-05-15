@@ -20,6 +20,8 @@ Common issues and practical resolution steps.
 
 ### Burp AI (built-in) shows `Offline`
 
+The steps below apply **only when the selected Preferred Backend is Burp AI (built-in)**. If a different backend shows `AI: Offline`, the cause is unrelated to Burp Pro's *Use AI for extensions* toggle — see [Backend Troubleshooting](../backends/troubleshooting.md) for per-backend error signatures.
+
 The built-in Burp AI backend depends on Burp Pro's native AI feature. If the top bar shows `AI: Offline` while this backend is selected:
 
 1. Open **Burp Settings → Burp AI → Use AI for extensions** and ensure it is **ON**.
@@ -89,6 +91,10 @@ npm-installed CLI tools (Codex, Gemini, OpenCode, Copilot) install as shell scri
 ### Windows + WSL Codex CLI bridge
 
 If Burp runs on Windows and Codex runs in WSL, use a `.cmd` wrapper that forwards args into WSL and configure **Codex CLI Command** with that wrapper path.
+
+### Windows + WSL Claude CLI bridge
+
+If Burp runs on Windows and Claude CLI is installed in WSL, set **Claude CLI Command** to a one-liner like `wsl -d Debian bash -ic "/home/<username>/.local/bin/claude"`. The interactive `bash -ic` sources `~/.bashrc` so `ANTHROPIC_API_KEY` and `PATH` are populated before launching the binary. Full example and notes in [Claude CLI → Windows + WSL bridge](../backends/claude-cli.md#windows--wsl-bridge).
 
 ## MCP Issues
 

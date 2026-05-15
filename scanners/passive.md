@@ -75,6 +75,8 @@ If cloud cost is high, lower `Resp body chars (AI)`, `Max headers`, `Max params`
 {% endhint %}
 
 ![Screenshot: Passive scanner settings](../.gitbook/assets/passive-scanner.png)
+<!-- TODO: refresh passive-scanner.png — panel was rebuilt; now uses SubtleNotice banners instead of stacked red labels and includes the batch size / persistent cache controls. -->
+
 
 ## MIME Type Filtering
 
@@ -172,6 +174,28 @@ AI analysis results are cached to disk at `~/.burp-ai-agent/cache/<project>/` (p
 * LRU eviction keeps disk usage within the configured maximum (default 50 MB).
 * Disable via the **Persistent cache** toggle in settings.
 
+### Cache Key (Prompt Hash)
+
+Each cached entry is keyed by a SHA-256 hash of the *normalized* prompt payload. Normalization runs before hashing so semantically equivalent prompts collide on the same key:
+
+* Response-body prefixes have UUIDs, MongoDB ObjectIds, Unix timestamps, ISO-8601 dates, and long tokens/nonces replaced with placeholders.
+* Endpoint dedup keys sort query-parameter names alphabetically and drop cache-busting parameters (`_`, `ts`, `timestamp`, `nonce`, etc.).
+* Header allowlists are applied before the prompt is built, so noise headers do not perturb the hash.
+
+This means a re-scan after a backend swap, a Burp restart, or even a cosmetic change in a dynamic field still hits the cache as long as the security-relevant content is unchanged.
+
+### Invalidation
+
+Entries are removed in three situations:
+
+| Trigger | What happens |
+| :--- | :--- |
+| **TTL expiry** | Each entry stores its `createdAtMs`. On read, entries older than the configured **Persistent TTL (hrs)** (default `24`) are deleted in place and a fresh AI call runs. |
+| **LRU pressure** | When disk usage exceeds **Persistent max (MB)** × `0.8`, the oldest files (by filesystem `lastModified`) are deleted until usage falls below the cap. |
+| **Manual clear** | Delete the directory directly: `rm -rf ~/.burp-ai-agent/cache/<project>/`. The plugin recreates it on next write. There is no in-UI "clear cache" button — direct disk action is the supported path. |
+
+Project switches do **not** invalidate the cache: each project has its own subdirectory under `~/.burp-ai-agent/cache/` and they remain side-by-side until manually cleaned.
+
 ## Cache Normalization
 
 Response fingerprints and endpoint dedup keys are normalized to improve cache hit rates:
@@ -199,7 +223,7 @@ Captured HTTP traffic is attacker-controlled. Response bodies, error messages, a
 * The output schema is strict (`reasoning` + `title` + `severity` + `detail` + `confidence`); any out-of-schema output is discarded on parse, which acts as a second line of defense.
 * Privacy-mode redaction runs **before** the content is placed inside the prompt, so at `BALANCED` or `STRICT` the model never sees raw cookies, auth tokens, or JWTs even if an attacker crafts a response that would otherwise surface them.
 
-This is defense in depth, not a guarantee. Keep confidence thresholds conservative (default 85) and review issues manually for unusual targets.
+This is defense in depth, not a guarantee. Keep confidence thresholds conservative (default 85) and review issues manually for unusual targets. See [Limitations & Hallucinations](../privacy/limitations.md) for what AI-generated findings can and cannot be relied on for.
 
 ## Output Token Limits
 
@@ -254,4 +278,5 @@ Each passive scanner job generates a unique trace ID (`scanner-job-{UUID}`) that
 
 * [Active AI Scanner](active.md)
 * [Settings Reference](../reference/settings-reference.md)
+* [Limitations & Hallucinations](../privacy/limitations.md)
 * [Troubleshooting](../reference/troubleshooting.md)

@@ -13,6 +13,10 @@ This backend is only available on Burp Suite **Professional** with AI credits an
 
 When *Use AI for extensions* is off, the extension's supervisor refuses to start a Burp AI session and you'll see `AI: Offline` in the top bar even when the backend is selected. Switching it on takes effect immediately without restarting Burp.
 
+{% hint style="info" %}
+This gate is scoped to the **Burp AI** backend only. The supervisor refuses to start a session and the scanners refuse to enqueue work **only when** the *selected* Preferred Backend is `burp-ai` and Burp's *Use AI for extensions* toggle is off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, and the Gemini / Claude / Codex / Copilot / OpenCode CLI agents — keeps working whether that toggle is on, off, or you're on Burp Community (where the toggle does not exist).
+{% endhint %}
+
 ## Selecting Burp AI
 
 1. Open **Custom AI Agent → Settings → AI Backend**.
@@ -48,7 +52,6 @@ See [Privacy Modes](../privacy/privacy-modes.md) for what gets redacted.
 ## Troubleshooting
 
 * **`AI: Offline` in the top bar with Burp Pro running** — open **Burp Settings → Burp AI** and toggle **Use AI for extensions** on. The plugin polls `api.ai().isEnabled()` on every health cycle and will pick the change up automatically.
-* **"Unsupported backend" error from chat** — this was a fixed regression in v0.5.0; make sure you are on v0.5.0 or newer.
 * **AI credits exhausted** — Burp Pro surfaces quota errors directly; the plugin relays them as an `ERROR` entry in the [AI Request Logger](../privacy/ai-request-logger.md).
 * **`api.ai().isEnabled()` throws on custom builds** — on older Montoya API versions the `ai()` surface may be missing; the backend falls back to `Unavailable` and disappears from the Preferred Backend dropdown automatically.
 

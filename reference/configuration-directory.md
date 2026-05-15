@@ -1,6 +1,6 @@
 # Configuration Directory
 
-The extension stores all runtime state under a single directory in the user's home folder. The directory keeps the legacy `burp-ai-agent` name for upgrade compatibility — see [Naming & Paths](naming-and-paths.md).
+The extension stores all runtime state under a single directory in the user's home folder. The directory keeps the legacy `burp-ai-agent` name for upgrade compatibility — see [Legacy Identifier Reference](#legacy-identifier-reference) below for why the product name and the on-disk name diverge.
 
 ## Location
 
@@ -71,9 +71,49 @@ Chat sessions do **not** live in this directory. They are stored in Burp's `exte
 | Start fresh for a new client engagement | Move the directory aside (`mv ~/.burp-ai-agent ~/.burp-ai-agent.bak`) before launching Burp. |
 | Disable rolling logs | Unset the `-Dburp.ai.logger.rolling.enabled=true` JVM flag at Burp startup (the `logs/` directory remains but no new entries are appended). |
 
+## Legacy Identifier Reference
+
+The product is called **Custom AI Agent** but several internal identifiers still use the legacy name `burp-ai-agent`. This table lists exactly where each form appears.
+
+| Context | Value | Notes |
+| :--- | :--- | :--- |
+| Product and Burp extension name | `Custom AI Agent` | Visible in Burp's Extensions list and in the main tab. |
+| Release artifact | `Custom-AI-Agent-<version>.jar` | Published on GitHub Releases. |
+| Checksum / SBOM | `Custom-AI-Agent-<version>.jar.sha256`, `bom.json` | Attached to every GitHub release. |
+| Burp tab title | `AI Agent` | Short form; does not include the word "Custom". |
+| GitHub repository | `github.com/six2dez/burp-ai-agent` | Repo URL kept to avoid breaking external links, issues, and forks. |
+| Runtime directory | `~/.burp-ai-agent/` (Windows: `%USERPROFILE%\.burp-ai-agent\`) | Documented above. |
+| Java package | `com.six2dez.burp.aiagent` | Kept to preserve backend SPI compatibility for drop-in JARs. |
+| Gradle project name | `burp-ai-agent` (in `settings.gradle.kts`) | Internal only. |
+| MCP implementation string | `burp-ai-agent` | Shows up in MCP `initialize` responses; clients may rename. |
+| MCP server name in client configs (examples) | `burp-ai-agent` | Suggested key in `claude_desktop_config.json` and similar; you can call it anything you like. |
+| Audit log path | `~/.burp-ai-agent/audit.jsonl` | Inside the runtime directory above. |
+
+### Why the Two Names Coexist
+
+The product is called **Custom AI Agent** because PortSwigger naming guidance asks third-party extensions to avoid using "Burp" as the leading word in a product name. User-facing strings and the JAR artifact carry the new name; internal identifiers still use the legacy `burp-ai-agent` form on purpose, for three reasons:
+
+1. **Migrations**: existing users already have `~/.burp-ai-agent/` populated with audit logs, prompt caches, agent profiles, and drop-in backend JARs. Renaming the directory would invalidate all of that silently.
+2. **SPI compatibility**: external drop-in backends ship JARs that register under `com.six2dez.burp.aiagent.backends.AiBackendFactory` via `META-INF/services`. Renaming the package would break every published third-party backend.
+3. **GitHub identifiers**: repo URL, issue IDs, and pull requests are stable references that appear in pinned dependencies, automation, and user bookmarks.
+
+### What to Expect in Each Surface
+
+* **UI, chat labels, audit payloads, documentation titles** → `Custom AI Agent`.
+* **Filesystem paths, repo URL, Java imports, Gradle tasks** → `burp-ai-agent`.
+* **MCP client configs** → either is fine; the identifier is advisory. Prefer `burp-ai-agent` if you want copy-paste examples from the docs to keep working.
+
+### Ops and CI Naming Notes
+
+When wiring scripts, automation, or dashboards against this extension:
+
+* Scripts that download or pin the release JAR should target `Custom-AI-Agent-*.jar`.
+* Dashboards or Slack messages that reference the Burp tab should use the short form **`AI Agent`** (the user-visible tab name).
+
+Scripts that reference `~/.burp-ai-agent/`, the GitHub repo URL, the Java package, or the MCP implementation string follow the legacy identifier form — those do **not** need to match the product name.
+
 ## Related Pages
 
-* [Naming & Paths](naming-and-paths.md)
 * [Settings Reference](settings-reference.md)
 * [Audit Logging](../privacy/audit-logging.md)
 * [AI Request Logger](../privacy/ai-request-logger.md)

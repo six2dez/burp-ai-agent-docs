@@ -50,7 +50,16 @@ stateDiagram-v2
 
 ### Use AI Gate
 
-On every `startOrAttach`, `send`, and `sendChat` the supervisor short-circuits if `api.ai().isEnabled()` returns `false` (the Burp Pro *Use AI for extensions* toggle). This means the gate applies to **every** backend, not just the built-in Burp AI backend. See [Burp AI (Built-in)](../backends/burp-ai.md) for the end-user-visible behaviour.
+The supervisor exposes two helpers that scope Burp Pro's *Use AI for extensions* toggle to the only backend that actually depends on it:
+
+* `requiresBurpAiAndDisabled(backendId: String): Boolean` — returns `true` only when `backendId == "burp-ai"` **and** `api.ai().isEnabled()` returns `false`. Used by call sites that know which backend they're about to talk to before starting it.
+* `isBlockedByBurpAiGate(): Boolean` — convenience wrapper that checks `requiresBurpAiAndDisabled` against the currently-running session's backend id.
+
+`startOrAttach`, `send`, and `sendChat` short-circuit through `requiresBurpAiAndDisabled` so they only refuse when the user has selected **Burp AI (built-in)** with Burp's toggle off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, and the Claude / Codex / Gemini / OpenCode / Copilot CLI agents — starts regardless of `api.ai().isEnabled()`. This also unblocks Burp Community users, where `api.ai().isEnabled()` is permanently `false`.
+
+The same helpers gate the two scanner pipelines outside the supervisor: `PassiveAiScanner` and `ActiveAiScanner` call `isBlockedByBurpAiGate()` before scheduling work, and `ChatPanel.send` calls `requiresBurpAiAndDisabled` before opening a session.
+
+When the gate trips on the `burp-ai` startup path, callers surface the error string `"Burp AI is disabled in Burp Suite settings. Enable 'Use AI' for extensions, or pick a different backend."` See [Burp AI (Built-in)](../backends/burp-ai.md) for the end-user-visible behaviour.
 
 ### Session Management
 

@@ -45,3 +45,5 @@ Default privacy mode is `BALANCED` (cookies stripped, tokens redacted, hosts pre
 If any step fails, use [Troubleshooting](../reference/troubleshooting.md).
 
 <figure><img src="../.gitbook/assets/first-run-context-menu.png" alt="Context menu showing Custom AI Agent actions during first-run verification"><figcaption></figcaption></figure>
+<!-- TODO: refresh first-run-context-menu.png — menu now includes "AI Scan on Selected Insertion Point" when text is selected, and the Custom prompts submenu has favorites/search. -->
+

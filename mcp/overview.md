@@ -89,8 +89,11 @@ If token is required:
 * Administrative endpoints (`GET /__mcp/health`, `POST /__mcp/shutdown`) used for health checks and safe takeover.
 * Auto-restart of the MCP listener on unexpected termination.
 * Privacy-aware tool output filtering.
+* Inline advisory banner in the **MCP Server** settings tab that surfaces risky combinations (external access without allowed origins, external access with **Enable Unsafe Tools** on, etc.). See [UI Tour → Advisory Banner (SubtleNotice)](../user-guide/ui-tour.md#advisory-banner-subtlenotice).
 
 ![Screenshot: MCP settings](../.gitbook/assets/mcp-settings.png)
+<!-- TODO: refresh mcp-settings.png — panel was rebuilt; now includes the MCP Proxy History Preprocessing section and the SubtleNotice advisory banner style. -->
+
 
 ## Administrative Endpoints
 

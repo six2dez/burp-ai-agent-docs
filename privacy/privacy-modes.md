@@ -5,7 +5,7 @@ Privacy mode controls what request/response data can leave Burp when the extensi
 Configure it in the **Privacy & Logging** tab in the Settings panel.
 
 {% hint style="info" %}
-Default value is `BALANCED` (was `OFF` prior to v0.6.0). New installs and users who never explicitly chose a mode get cookie stripping and token redaction automatically. Users with an existing explicit choice keep it unchanged.
+Default is `BALANCED` — cookies and tokens are redacted automatically. Users who explicitly choose another mode keep their choice across sessions.
 {% endhint %}
 
 ## Mode Comparison
@@ -60,6 +60,8 @@ flowchart TD
 
 * Raw context is eligible for transmission.
 * No automatic redaction is applied.
+
+When you change Privacy Mode the **Privacy & Logging** tab surfaces an inline advisory banner that summarises the combined state (e.g. `OFF` with MCP on, `STRICT` with the active scanner on, external MCP without allowed origins). See [UI Tour → Advisory Banner (SubtleNotice)](../user-guide/ui-tour.md#advisory-banner-subtlenotice) for the level semantics.
 
 ## Patterns Redacted (STRICT and BALANCED)
 
@@ -130,3 +132,4 @@ Privacy mode does not prevent active scanner traffic from reaching the real targ
 * [Redaction Pipeline](../developer/redaction-pipeline.md)
 * [Determinism & Salt](determinism-salt.md)
 * [Audit Logging](audit-logging.md)
+* [Limitations & Hallucinations](limitations.md)

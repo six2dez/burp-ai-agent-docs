@@ -17,6 +17,7 @@ When you right-click HTTP request/response items, these actions are available un
 | :--- | :--- |
 | **AI Passive Scan** | Queues selected request(s) for passive AI analysis in the background. |
 | **AI Active Scan** | Queues selected request(s) for active testing. Sends traffic to the target. |
+| **AI Scan on Selected Insertion Point** | Surgical active scan scoped to a single parameter/header/JSON field/XML element/path-segment under the request-editor selection. Hidden until the selection overlaps a candidate. See [Insertion Point Scan](insertion-point-scan.md). |
 | **Test 403 Bypass** | Queues selected 403-status requests for active bypass testing using IP spoofing headers, path manipulation, and HTTP method switching. Sends traffic to the target. |
 | **Extract JS Endpoints** | Extracts API endpoints from JavaScript responses using regex pattern matching. Shows results in a scrollable dialog. |
 | **Targeted tests** | Submenu for focused active checks (SQLi, XSS, SSRF, IDOR, etc.). Sends traffic to the target. |
@@ -29,6 +30,8 @@ When you right-click HTTP request/response items, these actions are available un
 | **Custom prompts** | Submenu of your saved custom prompts (filtered by applicability tag) plus a `Custom…` entry that opens a free-form editor. See [Custom Prompt Library](#custom-prompt-library) below. |
 
 ![Screenshot: Request menu](../.gitbook/assets/context-menu-request.png)
+<!-- TODO: refresh context-menu-request.png — when text is selected inside a request, the menu now includes "AI Scan on Selected Insertion Point (<type>: <name>)". The Custom prompts submenu also surfaces ★ favorites at the top. -->
+
 
 ## BountyPrompt Submenu
 
@@ -66,19 +69,25 @@ Ad-hoc prompts do not persist — if you want to reuse, save them from **Setting
 
 ### Managing saved prompts
 
-Open **Settings → Prompt Templates → Custom prompt library**. Each entry has:
+Open **Settings → Custom Prompts** (the dedicated tab; previously folded under **Prompt Templates**). Each entry has:
 
 | Field | Meaning |
 | :--- | :--- |
 | **Title** | Menu label and session-title stem. Truncated to 50 chars in the submenu. |
 | **Prompt text** | Free-form text sent as the user prompt. No variable substitution in v1 (see below). |
-| **HTTP request/response menu** tag | Show in the HTTP context menu. |
-| **Scanner issue menu** tag | Show in the scanner-issue context menu. |
+| **Tag `HTTP_SELECTION`** | Show in the HTTP request/response context menu. |
+| **Tag `SCANNER_ISSUE`** | Show in the scanner-issue context menu. |
 | **Show in context menu** | Master toggle. Hidden entries stay in the library but are not exposed in menus. |
+| **Favorite (★)** | Pins the entry to the top of its context-menu group. Favorites keep their relative order; non-favorites follow. |
 
-Buttons: `Add`, `Edit`, `Duplicate`, `Delete`, `Move Up`, `Move Down`. The list order is the menu order — no auto-sort.
+Buttons: `Add`, `Edit`, `Duplicate`, `Delete`, `Move Up`, `Move Down`. Move Up / Move Down respect the favorite grouping — you cannot reorder a non-favorite past a favorite. The list order is the menu order — no auto-sort.
 
-The library is persisted globally (per Burp extension, not per project) as JSON under settings schema v3. Malformed JSON loads as an empty library with an error in Burp's extension log.
+The editor also exposes:
+
+* **Search** — a live filter that matches case-insensitively against title and prompt text. Clears with one click.
+* **Import JSON** / **Export JSON** — bulk operations. Export writes the entire library as pretty-printed JSON. Import merges incoming entries by `id`: existing entries are updated in place, new entries are appended, and duplicate IDs across the import payload are de-duplicated.
+
+The library is persisted globally (per Burp extension, not per project) as JSON. Malformed JSON loads as an empty library with an error in Burp's extension log.
 
 ### Launch metadata
 
@@ -100,6 +109,12 @@ Canned actions continue to work unchanged, now stamped with `promptSource=FIXED`
 ### No variable substitution in v1
 
 Placeholders such as `$URL`, `$REQUEST`, `$RESPONSE` are **not supported** in v1. The prompt text travels through a different path than the context JSON, so interpolating the raw request/response into the prompt string would bypass the `PrivacyMode` redaction pipeline. If variable substitution is added later it will resolve against the already-redacted capture, not the raw HTTP message.
+
+## AI Scan on Selected Insertion Point
+
+Highlight the value of a single parameter, header, JSON field, XML element, or path-segment ID in any request editor and the **AI Scan on Selected Insertion Point** entry appears in the context menu, labelled with the resolved type and name (for example `AI Scan on Selected Insertion Point (json field: user_id)`). It runs an active AI scan scoped to that one insertion point, ahead of the regular manual/passive queue (priority 60). The action is hidden when the selection is empty, on the response side, or does not overlap any candidate.
+
+See [Insertion Point Scan](insertion-point-scan.md) for the supported insertion-point types, the vuln-class picker filtering rules, queue/scope behavior, and safety boundaries.
 
 ## Targeted Tests Submenu
 

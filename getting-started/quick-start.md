@@ -17,6 +17,8 @@ If you skip this step, the backend will show `Offline` in the top bar until the 
 * Verify indicator turns active.
 
 ![Screenshot: Top bar toggles](../.gitbook/assets/top-bar-toggles.png)
+<!-- TODO: refresh top-bar-toggles.png — top bar now includes the SafetyIndicator pill (OK/WARN/RISK). -->
+
 
 ## 2. Select Agent Profile (Recommended)
 
@@ -37,6 +39,8 @@ If using cloud CLIs, required credentials must exist in the runtime environment 
 For backend-specific values, see [Backends Overview](../backends/overview.md).
 
 ![Screenshot: Backend selection](../.gitbook/assets/backend-selection.png)
+<!-- TODO: refresh backend-selection.png — the Preferred Backend dropdown now lists Perplexity (between NVIDIA NIM and Generic OpenAI-compatible). -->
+
 
 ## 4. Analyze a Request
 
@@ -45,6 +49,8 @@ For backend-specific values, see [Backends Overview](../backends/overview.md).
 3. Select **Extensions -> Custom AI Agent -> Find vulnerabilities**.
 
 ![Screenshot: Context menu on request](../.gitbook/assets/context-menu-request.png)
+<!-- TODO: refresh context-menu-request.png — when text is selected inside a request, the menu now includes "AI Scan on Selected Insertion Point (<type>: <name>)". The Custom prompts submenu also surfaces ★ favorites at the top. -->
+
 
 ## 5. Review Response
 

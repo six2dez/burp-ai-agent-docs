@@ -51,19 +51,19 @@ build/libs/Custom-AI-Agent-<version>.jar
 
 ## Verify JAR Integrity (SHA-256)
 
-Every GitHub release since v0.6.0 ships a `*.jar.sha256` file next to the JAR and a CycloneDX `bom.json` software bill of materials. Verify the JAR before loading it:
+Every GitHub release ships a `*.jar.sha256` checksum file next to the JAR and a CycloneDX `bom.json` software bill of materials. Verify the JAR before loading it:
 
 {% tabs %}
 {% tab title="macOS / Linux" %}
 ```bash
-shasum -a 256 Custom-AI-Agent-0.6.0.jar
-# Compare against the contents of Custom-AI-Agent-0.6.0.jar.sha256
+shasum -a 256 Custom-AI-Agent-<version>.jar
+# Compare against the contents of Custom-AI-Agent-<version>.jar.sha256
 ```
 {% endtab %}
 
 {% tab title="Windows (PowerShell)" %}
 ```powershell
-Get-FileHash -Algorithm SHA256 Custom-AI-Agent-0.6.0.jar
+Get-FileHash -Algorithm SHA256 Custom-AI-Agent-<version>.jar
 ```
 {% endtab %}
 {% endtabs %}
@@ -103,13 +103,13 @@ On first start, `~/.burp-ai-agent/` is created:
 │   └── mcp-keystore.p12
 ├── logs/             # created on demand by the opt-in rolling AI Request Logger
 └── AGENTS/
-    ├── default
+    ├── default          # plain text file whose content names the active profile (no extension)
     ├── pentester.md
     ├── bughunter.md
     └── auditor.md
 ```
 
-The directory keeps the legacy `burp-ai-agent` name on disk to preserve upgrades for existing users; the product itself is now called **Custom AI Agent**. See [Naming & Paths](../reference/naming-and-paths.md) for the full rationale and [Configuration Directory](../reference/configuration-directory.md) for a per-entry reference.
+The directory keeps the legacy `burp-ai-agent` name on disk to preserve upgrades for existing users; the product itself is now called **Custom AI Agent**. See [Configuration Directory](../reference/configuration-directory.md) for a per-entry reference.
 
 Custom additions:
 

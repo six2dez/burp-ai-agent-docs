@@ -80,7 +80,7 @@ Produce a verifiable record of all AI interactions for compliance.
 Drive Burp from a terminal-based AI (Claude Code, Gemini CLI, etc.) while keeping the UI out of the loop.
 
 1.  Enable **MCP** in the extension, note the bearer token, and confirm `/__mcp/health` responds on `127.0.0.1:9876`.
-2.  Install the `/burp-scan` skill ([Burp Scan Skill](../user-guide/burp-scan-skill.md)) into your terminal AI's skills directory.
+2.  Install the `/burp-scan` skill ([Burp Scan Skill](burp-scan-skill.md)) into your terminal AI's skills directory.
 3.  From the terminal, invoke `/burp-scan` — the skill instructs the AI to call MCP tools like `proxy_http_history`, `http1_request`, `scanner_issues`, and `issue_create`.
 4.  The AI narrates each step; confirmed findings land as Burp issues via `issue_create` and appear in Burp's Target view without you leaving the terminal.
 5.  Audit log entries are tagged with `chat-turn-*` / `scanner-job-*` trace IDs so the entire terminal-driven run is reproducible alongside UI work. See [Audit Logging](../privacy/audit-logging.md).

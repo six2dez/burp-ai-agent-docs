@@ -2,7 +2,7 @@
 
 This page documents configurable settings in the extension, organized by settings tab.
 
-For tuning model spend, also see [Token Usage & Cost Management](../user-guide/token-management.md).
+For tuning model spend, also see [Token Usage & Cost Management](../user-guide/token-management.md). Contributors extending the plugin with new settings should read [Settings Migration](../developer/settings-migration.md) for how the schema is versioned and how to add a forward-only migration step.
 
 ## AI Backend
 
@@ -40,6 +40,11 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **NVIDIA NIM API Key** | Text | *(empty)* | Bearer token for NVIDIA NIM. |
 | **NVIDIA NIM Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
 | **NVIDIA NIM Timeout** | Number | `60` | Timeout in seconds (range: 30-3600). |
+| **Perplexity URL** | Text | `https://api.perplexity.ai` | Base URL for Perplexity Sonar endpoints. Targets `/chat/completions` directly (no `/v1` prefix). |
+| **Perplexity Model** | Text | *(empty)* | Sonar model identifier (e.g. `sonar-pro`, `sonar-reasoning-pro`). |
+| **Perplexity API Key** | Text | *(empty)* | `pplx-…` bearer token. |
+| **Perplexity Extra Headers** | Multiline | *(empty)* | Extra headers, one per line (`Header: value`). |
+| **Perplexity Timeout** | Number | `60` | Timeout in seconds (range: 30-3600). |
 | **Auto-Restart** | Toggle | On | Automatically restart crashed CLI backends. |
 | **Agent Profile** | Dropdown | `pentester` | Active profile from `~/.burp-ai-agent/AGENTS/*.md`. |
 
@@ -155,12 +160,6 @@ Applies to MCP tools that surface Burp proxy history (`proxy_http_history`, `pro
 | **Impact & Severity** | Text area | Prompt for impact and severity assessment. |
 | **Full Report** | Text area | Prompt for complete report generation. |
 
-### Custom Prompt Library
-
-| Setting | Type | Default | Description |
-| :--- | :--- | :--- | :--- |
-| **Custom prompt library** | JSON list (edited via Add/Edit/Dup/Del/Move buttons) | `[]` | Ordered list of saved free-form prompts surfaced in the right-click **Custom prompts** submenu. Each entry stores `id` (UUID), `title`, `promptText`, `tags` (`HTTP_SELECTION` and/or `SCANNER_ISSUE`), and `showInContextMenu`. Persisted as JSON under the preferences key `custom.prompt.library.v1` (settings schema v3). Malformed JSON loads as an empty library. See [Custom Prompt Library](../user-guide/context-menus.md#custom-prompt-library). |
-
 ### BountyPrompt Integration
 
 | Setting | Type | Default | Description |
@@ -181,6 +180,42 @@ Default curated IDs:
 * `Vulnerable_File_Upload_Endpoint_Detection`
 * `Web_Attack_Suggestions`
 * `Sensitive_Error_Messages_Detection`
+
+## Custom Prompts
+
+Dedicated settings tab that owns the saved free-form prompt library surfaced through the right-click **Custom prompts** submenu. The library persists globally (not per Burp project) as JSON. Malformed JSON loads as an empty library with an entry in Burp's extension log. Saving from this tab reflects in right-click menus immediately — no Burp restart required.
+
+<!-- TODO: screenshot of the new Custom Prompts settings tab showing the entry list (with at least one ★ favorite pinned to the top), the search bar, and the Import JSON / Export JSON buttons. Save as .gitbook/assets/custom-prompts-tab.png and reference it with:
+![Screenshot: Custom Prompts settings tab](../.gitbook/assets/custom-prompts-tab.png)
+-->
+
+
+### Library Entries
+
+Each entry stores:
+
+| Field | Type | Description |
+| :--- | :--- | :--- |
+| `id` | UUID | Stable identifier. Used by Import to merge updates in place. |
+| `title` | Text | Menu label and session-title stem. Truncated to 50 chars in the submenu. |
+| `promptText` | Text (multiline) | Free-form user prompt sent to the backend. No variable substitution. |
+| `tags` | Set | Subset of `HTTP_SELECTION`, `SCANNER_ISSUE`. Determines which context menus expose the entry. |
+| `showInContextMenu` | Toggle | Master visibility switch. Hidden entries stay in the library but are not exposed in menus. |
+| `isFavorite` | Toggle (★) | When true, pins the entry to the top of its context-menu group. Favorites keep their relative order; non-favorites follow. |
+
+### Editor Controls
+
+| Control | Description |
+| :--- | :--- |
+| **Add** | Create a new entry with a generated UUID. |
+| **Edit** | Modify the selected entry in place. |
+| **Duplicate** | Copy the selected entry under a new UUID; `" (copy)"` is appended to the title. |
+| **Delete** | Remove the selected entry. |
+| **Move Up** / **Move Down** | Reorder. List order is the menu order — no auto-sort. Cross-group moves between favorites and non-favorites are blocked. |
+| **Favorite (★)** | Pin/unpin the selected entry. Favorites appear above non-favorites in every context menu. |
+| **Search** | Live filter on the editor table. Case-insensitive substring match against `title` and `promptText`. Clears with one click. |
+| **Import JSON** | Read a JSON file and merge entries into the library by `id`. Existing IDs are updated in place; new IDs are appended. Duplicate IDs within the import payload are de-duplicated. |
+| **Export JSON** | Write the entire library to a JSON file (pretty-printed, sorted keys per entry). |
 
 ## File Locations
 

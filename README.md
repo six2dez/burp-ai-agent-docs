@@ -6,7 +6,7 @@
 
 Custom AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
 
-* **Pluggable Backends**: Use the built-in Burp AI backend (Burp Pro with *Use AI for extensions* enabled), local models (Ollama, LM Studio), NVIDIA NIM, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs.
+* **Pluggable Backends**: Use the built-in Burp AI backend (Burp Pro with *Use AI for extensions* enabled), local models (Ollama, LM Studio), NVIDIA NIM, Perplexity, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs. Only the **Burp AI** backend depends on Burp Pro's *Use AI for extensions* toggle; every other backend runs independently and works on Burp Community too.
 * **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) default to **Balanced**; cookies, auth headers, inline Bearer/Basic/JWT tokens, and sensitive URL query parameters are stripped before data leaves Burp. A preview dialog shows the exact payload before any auto-captured context is sent.
 * **MCP Server**: An embedded Model Context Protocol (MCP) server with 53+ tools for Burp history, Repeater, Scanner, scope, and issue workflows.
 * **AI Scanners**: Passive and Active scanners that analyze traffic automatically across 62 vulnerability classes.
@@ -17,12 +17,14 @@ Custom AI Agent is an extension for Burp Suite that integrates AI capabilities i
 * **Auto Tool Chaining**: Automatic multi-step MCP tool execution where the AI autonomously chains up to 8 tool calls to complete complex tasks.
 
 <figure><img src=".gitbook/assets/overview-main.png" alt="Custom AI Agent main tab with chat and settings"><figcaption></figcaption></figure>
+<!-- TODO: refresh overview-main.png — main tab UI has evolved (new SafetyIndicator pill, 10-tab settings panel including Custom Prompts). -->
+
 
 ## Key Features
 
 | Feature | Description |
 | :--- | :--- |
-| **10 Built-in Backends** | Burp AI (built-in), Ollama, LM Studio, NVIDIA NIM, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
+| **11 Built-in Backends** | Burp AI (built-in), Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
 | **53+ MCP Tools** | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more. |
 | **Auto Tool Chaining** | AI autonomously chains up to 8 MCP tool calls per interaction to complete multi-step tasks. |
 | **AI Request Logger** | Real-time activity log with trace ID correlation, preset filters, and optional rolling JSONL persistence. |

@@ -120,4 +120,3 @@ sequenceDiagram
 * [Data Flow](data-flow.md)
 * [Redaction Pipeline](redaction-pipeline.md)
 * [Supervisor & Backends](supervisor-backends.md)
-* [Feature Coverage](feature-coverage.md)

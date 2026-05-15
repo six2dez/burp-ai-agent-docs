@@ -1,6 +1,6 @@
 # Backends Overview
 
-Custom AI Agent is backend-agnostic. You can run the built-in Burp AI backend, local models, cloud CLI providers, or OpenAI-compatible HTTP providers. Ten backends ship with the extension, and additional ones can be dropped in as JARs.
+Custom AI Agent is backend-agnostic. You can run the built-in Burp AI backend, local models, cloud CLI providers, or OpenAI-compatible HTTP providers. Eleven backends ship with the extension, and additional ones can be dropped in as JARs.
 
 ## Backend Selection Guide
 
@@ -34,6 +34,7 @@ flowchart TD
 | **Ollama** | Local HTTP | High | Offline or strict data control. |
 | **LM Studio** | Local HTTP | High | Local models with GUI management. |
 | **NVIDIA NIM** | Cloud HTTP | Medium | NVIDIA-hosted models (e.g. `moonshotai/kimi-k2.5`) via `integrate.api.nvidia.com`. |
+| **Perplexity** | Cloud HTTP | Medium | Sonar family of web-aware reasoning models via `api.perplexity.ai`. |
 | **Generic (OpenAI-compatible)** | HTTP | Medium | Any compatible provider endpoint. |
 | **Gemini CLI** | Cloud CLI | Medium | Large-context cloud workflows. |
 | **Claude CLI** | Cloud CLI | Medium | Reasoning-heavy analysis. |
@@ -49,6 +50,7 @@ flowchart TD
 | **Ollama** | Yes (SSE) | Yes (`format=json`) | Yes | Yes (`ollama serve`) |
 | **LM Studio** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | Yes (`lms server start`) |
 | **NVIDIA NIM** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | N/A |
+| **Perplexity** | Yes (SSE) | **No** (Sonar API rejects `response_format=json_object`) | Yes | N/A |
 | **Generic OpenAI-compatible** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | N/A |
 | **Gemini CLI** | Line-by-line stdout | No | No (prepended) | N/A |
 | **Claude CLI** | Line-by-line stdout | No | No (prepended) | N/A |
@@ -108,11 +110,25 @@ This eliminates the `CreateProcess error=193` that occurs when Java tries to exe
 
 ## Burp Edition Notes
 
-Backends are available in both Community and Professional editions. MCP tool availability still depends on Burp edition and tool safety gates.
+Backends are available in both Community and Professional editions. MCP tool availability still depends on Burp edition and tool safety gates. Every backend except **Burp AI (built-in)** runs on Burp Community without any change in behaviour — the *Use AI for extensions* setting and the AI-credits requirement are specific to the Burp AI backend, which delegates inference to Burp's bundled AI provider.
+
+## Health States
+
+A timer in the main tab polls the active backend every **5 seconds** and renders the result as a colored pill in the top bar:
+
+| Pill | Internal state | Meaning | Typical cause |
+| :--- | :--- | :--- | :--- |
+| **AI: OK** (green) | `Healthy` | Last health probe succeeded. Backend accepted a minimal test request and returned a usable response. | Normal steady state. |
+| **AI: Degraded** (amber) | `Degraded` | Probe succeeded with warnings (e.g., elevated latency, partial response, soft-error returned by the model API). The tooltip shows the diagnostic message. | Slow first token from a cold cloud model; transient rate limiting that did not fail; CLI backend responding but with stderr noise. |
+| **AI: Offline** (red) | `Offline` / `Unavailable` | Probe failed or the backend is structurally unavailable (selected backend is **Burp AI (built-in)** without *Use AI for extensions* enabled, CLI binary not on PATH, HTTP endpoint refusing connections, circuit breaker open). The tooltip carries the underlying message. The *Use AI for extensions* gate only affects the **Burp AI** backend — picking any other backend keeps the plugin running even with the toggle off. | Missing API key, model name typo, local model server not started, CLI authentication expired, circuit breaker tripped after 5 consecutive failures. |
+
+The probe is asynchronous so UI threading is never blocked. Each transition between states is recorded in the [AI Request Logger](../privacy/ai-request-logger.md) so you can correlate dips with specific traffic spikes or backend errors.
+
+If a backend stays `Offline` longer than expected, see [Backend Troubleshooting](troubleshooting.md) for per-backend error signatures.
 
 ## Retry Behavior
 
-HTTP backends (Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM) include automatic retry logic with bounded stepped backoff:
+HTTP backends (Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity) include automatic retry logic with bounded stepped backoff:
 
 * **Maximum attempts**: 6.
 * **Retryable errors**: Connection timeouts, connection refused, and other transient network failures.
@@ -132,7 +148,7 @@ The **Burp AI (built-in)** backend uses Burp Pro's own retry and error handling,
 
 ## Output Token Limits
 
-HTTP backends (Ollama, LM Studio, OpenAI-compatible) automatically set output token limits per request type to ensure complete responses:
+HTTP backends (Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity) automatically set output token limits per request type to ensure complete responses:
 
 | Request Type | Max Output Tokens |
 | :--- | :--- |
@@ -149,6 +165,7 @@ CLI backends manage their own output limits through their respective configurati
 * [Ollama (Local)](ollama.md)
 * [LM Studio (Local)](lm-studio.md)
 * [NVIDIA NIM](nvidia-nim.md)
+* [Perplexity](perplexity.md)
 * [Generic (OpenAI-compatible)](openai-compatible.md)
 * [Gemini CLI](gemini-cli.md)
 * [Claude CLI](claude-cli.md)

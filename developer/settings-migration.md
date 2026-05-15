@@ -8,11 +8,11 @@ The schema version is stored in Burp preferences under the key `settings.schema.
 
 ## Current Schema
 
-| Version | Released in | Changes |
-| :--- | :--- | :--- |
-| v1 | Initial 0.1.x line | Baseline — all original settings keys. |
-| v2 | v0.3.0 | Normalize `mcp.allowedOrigins` into a clean list; replace the legacy Gemini default command with `--output-format text --model gemini-2.5-flash --yolo`. Introduces MCP proxy history preprocessing keys (`preprocess.proxy.history.*`) with defaults. |
-| v3 | v0.5.0 | Stamp only — no data movement. Reserves the `custom.prompt.library.v1` key for the Custom Prompt Library; missing or malformed JSON loads as an empty library. |
+| Version | Changes |
+| :--- | :--- |
+| v1 | Baseline — all original settings keys. |
+| v2 | Normalize `mcp.allowedOrigins` into a clean list; replace the legacy Gemini default command with `--output-format text --model gemini-2.5-flash --yolo`. Introduces MCP proxy history preprocessing keys (`preprocess.proxy.history.*`) with defaults. |
+| v3 | Stamp only — no data movement. Reserves the `custom.prompt.library.v1` key for the Custom Prompt Library; missing or malformed JSON loads as an empty library. |
 
 ## Migration Flow
 
@@ -78,5 +78,4 @@ Because migrations are forward-only, expect anything added after the target vers
 ## Related Pages
 
 * [Settings Reference](../reference/settings-reference.md)
-* [Upgrade & Migration Guide](../reference/upgrade-migration.md)
 * [Architecture](architecture.md)

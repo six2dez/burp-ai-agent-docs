@@ -33,7 +33,7 @@ The skill file is located at `skills/burp-scan/SKILL.md` in the [repository](htt
 Copy the skill to your Claude Code skills directory:
 
 {% hint style="info" %}
-The GitHub repository is still called `burp-ai-agent` even though the extension is now published as **Custom AI Agent** — see [Naming & Paths](../reference/naming-and-paths.md).
+The GitHub repository is still called `burp-ai-agent` even though the extension is now published as **Custom AI Agent** — see [Configuration Directory → Legacy Identifier Reference](../reference/configuration-directory.md#legacy-identifier-reference).
 {% endhint %}
 
 ```bash

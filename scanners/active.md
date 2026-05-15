@@ -319,3 +319,11 @@ The active scanner enforces queue backpressure to keep runtime stable under heav
 - Context-menu initiated active scans now surface queue status more explicitly in the UI.
 
 This complements the existing 1-hour dedup window and scope filtering.
+
+## Related Pages
+
+* [Passive AI Scanner](passive.md)
+* [Insertion Point Scan](../user-guide/insertion-point-scan.md)
+* [Limitations & Hallucinations](../privacy/limitations.md)
+* [Settings Reference](../reference/settings-reference.md)
+* [Troubleshooting](../reference/troubleshooting.md)

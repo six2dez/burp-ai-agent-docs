@@ -14,6 +14,11 @@ Each chat session is an independent conversation with the AI. Sessions store:
 
 Session context is preserved per session. Follow-up prompts in the same session reuse the conversation history so the AI can keep track of previous responses and decisions.
 
+<!-- TODO: screenshot of the sessions sidebar showing multiple parallel sessions with per-session token bars (green/yellow/orange color coding) and the title/backend metadata visible. Save as .gitbook/assets/chat-sessions-sidebar.png and reference with:
+![Screenshot: Chat sessions sidebar with token bars](../.gitbook/assets/chat-sessions-sidebar.png)
+-->
+
+
 History is trimmed to keep runtime bounded:
 
 * HTTP backends: up to `20` messages and `40000` total characters (minimum latest 2 messages retained).
@@ -34,6 +39,19 @@ Switch between sessions using the session list in the left sidebar.
 * **Delete**: Click the "X" icon or right‑click a session and select **Delete**.
 * **Persistence**: Sessions are auto-saved and restored across Burp restarts.
 * **Export**: Right‑click a session and choose **Export as Markdown**.
+
+### Project Scope
+
+Sessions are stored **per Burp project** (in `extensionData()` rather than global preferences). A 30-second timer polls `api.project().id()`; when a project switch is detected:
+
+* The current sessions are saved against the **old** project before the switch is acted on.
+* In-memory chat state is cleared and the **new** project's sessions are restored from storage.
+* The shared `ScanKnowledgeBase` (tech stack, auth patterns, prior findings) is cleared to prevent cross-project contamination.
+* Live backend chat connections (conversation history held inside CLI processes or HTTP session loops) are shut down — the next prompt opens a fresh connection.
+
+{% hint style="warning" %}
+Anything held purely in-memory (like the conversation context inside a running CLI process) is **lost** on a project switch. Persisted sessions, audit logs, and per-project cache directories under `~/.burp-ai-agent/cache/<project>/` survive — see [Passive AI Scanner → Cache Behavior](../scanners/passive.md#cache-key-prompt-hash) for cache details.
+{% endhint %}
 
 ## Chat Interface
 
