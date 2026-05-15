@@ -21,7 +21,7 @@ Primary transport for MCP clients.
 
 Default endpoint:
 
-```text
+```
 http://127.0.0.1:9876/sse
 ```
 
@@ -91,16 +91,14 @@ If token is required:
 * Privacy-aware tool output filtering.
 * Inline advisory banner in the **MCP Server** settings tab that surfaces risky combinations (external access without allowed origins, external access with **Enable Unsafe Tools** on, etc.). See [UI Tour → Advisory Banner (SubtleNotice)](../user-guide/ui-tour.md#advisory-banner-subtlenotice).
 
-![Screenshot: MCP settings](../.gitbook/assets/mcp-settings.png)
-<!-- TODO: refresh mcp-settings.png — panel was rebuilt; now includes the MCP Proxy History Preprocessing section and the SubtleNotice advisory banner style. -->
-
+<figure><img src="../.gitbook/assets/Screenshot 2026-05-15 at 10.33.38.png" alt=""><figcaption></figcaption></figure>
 
 ## Administrative Endpoints
 
-| Endpoint | Method | Auth | Purpose |
-| :--- | :--- | :--- | :--- |
-| `/__mcp/health` | GET | None — loopback only | Returns `"ok"` with the marker header `X-Burp-AI-Agent: mcp`. Used by the MCP Supervisor to detect a pre-existing Custom AI Agent listener on the same port before attempting a takeover. |
-| `/__mcp/shutdown` | POST | `Authorization: Bearer <token>` | Used during port takeover: a new MCP server instance sends this to ask a colliding older instance to release the port. Rejects requests without a valid bearer. |
+| Endpoint          | Method | Auth                            | Purpose                                                                                                                                                                                   |
+| ----------------- | ------ | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/__mcp/health`   | GET    | None — loopback only            | Returns `"ok"` with the marker header `X-Burp-AI-Agent: mcp`. Used by the MCP Supervisor to detect a pre-existing Custom AI Agent listener on the same port before attempting a takeover. |
+| `/__mcp/shutdown` | POST   | `Authorization: Bearer <token>` | Used during port takeover: a new MCP server instance sends this to ask a colliding older instance to release the port. Rejects requests without a valid bearer.                           |
 
 ## Port Conflict Handling and Takeover
 
