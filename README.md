@@ -4,6 +4,8 @@
 
 **AI integration for Burp Suite.**
 
+> **A note on the name:** This extension is published as **Custom AI Agent** (formerly *Burp AI Agent*). It was renamed to comply with PortSwigger's BApp Store naming requirements and to avoid confusion with Burp Suite's built-in **Burp AI** provider. The GitHub repository (`github.com/six2dez/burp-ai-agent`), the documentation site (`burp-ai-agent.six2dez.com`), and the configuration directory (`~/.burp-ai-agent/`) keep the `burp-ai-agent` identifier for continuity.
+
 Custom AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
 
 * **Pluggable Backends**: Use the built-in Burp AI backend (Burp Pro with *Use AI for extensions* enabled), local models (Ollama, LM Studio), NVIDIA NIM, Perplexity, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs. Only the **Burp AI** backend depends on Burp Pro's *Use AI for extensions* toggle; every other backend runs independently and works on Burp Community too.
