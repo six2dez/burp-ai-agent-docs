@@ -9,29 +9,29 @@ The extension adds actions to Burp right-click menus in tools where HTTP traffic
 * **Site Map**: Right-click any entry or directory/root node. When a tree node is selected (not an individual request), the extension falls back to querying the full site map under that node, with labels showing "(site map - N)" to indicate broader scope.
 * **Scanner -> Issues** (Pro only): Right-click any finding.
 
+<figure><img src="../.gitbook/assets/Screenshot 2026-05-15 at 10.35.24.png" alt=""><figcaption></figcaption></figure>
+
 ## Request Actions
 
 When you right-click HTTP request/response items, these actions are available under **Extensions -> Custom AI Agent**:
 
-| Action | Description |
-| :--- | :--- |
-| **AI Passive Scan** | Queues selected request(s) for passive AI analysis in the background. |
-| **AI Active Scan** | Queues selected request(s) for active testing. Sends traffic to the target. |
+| Action                                  | Description                                                                                                                                                                                                                            |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AI Passive Scan**                     | Queues selected request(s) for passive AI analysis in the background.                                                                                                                                                                  |
+| **AI Active Scan**                      | Queues selected request(s) for active testing. Sends traffic to the target.                                                                                                                                                            |
 | **AI Scan on Selected Insertion Point** | Surgical active scan scoped to a single parameter/header/JSON field/XML element/path-segment under the request-editor selection. Hidden until the selection overlaps a candidate. See [Insertion Point Scan](insertion-point-scan.md). |
-| **Test 403 Bypass** | Queues selected 403-status requests for active bypass testing using IP spoofing headers, path manipulation, and HTTP method switching. Sends traffic to the target. |
-| **Extract JS Endpoints** | Extracts API endpoints from JavaScript responses using regex pattern matching. Shows results in a scrollable dialog. |
-| **Targeted tests** | Submenu for focused active checks (SQLi, XSS, SSRF, IDOR, etc.). Sends traffic to the target. |
-| **BountyPrompt** | Curated submenu of tag-aware prompts loaded from JSON files. Uses selective context extraction before model invocation. |
-| **Find vulnerabilities** | Broad security analysis for injection, auth/access, disclosure, and misconfiguration classes. |
-| **Analyze this request** | Compact endpoint summary (method, route, auth, params, response type, security notes). |
-| **Explain JS** | JavaScript behavior and risk analysis. |
-| **Access control** | Authorization test plan for horizontal/vertical privilege escalation paths. |
-| **Login sequence** | Login flow extraction and replay guidance from observed traffic. |
-| **Custom prompts** | Submenu of your saved custom prompts (filtered by applicability tag) plus a `Custom…` entry that opens a free-form editor. See [Custom Prompt Library](#custom-prompt-library) below. |
+| **Test 403 Bypass**                     | Queues selected 403-status requests for active bypass testing using IP spoofing headers, path manipulation, and HTTP method switching. Sends traffic to the target.                                                                    |
+| **Extract JS Endpoints**                | Extracts API endpoints from JavaScript responses using regex pattern matching. Shows results in a scrollable dialog.                                                                                                                   |
+| **Targeted tests**                      | Submenu for focused active checks (SQLi, XSS, SSRF, IDOR, etc.). Sends traffic to the target.                                                                                                                                          |
+| **BountyPrompt**                        | Curated submenu of tag-aware prompts loaded from JSON files. Uses selective context extraction before model invocation.                                                                                                                |
+| **Find vulnerabilities**                | Broad security analysis for injection, auth/access, disclosure, and misconfiguration classes.                                                                                                                                          |
+| **Analyze this request**                | Compact endpoint summary (method, route, auth, params, response type, security notes).                                                                                                                                                 |
+| **Explain JS**                          | JavaScript behavior and risk analysis.                                                                                                                                                                                                 |
+| **Access control**                      | Authorization test plan for horizontal/vertical privilege escalation paths.                                                                                                                                                            |
+| **Login sequence**                      | Login flow extraction and replay guidance from observed traffic.                                                                                                                                                                       |
+| **Custom prompts**                      | Submenu of your saved custom prompts (filtered by applicability tag) plus a `Custom…` entry that opens a free-form editor. See [Custom Prompt Library](context-menus.md#custom-prompt-library) below.                                  |
 
 ![Screenshot: Request menu](../.gitbook/assets/context-menu-request.png)
-<!-- TODO: refresh context-menu-request.png — when text is selected inside a request, the menu now includes "AI Scan on Selected Insertion Point (<type>: <name>)". The Custom prompts submenu also surfaces ★ favorites at the top. -->
-
 
 ## BountyPrompt Submenu
 
@@ -71,14 +71,14 @@ Ad-hoc prompts do not persist — if you want to reuse, save them from **Setting
 
 Open **Settings → Custom Prompts** (the dedicated tab; previously folded under **Prompt Templates**). Each entry has:
 
-| Field | Meaning |
-| :--- | :--- |
-| **Title** | Menu label and session-title stem. Truncated to 50 chars in the submenu. |
-| **Prompt text** | Free-form text sent as the user prompt. No variable substitution in v1 (see below). |
-| **Tag `HTTP_SELECTION`** | Show in the HTTP request/response context menu. |
-| **Tag `SCANNER_ISSUE`** | Show in the scanner-issue context menu. |
-| **Show in context menu** | Master toggle. Hidden entries stay in the library but are not exposed in menus. |
-| **Favorite (★)** | Pins the entry to the top of its context-menu group. Favorites keep their relative order; non-favorites follow. |
+| Field                    | Meaning                                                                                                         |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| **Title**                | Menu label and session-title stem. Truncated to 50 chars in the submenu.                                        |
+| **Prompt text**          | Free-form text sent as the user prompt. No variable substitution in v1 (see below).                             |
+| **Tag `HTTP_SELECTION`** | Show in the HTTP request/response context menu.                                                                 |
+| **Tag `SCANNER_ISSUE`**  | Show in the scanner-issue context menu.                                                                         |
+| **Show in context menu** | Master toggle. Hidden entries stay in the library but are not exposed in menus.                                 |
+| **Favorite (★)**         | Pins the entry to the top of its context-menu group. Favorites keep their relative order; non-favorites follow. |
 
 Buttons: `Add`, `Edit`, `Duplicate`, `Delete`, `Move Up`, `Move Down`. Move Up / Move Down respect the favorite grouping — you cannot reorder a non-favorite past a favorite. The list order is the menu order — no auto-sort.
 
@@ -129,19 +129,19 @@ Examples:
 * SSTI
 * XXE
 * Open Redirect
-* **Custom...** — Opens a multi-select dialog with all 62 vulnerability classes. Includes Select All / Deselect All buttons for quick selection. *Not to be confused with the `Custom…` entry under the `Custom prompts` submenu, which opens a free-form prompt editor; see [Custom Prompt Library](#custom-prompt-library).*
+* **Custom...** — Opens a multi-select dialog with all 62 vulnerability classes. Includes Select All / Deselect All buttons for quick selection. _Not to be confused with the `Custom…` entry under the `Custom prompts` submenu, which opens a free-form prompt editor; see_ [_Custom Prompt Library_](context-menus.md#custom-prompt-library)_._
 
 ## Issue Actions (Burp Pro)
 
 When you right-click scanner issues, these actions are available:
 
-| Action | Description |
-| :--- | :--- |
-| **Analyze this issue** | Detailed analysis with root cause, evidence, and validation flow. |
-| **Generate PoC & validate** | Step-by-step proof-of-concept with expected responses and success criteria. |
-| **Impact & severity** | CIA impact, exploitability, business risk, and CVSS-style reasoning. |
-| **Full report** | Structured vulnerability report for delivery. |
-| **Custom prompts** | Submenu of saved custom prompts tagged for scanner issues plus a `Custom…` free-form editor. See [Custom Prompt Library](#custom-prompt-library) below. |
+| Action                      | Description                                                                                                                                                             |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Analyze this issue**      | Detailed analysis with root cause, evidence, and validation flow.                                                                                                       |
+| **Generate PoC & validate** | Step-by-step proof-of-concept with expected responses and success criteria.                                                                                             |
+| **Impact & severity**       | CIA impact, exploitability, business risk, and CVSS-style reasoning.                                                                                                    |
+| **Full report**             | Structured vulnerability report for delivery.                                                                                                                           |
+| **Custom prompts**          | Submenu of saved custom prompts tagged for scanner issues plus a `Custom…` free-form editor. See [Custom Prompt Library](context-menus.md#custom-prompt-library) below. |
 
 ![Screenshot: Issue menu](../.gitbook/assets/context-menu-issue.png)
 
@@ -163,12 +163,12 @@ For BountyPrompt actions, tag resolution runs after redaction and before prompt 
 
 Before any auto-captured context leaves the plugin, a modal confirmation opens showing exactly what the AI will see.
 
-| Field | What it shows |
-| :--- | :--- |
-| **Action** | The menu action that triggered the capture (e.g. `Analyze this request`). |
+| Field            | What it shows                                                                                                                                   |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Action**       | The menu action that triggered the capture (e.g. `Analyze this request`).                                                                       |
 | **Privacy mode** | Current mode plus a one-line hint: STRICT, BALANCED (cookies and tokens redacted, hosts kept), or OFF (no redaction; raw traffic will be sent). |
-| **Prompt** | The exact prompt text that will be sent, after template resolution. |
-| **Context** | The exact redacted JSON envelope that will accompany the prompt. |
+| **Prompt**       | The exact prompt text that will be sent, after template resolution.                                                                             |
+| **Context**      | The exact redacted JSON envelope that will accompany the prompt.                                                                                |
 
 Two buttons at the bottom:
 

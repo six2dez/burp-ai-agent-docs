@@ -4,6 +4,8 @@
 
 Use it when you have a specific suspicion about one piece of input — a token in the URL path, a JSON field that looks reflected, an interesting header value — and you want to spend AI/active-scan budget only on that one point.
 
+<figure><img src="../.gitbook/assets/Screenshot 2026-05-15 at 10.34.30.png" alt=""><figcaption></figcaption></figure>
+
 ## How to Launch
 
 1. Open the request in any editor that supports text selection: **Proxy → HTTP History**, **Repeater**, or any request editor that surfaces context menus.
@@ -14,24 +16,19 @@ Use it when you have a specific suspicion about one piece of input — a token i
 
 If the selection does not intersect any candidate insertion point, or if the editor returns a response-side range, the menu item is hidden entirely — there is no "no match" placeholder. Clear the selection and pick the value of an actual parameter/header/field to make the item appear.
 
-<!-- TODO: screenshot of the right-click context menu showing the entry "AI Scan on Selected Insertion Point (json field: user_id)" with the dynamic label visible. Save as .gitbook/assets/insertion-point-context-menu.png and replace this marker with:
-![Screenshot: Insertion point context menu](../.gitbook/assets/insertion-point-context-menu.png)
--->
-
-
 ## Insertion Point Types
 
 The extractor resolves the selection against the following types, in priority order:
 
-| Type | Source | Notes |
-| :--- | :--- | :--- |
-| `URL_PARAM` | URL query parameters | Montoya exposes exact byte offsets via `ParsedHttpParameter.valueOffsets()`, so matching is precise. |
-| `BODY_PARAM` | Form-urlencoded body parameters | Same exact-offset match as URL params. |
-| `COOKIE` | Cookies parsed as parameters | Same exact-offset match. Selecting inside one cookie value resolves only that cookie, not the rest of the `Cookie:` line. |
-| `HEADER` | Request headers | Matched by locating the `Header-Name: value` line in the raw request bytes. Duplicate identical lines resolve to the first occurrence. |
-| `JSON_FIELD` | Top-level JSON object fields | Body must be valid JSON (or `Content-Type: application/json` with a regex fallback). Matched by substring of the value. Selecting only the key (not the value) is treated as a non-match — fall back to a full **AI Active Scan** if you need key-level coverage. |
-| `XML_ELEMENT` | XML element text content | Body must be XML-shaped (`<` start) or `Content-Type: */xml`. Matched by substring inside `<element>…</element>`. |
-| `PATH_SEGMENT` | Numeric or UUID/ObjectId-like segments in the URL path | Matches `^[0-9]+$`, 36-char UUIDs, and 24-char hex (Mongo ObjectId-style). Named as `path_id`. |
+| Type           | Source                                                 | Notes                                                                                                                                                                                                                                                             |
+| -------------- | ------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `URL_PARAM`    | URL query parameters                                   | Montoya exposes exact byte offsets via `ParsedHttpParameter.valueOffsets()`, so matching is precise.                                                                                                                                                              |
+| `BODY_PARAM`   | Form-urlencoded body parameters                        | Same exact-offset match as URL params.                                                                                                                                                                                                                            |
+| `COOKIE`       | Cookies parsed as parameters                           | Same exact-offset match. Selecting inside one cookie value resolves only that cookie, not the rest of the `Cookie:` line.                                                                                                                                         |
+| `HEADER`       | Request headers                                        | Matched by locating the `Header-Name: value` line in the raw request bytes. Duplicate identical lines resolve to the first occurrence.                                                                                                                            |
+| `JSON_FIELD`   | Top-level JSON object fields                           | Body must be valid JSON (or `Content-Type: application/json` with a regex fallback). Matched by substring of the value. Selecting only the key (not the value) is treated as a non-match — fall back to a full **AI Active Scan** if you need key-level coverage. |
+| `XML_ELEMENT`  | XML element text content                               | Body must be XML-shaped (`<` start) or `Content-Type: */xml`. Matched by substring inside `<element>…</element>`.                                                                                                                                                 |
+| `PATH_SEGMENT` | Numeric or UUID/ObjectId-like segments in the URL path | Matches `^[0-9]+$`, 36-char UUIDs, and 24-char hex (Mongo ObjectId-style). Named as `path_id`.                                                                                                                                                                    |
 
 Match resolution is **first hit wins** in the order above. If your selection overlaps both a URL param and a path ID, the URL param is selected.
 
@@ -43,11 +40,6 @@ Clicking the menu item opens a multi-select dialog listing every vulnerability c
 * **Classes disabled by the current Scan Mode** — `BUG_BOUNTY`, `PENTEST`, and `FULL` each scope the catalog differently. See [Active AI Scanner → Scan Modes](../scanners/active.md) for the per-mode lists.
 
 If after filtering no classes remain, you get a "No vulnerability classes selected" warning and nothing is queued.
-
-<!-- TODO: screenshot of the vulnerability-class multi-select dialog (the same one used by Targeted Tests → Custom…). Save as .gitbook/assets/vuln-class-picker.png and replace this marker with:
-![Screenshot: Vulnerability class picker](../.gitbook/assets/vuln-class-picker.png)
--->
-
 
 ## Priority and Queue Behavior
 

@@ -4,17 +4,15 @@ This page explains each major area of the Custom AI Agent interface. (In Burp th
 
 ## Top Bar
 
-| Control | Description |
-| :--- | :--- |
-| **MCP toggle** | Starts/stops MCP runtime. |
-| **Passive toggle** | Enables/disables passive scanner. |
-| **Active toggle** | Enables/disables active scanner. |
-| **Backend selector** | Backend for new sessions (available only). |
+| Control              | Description                                             |
+| -------------------- | ------------------------------------------------------- |
+| **MCP toggle**       | Starts/stops MCP runtime.                               |
+| **Passive toggle**   | Enables/disables passive scanner.                       |
+| **Active toggle**    | Enables/disables active scanner.                        |
+| **Backend selector** | Backend for new sessions (available only).              |
 | **Status indicator** | Health state (`AI: OK`, `AI: Degraded`, `AI: Offline`). |
 
-![Screenshot: Top bar](../.gitbook/assets/top-bar.png)
-<!-- TODO: refresh top-bar.png — the top bar now includes the compact SafetyIndicator pill (OK/WARN/RISK) alongside the AI: OK/Degraded/Offline pill. -->
-
+<figure><img src="../.gitbook/assets/Screenshot 2026-05-15 at 10.28.50.png" alt=""><figcaption></figcaption></figure>
 
 ## Chat Panel
 
@@ -30,6 +28,7 @@ This page explains each major area of the Custom AI Agent interface. (In Burp th
 
 The panel is docked at the bottom of the AI Agent tab and can be resized/collapsed.
 
+<<<<<<< HEAD
 All Settings tabs are built on a shared internal design system (consistent spacing/typography, one-line section descriptions, and collapsible sections on the dense scanner tabs). Colors are theme-aware tokens, so the UI re-themes automatically when Burp switches between light and dark — there are no hardcoded colors. Settings keys and persistence are unchanged, so previously saved configs load as-is.
 
 | Tab | Purpose |
@@ -47,7 +46,22 @@ All Settings tabs are built on a shared internal design system (consistent spaci
 
 <figure><img src="../.gitbook/assets/ui-tour-settings-panel.png" alt="Settings panel tabs in the AI Agent UI"><figcaption></figcaption></figure>
 <!-- TODO: refresh ui-tour-settings-panel.png — the settings panel now has 10 tabs (new "Custom Prompts" tab between Prompt Templates and Privacy & Logging). -->
+=======
+| Tab                    | Purpose                                                                                                                                                                                         |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **AI Backend**         | Backend commands/URLs/models/auth and health testing.                                                                                                                                           |
+| **AI Passive Scanner** | Scope/rate/size controls, dedup/cache, context caps, findings.                                                                                                                                  |
+| **AI Active Scanner**  | Concurrency, risk level, scan mode, queue controls, Collaborator.                                                                                                                               |
+| **MCP Server**         | Host/port/TLS/token/limits/unsafe-tool master switch.                                                                                                                                           |
+| **Burp Integration**   | Per-tool MCP toggles by category.                                                                                                                                                               |
+| **Prompt Templates**   | Built-in template editing and BountyPrompt controls.                                                                                                                                            |
+| **Custom Prompts**     | Saved free-form prompt library: add/edit/duplicate/delete, ★ favorites (pinned to the top of the context menu), live search filter, JSON import/export, per-entry context-menu visibility tags. |
+| **Privacy & Logging**  | Privacy mode, determinism, salt, audit logging, AI request logger.                                                                                                                              |
+| **AI Logger**          | Real-time AI activity log with filters, trace correlation, and export.                                                                                                                          |
+| **Help**               | Quick docs and setup references.                                                                                                                                                                |
+>>>>>>> 41ae07906f5a909fa7722d0baddcbba755455e53
 
+<figure><img src="../.gitbook/assets/Screenshot 2026-05-15 at 10.29.37.png" alt=""><figcaption></figcaption></figure>
 
 ## Privacy Indicator
 
@@ -57,11 +71,11 @@ Visual pill indicates active mode (`STRICT`, `BALANCED`, `OFF`) so you can confi
 
 The **Privacy & Logging** and **MCP Server** settings tabs render advisory state through a single inline banner instead of stacked red labels. It auto-selects one of three levels based on the combined state of privacy mode, MCP exposure, **Enable Unsafe Tools**, and the active scanner:
 
-| Level | When it shows | Typical example |
-| :--- | :--- | :--- |
-| **INFO** (blue) | Posture is unusual but not risky — worth noting before you click Save. | Privacy mode `OFF` with MCP running. |
-| **WARN** (yellow) | A reversible combination that increases exposure if left in place. | Privacy `STRICT` with the active scanner on; external MCP without **Allowed Origins** populated. |
-| **RISK** (red) | A combination that should be deliberate — exposes traffic or tools outside the loopback boundary. | External MCP with **Enable Unsafe Tools** on; active scanner on with Privacy `OFF`. |
+| Level             | When it shows                                                                                     | Typical example                                                                                  |
+| ----------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **INFO** (blue)   | Posture is unusual but not risky — worth noting before you click Save.                            | Privacy mode `OFF` with MCP running.                                                             |
+| **WARN** (yellow) | A reversible combination that increases exposure if left in place.                                | Privacy `STRICT` with the active scanner on; external MCP without **Allowed Origins** populated. |
+| **RISK** (red)    | A combination that should be deliberate — exposes traffic or tools outside the loopback boundary. | External MCP with **Enable Unsafe Tools** on; active scanner on with Privacy `OFF`.              |
 
 The banner supports multi-line HTML wrapping inside the `GridBagLayout` rows, repaints automatically when you switch Burp's theme, and collapses cleanly when there is nothing to report — no dangling "Advisory:" label remains visible. See [Privacy Modes](../privacy/privacy-modes.md) and [MCP Overview](../mcp/overview.md) for the per-setting consequences the banner is summarizing.
 
