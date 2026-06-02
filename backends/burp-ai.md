@@ -15,6 +15,8 @@ When *Use AI for extensions* is off, the extension's supervisor refuses to start
 
 {% hint style="info" %}
 This gate is scoped to the **Burp AI** backend only. The supervisor refuses to start a session and the scanners refuse to enqueue work **only when** the *selected* Preferred Backend is `burp-ai` and Burp's *Use AI for extensions* toggle is off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, and the Gemini / Claude / Codex / Copilot / OpenCode CLI agents — keeps working whether that toggle is on, off, or you're on Burp Community (where the toggle does not exist).
+
+The AI-calling MCP tools (`ai_analyze`, `ai_passive_scan`, and friends) honour the same `api.ai().isEnabled()` check before issuing a request, so they respect Burp's *Use AI for extensions* setting when the Burp AI backend is selected. Independent third-party backends still answer those tools even when Burp's built-in AI is off.
 {% endhint %}
 
 ## Selecting Burp AI

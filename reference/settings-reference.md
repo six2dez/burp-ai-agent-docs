@@ -1,6 +1,8 @@
 # Settings Reference
 
-This page documents configurable settings in the extension, organized by settings tab.
+This page documents configurable settings in the extension (which appears as **Custom AI Agent** in Burp's Extensions list and Suite tab), organized by settings tab.
+
+As of v0.8.0 the Settings tabs were rebuilt on an internal design system: consistent layout, one-line section descriptions, and collapsible sections on the dense scanner tabs, all re-theming automatically when Burp switches light/dark. The settings **keys and persistence are unchanged** — saved configurations load exactly as before. The tables below list those keys.
 
 For tuning model spend, also see [Token Usage & Cost Management](../user-guide/token-management.md). Contributors extending the plugin with new settings should read [Settings Migration](../developer/settings-migration.md) for how the schema is versioned and how to add a forward-only migration step.
 
@@ -96,9 +98,11 @@ Applies to MCP tools that surface Burp proxy history (`proxy_http_history`, `pro
 
 ## Burp Integration
 
+This is the redesigned MCP Tools tab. Tools are grouped into **extension-native (AI)** tools and **generic (Montoya)** tools, each tagged with the build it ships in (**store-build** vs **full-build**), with a search/filter box and per-group bulk toggles. The full build registers all 59 MCP tools; the BApp Store build registers only the 8 extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`).
+
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
-| **Tool Toggles** | Checkboxes | *(varies)* | Enable/disable MCP tools per category. |
+| **Tool Toggles** | Checkboxes | *(varies)* | Enable/disable MCP tools per group, individually or with the per-group bulk toggle. |
 
 ## Passive AI Scanner
 

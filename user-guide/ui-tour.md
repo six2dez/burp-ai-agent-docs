@@ -1,6 +1,6 @@
 # UI Tour
 
-This page explains each major area of the Custom AI Agent interface.
+This page explains each major area of the Custom AI Agent interface. (In Burp the extension loads under the display name **Custom AI Agent** — its entry in the **Extensions** list and the Suite tab title — to distinguish it from Burp's built-in "Burp AI" provider.)
 
 ## Top Bar
 
@@ -30,13 +30,15 @@ This page explains each major area of the Custom AI Agent interface.
 
 The panel is docked at the bottom of the AI Agent tab and can be resized/collapsed.
 
+All Settings tabs are built on a shared internal design system (consistent spacing/typography, one-line section descriptions, and collapsible sections on the dense scanner tabs). Colors are theme-aware tokens, so the UI re-themes automatically when Burp switches between light and dark — there are no hardcoded colors. Settings keys and persistence are unchanged, so previously saved configs load as-is.
+
 | Tab | Purpose |
 | :--- | :--- |
 | **AI Backend** | Backend commands/URLs/models/auth and health testing. |
 | **AI Passive Scanner** | Scope/rate/size controls, dedup/cache, context caps, findings. |
 | **AI Active Scanner** | Concurrency, risk level, scan mode, queue controls, Collaborator. |
 | **MCP Server** | Host/port/TLS/token/limits/unsafe-tool master switch. |
-| **Burp Integration** | Per-tool MCP toggles by category. |
+| **Burp Integration** | Redesigned MCP Tools panel: tools grouped extension-native (AI) vs generic (Montoya), each tagged store-build / full-build, with search/filter and per-group bulk toggles. |
 | **Prompt Templates** | Built-in template editing and BountyPrompt controls. |
 | **Custom Prompts** | Saved free-form prompt library: add/edit/duplicate/delete, ★ favorites (pinned to the top of the context menu), live search filter, JSON import/export, per-entry context-menu visibility tags. |
 | **Privacy & Logging** | Privacy mode, determinism, salt, audit logging, AI request logger. |

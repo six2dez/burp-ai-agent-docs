@@ -14,7 +14,7 @@ If you delete them, simply re-run Burp or drop the files back into the directory
 2. The extension writes the active profile name to `~/.burp-ai-agent/AGENTS/default`.
 3. When a chat session or context menu action runs, the extension loads the corresponding `.md` file and picks the matching section.
 4. **Delivery depends on the backend:**
-   * **HTTP backends** that advertise `supportsSystemRole = true` (Burp AI, Ollama, LM Studio, Generic OpenAI-compatible, NVIDIA NIM) receive the profile text as a dedicated **system-role message** at the start of the conversation, separate from the user prompt.
+   * **HTTP backends** that advertise `supportsSystemRole = true` (Burp AI, Ollama, LM Studio, Generic OpenAI-compatible, NVIDIA NIM, Perplexity) receive the profile text as a dedicated **system-role message** at the start of the conversation, separate from the user prompt.
    * **CLI backends** (Gemini, Claude, Codex, Copilot, OpenCode) do not have a system-role channel, so the profile text is **prepended to the user prompt** before the command is invoked.
    * For either path, the text is labeled `System instructions (AGENTS):` so it is auditable in logs.
 

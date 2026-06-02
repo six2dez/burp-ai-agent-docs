@@ -78,7 +78,8 @@ The product is called **Custom AI Agent** but several internal identifiers still
 | Context | Value | Notes |
 | :--- | :--- | :--- |
 | Product and Burp extension name | `Custom AI Agent` | Visible in Burp's Extensions list and in the main tab. |
-| Release artifact | `Custom-AI-Agent-<version>.jar` | Published on GitHub Releases. |
+| Release artifact (full build) | `Custom-AI-Agent-full-<version>.jar` | Published on GitHub Releases; registers all 59 MCP tools. Built with `./gradlew shadowJar`. |
+| Release artifact (BApp Store build) | `Custom-AI-Agent-<version>.jar` | BApp Store listing; registers only the 8 extension-native AI MCP tools. Built with `./gradlew shadowJar -PstoreBuild=true`. |
 | Checksum / SBOM | `Custom-AI-Agent-<version>.jar.sha256`, `bom.json` | Attached to every GitHub release. |
 | Burp tab title | `AI Agent` | Short form; does not include the word "Custom". |
 | GitHub repository | `github.com/six2dez/burp-ai-agent` | Repo URL kept to avoid breaking external links, issues, and forks. |

@@ -14,9 +14,16 @@
 ## Install Path
 
 {% tabs %}
+{% tab title="Install from the BApp Store" %}
+1. In Burp, open **Extensions -> BApp Store** and search for **Custom AI Agent**.
+2. Click **Install**.
+
+The BApp Store build registers only the 8 extension-native AI MCP tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). For the full set of 59 MCP tools, download the full build from GitHub Releases.
+{% endtab %}
+
 {% tab title="Download from Releases" %}
 1. Open [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases).
-2. Download the latest `Custom-AI-Agent-<version>.jar` plus its `Custom-AI-Agent-<version>.jar.sha256` checksum and, optionally, the `bom.json` CycloneDX SBOM.
+2. Download the latest full build `Custom-AI-Agent-full-<version>.jar` plus its `*.jar.sha256` checksum and, optionally, the `bom.json` CycloneDX SBOM. (The store build is published as `Custom-AI-Agent-<version>.jar` and is the same artifact distributed via the BApp Store.)
 3. Verify the JAR integrity (see [Verify JAR Integrity](#verify-jar-integrity-sha-256)) before loading.
 {% endtab %}
 
@@ -28,17 +35,24 @@ git clone https://github.com/six2dez/burp-ai-agent.git
 cd burp-ai-agent
 ```
 
-2. Build fat JAR:
+2. Build a fat JAR. The default build is the **full** artifact (all 59 MCP tools, for GitHub releases); pass `-PstoreBuild=true` for the **store** artifact (only the 8 extension-native AI MCP tools, for the BApp Store):
 
 ```bash
+# Full build (default) -> build/libs/Custom-AI-Agent-full-<version>.jar
 ./gradlew clean shadowJar
+
+# Store build (BApp Store) -> build/libs/Custom-AI-Agent-<version>.jar
+./gradlew clean shadowJar -PstoreBuild=true
 ```
 
-3. Output path:
+3. Output paths:
 
 ```text
-build/libs/Custom-AI-Agent-<version>.jar
+build/libs/Custom-AI-Agent-full-<version>.jar   # full build (default)
+build/libs/Custom-AI-Agent-<version>.jar        # store build (-PstoreBuild=true)
 ```
+
+A generated compile-time flag (`BuildFlags.STORE_BUILD`) gates which MCP tools register.
 
 4. (Optional) Generate an SBOM alongside the JAR:
 
@@ -84,7 +98,9 @@ If the two values differ, **do not load the JAR** — re-download from the offic
 Expected indicators:
 
 * extension loads without startup errors,
-* **AI Agent** tab appears in Burp main navigation.
+* the extension appears as **Custom AI Agent** in **Extensions -> Installed**, and its **AI Agent** tab appears in Burp main navigation.
+
+> The extension registers its display name as **Custom AI Agent** to distinguish it from Burp's built-in **Burp AI** provider; that is the name shown in Burp's Extensions list, the Suite tab, and the BApp Store listing.
 
 <figure><img src="../.gitbook/assets/installation-ai-agent-tab.png" alt="Burp with AI Agent tab visible after extension load"><figcaption></figcaption></figure>
 

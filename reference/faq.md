@@ -2,11 +2,11 @@
 
 ## Does it work with Burp Community Edition?
 
-Yes. Core chat, context actions, passive scanner, and most MCP functionality work in Community. Pro-only capabilities (scanner APIs, some tools) remain gated.
+Yes. Core chat, context actions, and most MCP functionality work in Community. Pro-only capabilities remain gated — including the AI passive scanner, which is registered as a Burp `PassiveScanCheck` (a Pro feature; on Community the registration fails silently and is logged), the active scanner APIs, and some tools.
 
 ## Does the passive scanner send extra traffic?
 
-No. Passive scanner analyzes observed proxy traffic. Active scanner is the component that sends additional requests.
+No. The passive scanner is a Burp `PassiveScanCheck` that runs per request on traffic Burp already observed. Active scanner is the component that sends additional requests.
 
 ## Are my data safe with cloud backends?
 
@@ -34,7 +34,7 @@ Health checks detected command/API issues. Use backend **Test connection** and i
 
 ## Why are MCP tools missing?
 
-Check tool toggles in **Burp Integration**, unsafe-tool master switch in **MCP Server**, and Burp edition constraints.
+Check tool toggles in **Burp Integration**, unsafe-tool master switch in **MCP Server**, and Burp edition constraints. Also confirm which build you are running: the BApp Store build (`Custom-AI-Agent-<version>.jar`) registers only the 8 extension-native AI tools, while the full build (`Custom-AI-Agent-full-<version>.jar`, from GitHub releases) registers all 59. The generic Montoya tools (proxy history, repeater, scanner, etc.) exist only in the full build — for those in the store build, use PortSwigger's official Burp MCP Server.
 
 ## What is the AI Request Logger?
 

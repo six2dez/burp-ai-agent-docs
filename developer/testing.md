@@ -40,12 +40,17 @@ Reports land at `build/reports/jacoco/test/html/index.html` and `build/reports/j
 
 ## Building from Source
 
-To build the extension JAR:
+The build produces two artifacts (see [issue #231](https://github.com/six2dez/burp-ai-agent/issues/231)):
+
 ```bash
-./gradlew clean shadowJar
+./gradlew clean shadowJar                  # full build (default, GitHub releases)
+./gradlew clean shadowJar -PstoreBuild=true # BApp Store build
 ```
 
-The output JAR is `build/libs/Custom-AI-Agent-<version>.jar`. Use that JAR to install the extension in Burp.
+* **Full build** → `build/libs/Custom-AI-Agent-full-<version>.jar` — registers all 59 MCP tools.
+* **Store build** → `build/libs/Custom-AI-Agent-<version>.jar` — registers only the 8 extension-native AI MCP tools (BApp Store compliance).
+
+The `-PstoreBuild` flag sets the generated `BuildFlags.STORE_BUILD` constant that gates which tools register. Use the resulting JAR to install the extension in Burp, where it appears as **Custom AI Agent**.
 
 ## SBOM
 

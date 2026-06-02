@@ -1,6 +1,6 @@
 # Architecture
 
-Custom AI Agent is implemented in Kotlin on the JVM using the Burp Montoya API. The architecture is intentionally layered so UI, context collection, redaction, backend execution, scanning, MCP, and audit concerns can evolve independently.
+The extension (loaded in Burp as **Custom AI Agent**) is implemented in Kotlin on the JVM using the Burp Montoya API. The architecture is intentionally layered so UI, context collection, redaction, backend execution, scanning, MCP, and audit concerns can evolve independently.
 
 ## Layered Design
 
@@ -101,6 +101,8 @@ sequenceDiagram
 | Package | Purpose |
 | :--- | :--- |
 | `ui/*` | Swing UI, settings panels, interaction components, AI Logger panel. |
+| `ui/design/*` | Internal design system: `DesignTokens` (spacing/typography/theme-aware color tokens) and reusable `Components`. Re-themes automatically when Burp switches light/dark — no hardcoded colors. |
+| `ui/components/AccordionPanel` | Collapsible section panel used to organize dense settings tabs. |
 | `ui/UiActions` | Context menu wiring for request/response and issue actions. |
 | `ui/ToolCallParser` | Extracts MCP tool-call payloads from AI model responses (fenced blocks, raw JSON, OpenAI-style). |
 | `ui/ChatPanel` | Chat orchestration with auto tool chaining (up to 8 iterations) and trace ID propagation. |
@@ -110,7 +112,7 @@ sequenceDiagram
 | `backends/*` | Backend registry, built-in adapters, diagnostics. |
 | `supervisor/*` | Backend and MCP lifecycle supervision. |
 | `mcp/*` | MCP manager, catalog, limiter, and transports. |
-| `scanner/*` | Passive/active scanner engines and analyzers. |
+| `scanner/*` | Passive/active scanner engines and analyzers. The AI passive scanner runs as a Montoya `PassiveScanCheck` (registered via `api.scanner().registerPassiveScanCheck(check, ScanCheckType.PER_REQUEST)` — a Burp Pro feature). |
 | `audit/*` | JSONL writer, integrity hashes, AI Request Logger (activity buffer, rolling persistence, trace correlation). |
 | `alerts/*` | Optional webhook notifications. |
 | `config/*` | Settings model, persistence, defaults, migration. |

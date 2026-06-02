@@ -1,6 +1,6 @@
 # Burp Scan Skill
 
-The **Burp Scan Skill** is a standalone knowledge file that lets you use any AI coding assistant (Claude Code, Gemini CLI, Codex, OpenCode, Copilot, etc.) as a Burp scanner from your terminal. Instead of relying on the plugin's built-in AI backends, your preferred terminal AI becomes the reasoning engine while Burp provides 53+ tools via MCP.
+The **Burp Scan Skill** is a standalone knowledge file that lets you use any AI coding assistant (Claude Code, Gemini CLI, Codex, OpenCode, Copilot, etc.) as a Burp scanner from your terminal. Instead of relying on the plugin's built-in AI backends, your preferred terminal AI becomes the reasoning engine while Burp provides MCP tools. The skill drives the generic Montoya tools (`proxy_http_history`, `http1_request`, `scanner_issues`, etc.), so it requires the **full build** (`Custom-AI-Agent-full-<version>.jar`), which registers all 59 MCP tools. The BApp Store build (`Custom-AI-Agent-<version>.jar`) ships only the 8 extension-native AI tools and does not expose these.
 
 ## Why Use the Skill?
 
@@ -9,7 +9,7 @@ The plugin has two layers that serve different purposes:
 | Plugin (Built-in Scanner) | Skill (Terminal AI) |
 | :--- | :--- |
 | Automated background scanning | Interactive, analyst-guided scanning |
-| Real-time proxy hooks (intercepts every response) | Pulls proxy history on demand |
+| Per-request passive scan check (analyzes traffic Burp observes) | Pulls proxy history on demand |
 | JVM-native performance (regex at JVM speed) | MCP tool calls over network (slower but smarter) |
 | Works with any backend (Ollama, LM Studio, etc.) | Uses your terminal AI (Claude Code, Gemini, etc.) |
 | Set-and-forget | Human-in-the-loop |
@@ -79,7 +79,7 @@ The skill is a self-contained Markdown file. You can use it with any AI that acc
 Before using the skill, ensure:
 
 1. **Burp Suite is running** (Community or Professional)
-2. **The AI Agent extension is loaded** and active
+2. **The full-build extension is loaded** and active (it appears as **Custom AI Agent** in Burp's Extensions list; the skill's tools require the full build)
 3. **MCP server is enabled** in Settings > MCP Server
 4. **Your AI assistant is connected** to the MCP server (via SSE, stdio, or HTTP)
 
@@ -110,7 +110,7 @@ The skill is organized into 6 sections:
 
 ### 1. MCP Tool Reference Card
 
-All 53+ MCP tools reorganized by scanning action (not by Burp UI category):
+The full build's MCP tools reorganized by scanning action (not by Burp UI category):
 
 * **Discover scope & surface**: `scope_check`, `site_map`, `proxy_http_history`, `response_body_search`
 * **Analyze traffic**: `params_extract`, `find_reflected`, `insertion_points`, `request_parse`, `diff_requests`
@@ -272,7 +272,7 @@ If you use Claude Code, the `burp-scan` skill integrates with the broader securi
 
 | Feature | Plugin Passive Scanner | Plugin Active Scanner | Burp Scan Skill |
 | :--- | :--- | :--- | :--- |
-| **Trigger** | Automatic (proxy hook) | Auto from passive or manual queue | Manual (user initiates) |
+| **Trigger** | Automatic (passive scan check) | Auto from passive or manual queue | Manual (user initiates) |
 | **AI Model** | Configured backend (Ollama, OpenAI, etc.) | Same | Your terminal AI (Claude, Gemini, etc.) |
 | **Speed** | Fast (JVM-native regex) | Fast (concurrent threads) | Slower (MCP round-trips) |
 | **Intelligence** | Limited by prompt template | Static + adaptive payloads | Full AI reasoning |

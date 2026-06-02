@@ -9,16 +9,31 @@ MCP tools follow a **descriptor + handler** pattern. Each tool has metadata in t
 Define the tool's metadata:
 
 ```kotlin
-ToolDescriptor(
+McpToolDescriptor(
     id = "my_tool",
     title = "My Tool Title",
     description = "What this tool does.",
     category = "MyCategory",
-    unsafe = false,        // true if it modifies state or sends traffic
     defaultEnabled = true, // whether it's enabled by default
-    proOnly = false        // true if it requires Burp Pro
+    proOnly = false,       // true if it requires Burp Pro
+    unsafeOnly = false,    // true if it modifies state or sends traffic
+    nativeTool = false     // see "Store Build vs Full Build" below
 )
 ```
+
+#### Store Build vs Full Build
+
+The `nativeTool` flag decides whether a tool ships in the **BApp Store build**. The catalog filters on it:
+
+```kotlin
+fun available(storeBuild: Boolean = BuildFlags.STORE_BUILD): List<McpToolDescriptor> =
+    if (storeBuild) tools.filter { it.nativeTool } else tools
+```
+
+* `nativeTool = true` — the tool is an extension-native AI tool and is registered in **both** builds. The BApp Store build (`./gradlew shadowJar -PstoreBuild=true`) exposes exactly these 8 tools: `status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`.
+* `nativeTool = false` (default) — the tool is a generic Montoya-API wrapper (proxy history, repeater, scanner, scope, site map, intruder, collaborator, utilities, …). It ships only in the **full build** (`./gradlew shadowJar`, the default GitHub-release artifact), which registers all 59 MCP tools.
+
+`BuildFlags.STORE_BUILD` is a generated compile-time constant set from the `-PstoreBuild` Gradle property, so the same source compiles into either artifact. The store build intentionally omits the generic tools because PortSwigger's official Burp MCP Server already provides those.
 
 ### 2. Implement Handler in `McpTools`
 
@@ -55,7 +70,7 @@ Define the JSON Schema for tool input parameters. This tells MCP clients what pa
 
 ### 4. Add Safety Gating (If Needed)
 
-If your tool is marked as `unsafe`:
+If your tool is marked as `unsafeOnly`:
 *   It will be disabled by default.
 *   Users must enable "Unsafe Tools" in settings to use it.
 *   Consider adding scope checks to prevent operations on out-of-scope targets.

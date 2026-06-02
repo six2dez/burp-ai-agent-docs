@@ -79,10 +79,21 @@ If token is required:
 }
 ```
 
+## Build Variants and Tool Exposure
+
+The extension ships two build artifacts, and the build you load determines which MCP tools are registered:
+
+* **BApp Store build** (`./gradlew shadowJar -PstoreBuild=true` → `Custom-AI-Agent-0.8.0.jar`): registers **only the 8 extension-native AI tools** — `status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`. Generic Burp/Montoya tools (proxy history, repeater, scanner, scope, site map, intruder, Collaborator, utilities, etc.) are intentionally **not** exposed here. For those, use PortSwigger's official Burp MCP Server alongside this extension.
+* **Full build** (`./gradlew shadowJar` → `Custom-AI-Agent-full-0.8.0.jar`, GitHub releases): registers **all 59 MCP tools**, including the generic Montoya tools above.
+
+A compile-time `BuildFlags.STORE_BUILD` constant gates which tools register. The AI-calling tools (`ai_analyze`, `ai_passive_scan`, …) also check `ai.isEnabled()` before issuing a request, so the configured AI setting is respected; independent third-party backends still work when Burp's built-in AI is off.
+
+When loaded, the extension appears in Burp's **Extensions** list and as a Suite tab titled **Custom AI Agent** (named that way to distinguish it from Burp's built-in "Burp AI" provider).
+
 ## Features
 
 * SSE and optional STDIO transport.
-* 53 built-in tools across Burp workflows (plus optional drop-in tools).
+* 59 MCP tools across Burp workflows in the full build (8 extension-native AI tools in the BApp Store build); see [Tools Reference](tools-reference.md).
 * Unsafe-tool gating with per-tool toggles.
 * Configurable request limiter and body-size caps.
 * Proxy-history preprocessing pipeline (binary filter, size cap, content-type allowlist, newest-first, raw opt-in). See [MCP Proxy History Preprocessing](../reference/settings-reference.md#mcp-proxy-history-preprocessing).

@@ -102,7 +102,7 @@ When the AI determines it needs to call an MCP tool to answer a request, it exec
 * **Maximum chain depth**: 8 sequential tool calls per interaction.
 * **Transparent execution**: Each tool call is logged in the [AI Request Logger](../privacy/ai-request-logger.md) with a shared trace ID so you can follow the full chain.
 * **Automatic follow-up**: After each tool result, the AI continues reasoning with the original question plus all accumulated tool results. The final response is the complete answer, not intermediate tool output.
-* **Works with all backends**: Tool chaining works with HTTP backends (Ollama, LM Studio, OpenAI-compatible) and CLI backends (Gemini, Claude, Codex, OpenCode).
+* **Works with all backends**: Tool chaining works with HTTP backends (Ollama, LM Studio, OpenAI-compatible) and CLI backends (Gemini, Claude, Codex, OpenCode, Copilot).
 
 ### How It Works
 

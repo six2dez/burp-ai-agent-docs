@@ -6,7 +6,7 @@ The extension integrates directly with Burp tools and workflows so AI analysis s
 
 | Burp Tool | Integration |
 | :--- | :--- |
-| **Proxy History** | Request context menus and passive scanner monitoring. |
+| **Proxy History** | Request context menus and passive scan coverage (via a registered Montoya passive scan check, Pro). |
 | **Repeater** | Context actions on requests/responses and MCP Repeater tools. |
 | **Intruder** | MCP tools can create and run Intruder setups. |
 | **Scanner** (Pro) | Issue context menus, active checks, and ScanCheck integration. |
@@ -24,7 +24,7 @@ The extension integrates directly with Burp tools and workflows so AI analysis s
 | Chat & sessions | Yes | Yes |
 | All AI backends | Yes | Yes |
 | MCP server | Yes (non-Pro tools) | Yes (all tools) |
-| Passive AI Scanner | Yes | Yes |
+| Passive AI Scanner | Manual queue path | Automatic passive scan check + manual queue |
 | Active AI Scanner | Manual queue path | Native scanner integration + queue |
 | Scanner MCP tools | No | Yes |
 | Collaborator OAST | No | Yes |
@@ -34,7 +34,16 @@ The extension detects Burp edition at startup and disables unsupported capabilit
 
 ## MCP Tool Toggles
 
-You control MCP exposure from **Burp Integration** and **MCP Server** tabs.
+You control MCP exposure from **Burp Integration** and **MCP Server** tabs. The **Burp Integration** tab embeds the redesigned MCP Tools panel: tools are grouped **extension-native (AI)** vs **generic (Montoya)**, each tagged **store-build** / **full-build**, with a search/filter box and per-group bulk toggles.
+
+### Build matters
+
+There are two build artifacts, and which tools are even registered depends on the build:
+
+* **Full build** (default, GitHub releases — `Custom-AI-Agent-full-0.8.0.jar`): registers all **59** MCP tools, including the generic Montoya-API tools (proxy history, Repeater, scanner, scope, site map, Intruder, Collaborator, utilities, etc.).
+* **Store build** (BApp Store — `Custom-AI-Agent-0.8.0.jar`): registers only the **8** extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). The generic Montoya-API tools are not exposed over MCP in this build — PortSwigger's official Burp MCP Server provides those.
+
+The tags in the panel show which group each tool belongs to so you can see at a glance what is available in your build.
 
 ### Safe vs Unsafe
 
@@ -44,9 +53,8 @@ You control MCP exposure from **Burp Integration** and **MCP Server** tabs.
 ### Managing Tool Access
 
 1. Open the **Burp Integration** tab in Settings.
-2. Enable/disable tools by category.
-3. Use **Select All / Deselect All** when needed.
-4. Enable **Unsafe Tools** in the **MCP Server** tab if unsafe tool toggles must be active.
+2. Enable/disable tools by group, using search/filter and per-group bulk toggles as needed.
+3. Enable **Unsafe Tools** in the **MCP Server** tab if unsafe tool toggles must be active.
 
 ![Screenshot: MCP tool toggles](../.gitbook/assets/mcp-tool-toggles.png)
 

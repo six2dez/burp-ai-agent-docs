@@ -8,6 +8,7 @@ The `issue_create` MCP tool lets an AI client create Burp issues programmaticall
 | :--- | :--- |
 | **Tool name** | `issue_create` |
 | **Category** | Issues |
+| **Native** | Yes (registered in both the BApp Store and full builds) |
 | **Unsafe** | No |
 | **Default enabled** | Yes |
 | **Pro only** | No |
@@ -77,5 +78,7 @@ Typical chain:
 2. Validate behavior (`http1_request` / `http2_request`).
 3. Summarize exploit evidence.
 4. Create issue (`issue_create`).
+
+The intermediate steps above use generic Montoya tools (`proxy_http_history_regex`, `http1_request`, `http2_request`), which are only present in the full build. In the BApp Store build, `issue_create` is still available, but pair it with PortSwigger's official Burp MCP Server (or `ai_passive_scan` / `ai_findings_recent`) to gather and validate evidence.
 
 See [Typical Workflows](../examples/typical-workflows.md).

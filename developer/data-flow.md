@@ -51,9 +51,11 @@ flowchart TD
 
 ## Passive Scanner Flow
 
+The AI passive scanner is registered as a Montoya `PassiveScanCheck` (via `api.scanner().registerPassiveScanCheck(check, ScanCheckType.PER_REQUEST)`), so Burp Scanner drives it per request. It is a Burp Pro feature; on Community the registration fails silently and is logged.
+
 ```mermaid
 flowchart LR
-    T[Proxy traffic]
+    T[PassiveScanCheck.doCheck per request]
     F[Filters]\nMIME, scope, size, stream patterns
     L[Local checks]\ncsrf, smuggling, upload, deserialization
     D[Dedup filters]\nendpoint and fingerprint windows

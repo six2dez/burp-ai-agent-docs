@@ -1,12 +1,16 @@
 # Passive AI Scanner
 
-The passive scanner analyzes proxy traffic in the background and can create Burp issues automatically. It observes existing traffic only and does not send extra requests by itself.
+The passive scanner analyzes traffic in the background and can create Burp issues automatically. It observes existing traffic only and does not send extra requests by itself.
+
+{% hint style="info" %}
+The passive scanner is registered as a Montoya **`PassiveScanCheck`** (via `api.scanner().registerPassiveScanCheck(check, ScanCheckType.PER_REQUEST)`), so it runs inside Burp's own scanner engine. This is a **Burp Suite Professional** feature: on Burp Community the registration fails silently and is logged, so passive AI analysis does not run there.
+{% endhint %}
 
 ## How It Works
 
-1. Proxy traffic is captured as you browse.
+1. Each scanned request/response is passed to the `PassiveScanCheck.doCheck()` callback by Burp's scanner.
 2. Requests/responses are filtered (scope, MIME, size, stream patterns).
-3. Local checks run before AI calls.
+3. Local checks run synchronously and return immediately; AI deep-analysis is enqueued asynchronously.
 4. Dedup and prompt-result cache reduce repeated analysis.
 5. Qualified items are sent to the selected backend.
 6. Findings with confidence `>= 85%` can become `[AI Passive]` issues.

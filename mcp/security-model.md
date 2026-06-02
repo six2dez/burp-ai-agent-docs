@@ -21,6 +21,15 @@ By default, server bind address is `127.0.0.1`. Only local processes can connect
 Unsafe tools can modify Burp state and generate outbound traffic. Enable only when needed and only for trusted clients.
 {% endhint %}
 
+### Build Variant Surface
+
+The build you load is the first gate on what MCP can reach:
+
+* The **BApp Store build** exposes **only the 8 extension-native AI tools** (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). It does **not** expose generic Burp/Montoya tools (proxy history, repeater, scanner, scope, site map, intruder, Collaborator, utilities, etc.) — for those, run PortSwigger's official Burp MCP Server.
+* The **full build** (GitHub releases) exposes all 59 MCP tools.
+
+The AI-calling tools additionally check `ai.isEnabled()` before issuing a request, so the configured AI setting is honored even when a client invokes them directly.
+
 ## 4. Origin and Host Validation
 
 The server validates `Host`, `Origin`, `Referer` and rejects browser `User-Agent` strings (configurable via **Allowed Origins**) to reduce CSRF and cross-origin abuse paths, even for loopback clients.
