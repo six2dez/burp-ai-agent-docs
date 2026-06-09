@@ -30,6 +30,10 @@ The build you load is the first gate on what MCP can reach:
 
 The AI-calling tools additionally check `ai.isEnabled()` before issuing a request, so the configured AI setting is honored even when a client invokes them directly.
 
+### Scope Restriction
+
+When **Restrict MCP tools to in-scope hosts** (`mcpScopeOnly`) is enabled in **MCP Server** settings, every scope-aware tool (proxy history, site map, the HTTP request senders, scanner, etc.) rejects targets outside Burp's defined scope before acting on them. This confines an external MCP client to the same scope you are testing, so it cannot reach out-of-scope hosts through Burp. The generic tools live in the full build; the BApp Store build only ships the 8 extension-native AI tools.
+
 ## 4. Origin and Host Validation
 
 The server validates `Host`, `Origin`, `Referer` and rejects browser `User-Agent` strings (configurable via **Allowed Origins**) to reduce CSRF and cross-origin abuse paths, even for loopback clients.

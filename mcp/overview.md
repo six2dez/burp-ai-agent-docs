@@ -95,6 +95,7 @@ When loaded, the extension appears in Burp's **Extensions** list and as a Suite 
 * SSE and optional STDIO transport.
 * 59 MCP tools across Burp workflows in the full build (8 extension-native AI tools in the BApp Store build); see [Tools Reference](tools-reference.md).
 * Unsafe-tool gating with per-tool toggles.
+* Optional **Restrict MCP tools to in-scope hosts** (`mcpScopeOnly`) that confines every scope-aware tool to Burp's defined scope.
 * Configurable request limiter and body-size caps.
 * Proxy-history preprocessing pipeline (binary filter, size cap, content-type allowlist, newest-first, raw opt-in). See [MCP Proxy History Preprocessing](../reference/settings-reference.md#mcp-proxy-history-preprocessing).
 * Administrative endpoints (`GET /__mcp/health`, `POST /__mcp/shutdown`) used for health checks and safe takeover.

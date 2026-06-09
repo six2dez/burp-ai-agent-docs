@@ -42,6 +42,10 @@ flowchart TD
 | **Copilot CLI** | Cloud CLI | Medium | Multi-model analysis via GitHub infrastructure. |
 | **OpenCode CLI** | Cloud CLI | Medium | Multi-provider via one CLI. |
 
+{% hint style="info" %}
+**Network transport:** the HTTP backends (Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible) send and health-check exclusively through Burp's own Montoya HTTP stack — there is no direct out-of-band HTTP client. AI-backend traffic therefore respects Burp's upstream proxy, TLS, and logging configuration and is visible in Burp like any other request (#69).
+{% endhint %}
+
 ### Capability Matrix
 
 | Backend | Streaming | JSON mode | System role | Auto-start |

@@ -49,6 +49,7 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **Perplexity Timeout**              | Number             | `60`                                                          | Timeout in seconds (range: 30-3600).                                                                                                                                                                                                                                               |
 | **Auto-Restart**                    | Toggle             | On                                                            | Automatically restart crashed CLI backends.                                                                                                                                                                                                                                        |
 | **Agent Profile**                   | Dropdown           | `pentester`                                                   | Active profile from `~/.burp-ai-agent/AGENTS/*.md`.                                                                                                                                                                                                                                |
+| **Small model mode** | Toggle | Off | Caps chat context to roughly 1500/750 characters per request/response so small local models are not overflowed. Setting key `smallModelMode`. |
 
 ## Privacy & Logging
 
@@ -69,6 +70,7 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **Host**                          | Text      | `127.0.0.1`                               | Bind address.                                                                                                                                     |
 | **Port**                          | Number    | `9876`                                    | TCP port for MCP server.                                                                                                                          |
 | **External Access**               | Toggle    | Off                                       | Allow non-loopback connections. Requires TLS and a bearer token.                                                                                  |
+| **Restrict to in-scope hosts** | Toggle | Off | When on, every scope-aware MCP tool (proxy history, site map, request senders, scanner, …) rejects targets outside Burp's defined scope, so an external MCP client cannot reach out-of-scope hosts through Burp. Setting key `mcpScopeOnly`. |
 | **STDIO Bridge**                  | Toggle    | Off                                       | Enable stdio transport in addition to SSE.                                                                                                        |
 | **Token**                         | Text      | _(auto-generated)_                        | Bearer token used for external access and for the `POST /__mcp/shutdown` endpoint. Persisted under preferences key `mcp.token`.                   |
 | **Allowed Origins**               | Multiline | _(empty)_                                 | Comma-, semicolon-, or newline-separated list of `Origin`/`Host` patterns to accept in addition to loopback. Leave empty to restrict to loopback. |
@@ -77,7 +79,7 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | **Keystore Path**                 | Text      | `~/.burp-ai-agent/certs/mcp-keystore.p12` | Custom PKCS12 path for TLS mode.                                                                                                                  |
 | **Keystore Password**             | Text      | _(auto-generated)_                        | Password used by custom keystore. Persisted under preferences key `mcp.tls.keystore.password`.                                                    |
 | **Max Concurrent Requests**       | Number    | `4`                                       | Max parallel MCP tool calls (range: 1-64).                                                                                                        |
-| **Max Body Bytes**                | Number    | `2097152`                                 | Max body bytes returned by MCP tools.                                                                                                             |
+| **Max body size (KB)** | Number | `2048` | Maximum MCP tool output body size per item, in KB (range: 32-102400). |
 | **Scan Task TTL (min)**           | Number    | `120`                                     | Retention for completed scan task references surfaced via MCP (range: 5-1440).                                                                    |
 | **Collaborator Client TTL (min)** | Number    | `60`                                      | Retention for Collaborator secret keys allocated by MCP (range: 5-1440).                                                                          |
 | **Enable Unsafe Tools**           | Toggle    | Off                                       | Master switch for tools marked unsafe.                                                                                                            |
@@ -98,17 +100,11 @@ Applies to MCP tools that surface Burp proxy history (`proxy_http_history`, `pro
 
 ## Burp Integration
 
-<<<<<<< HEAD
 This is the redesigned MCP Tools tab. Tools are grouped into **extension-native (AI)** tools and **generic (Montoya)** tools, each tagged with the build it ships in (**store-build** vs **full-build**), with a search/filter box and per-group bulk toggles. The full build registers all 59 MCP tools; the BApp Store build registers only the 8 extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`).
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | **Tool Toggles** | Checkboxes | *(varies)* | Enable/disable MCP tools per group, individually or with the per-group bulk toggle. |
-=======
-| Setting          | Type       | Default    | Description                            |
-| ---------------- | ---------- | ---------- | -------------------------------------- |
-| **Tool Toggles** | Checkboxes | _(varies)_ | Enable/disable MCP tools per category. |
->>>>>>> 41ae07906f5a909fa7722d0baddcbba755455e53
 
 ## Passive AI Scanner
 

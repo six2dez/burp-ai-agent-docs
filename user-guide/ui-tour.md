@@ -28,7 +28,6 @@ This page explains each major area of the Custom AI Agent interface. (In Burp th
 
 The panel is docked at the bottom of the AI Agent tab and can be resized/collapsed.
 
-<<<<<<< HEAD
 All Settings tabs are built on a shared internal design system (consistent spacing/typography, one-line section descriptions, and collapsible sections on the dense scanner tabs). Colors are theme-aware tokens, so the UI re-themes automatically when Burp switches between light and dark — there are no hardcoded colors. Settings keys and persistence are unchanged, so previously saved configs load as-is.
 
 | Tab | Purpose |
@@ -46,20 +45,6 @@ All Settings tabs are built on a shared internal design system (consistent spaci
 
 <figure><img src="../.gitbook/assets/ui-tour-settings-panel.png" alt="Settings panel tabs in the AI Agent UI"><figcaption></figcaption></figure>
 <!-- TODO: refresh ui-tour-settings-panel.png — the settings panel now has 10 tabs (new "Custom Prompts" tab between Prompt Templates and Privacy & Logging). -->
-=======
-| Tab                    | Purpose                                                                                                                                                                                         |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **AI Backend**         | Backend commands/URLs/models/auth and health testing.                                                                                                                                           |
-| **AI Passive Scanner** | Scope/rate/size controls, dedup/cache, context caps, findings.                                                                                                                                  |
-| **AI Active Scanner**  | Concurrency, risk level, scan mode, queue controls, Collaborator.                                                                                                                               |
-| **MCP Server**         | Host/port/TLS/token/limits/unsafe-tool master switch.                                                                                                                                           |
-| **Burp Integration**   | Per-tool MCP toggles by category.                                                                                                                                                               |
-| **Prompt Templates**   | Built-in template editing and BountyPrompt controls.                                                                                                                                            |
-| **Custom Prompts**     | Saved free-form prompt library: add/edit/duplicate/delete, ★ favorites (pinned to the top of the context menu), live search filter, JSON import/export, per-entry context-menu visibility tags. |
-| **Privacy & Logging**  | Privacy mode, determinism, salt, audit logging, AI request logger.                                                                                                                              |
-| **AI Logger**          | Real-time AI activity log with filters, trace correlation, and export.                                                                                                                          |
-| **Help**               | Quick docs and setup references.                                                                                                                                                                |
->>>>>>> 41ae07906f5a909fa7722d0baddcbba755455e53
 
 <figure><img src="../.gitbook/assets/Screenshot 2026-05-15 at 10.29.37.png" alt=""><figcaption></figcaption></figure>
 

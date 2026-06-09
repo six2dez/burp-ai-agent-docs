@@ -25,7 +25,6 @@ Custom AI Agent is an extension for Burp Suite that integrates AI capabilities i
 
 ## Key Features
 
-<<<<<<< HEAD
 | Feature | Description |
 | :--- | :--- |
 | **11 Built-in Backends** | Burp AI (built-in), Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
@@ -40,22 +39,6 @@ Custom AI Agent is an extension for Burp Suite that integrates AI capabilities i
 | **8 Curated BountyPrompt Actions** | Detection, recon, and advisory prompts with selective context tags. |
 | **Token-Aware Controls** | Passive scanner and manual context caps, dedup windows, and prompt-result caching to reduce model spend. |
 | **Burp Pro Integration** | Native `ScanCheck`, Collaborator OAST, and scanner issue actions. |
-=======
-| Feature                            | Description                                                                                                                                             |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **11 Built-in Backends**           | Burp AI (built-in), Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
-| **53+ MCP Tools**                  | History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more.                                                               |
-| **Auto Tool Chaining**             | AI autonomously chains up to 8 MCP tool calls per interaction to complete multi-step tasks.                                                             |
-| **AI Request Logger**              | Real-time activity log with trace ID correlation, preset filters, and optional rolling JSONL persistence.                                               |
-| **62 Vulnerability Classes**       | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues.                                                                             |
-| **3 Scan Modes**                   | `BUG_BOUNTY`, `PENTEST`, and `FULL` for different engagement styles.                                                                                    |
-| **3 Privacy Modes**                | `STRICT` (zero trust), `BALANCED` (pragmatic, default), and `OFF` (raw data, local-only).                                                               |
-| **9 Prompt Templates**             | Editable templates for request and issue context menu actions.                                                                                          |
-| **Custom Prompt Library**          | User-defined free-form prompts per context (HTTP request / scanner issue), with ordered menu and audit-tracked launch metadata.                         |
-| **8 Curated BountyPrompt Actions** | Detection, recon, and advisory prompts with selective context tags.                                                                                     |
-| **Token-Aware Controls**           | Passive scanner and manual context caps, dedup windows, and prompt-result caching to reduce model spend.                                                |
-| **Burp Pro Integration**           | Native `ScanCheck`, Collaborator OAST, and scanner issue actions.                                                                                       |
->>>>>>> 41ae07906f5a909fa7722d0baddcbba755455e53
 
 ## Use Cases
 
