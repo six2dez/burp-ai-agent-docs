@@ -1,6 +1,6 @@
 # Backends Overview
 
-Custom AI Agent is backend-agnostic. You can run the built-in Burp AI backend, local models, cloud CLI providers, or OpenAI-compatible HTTP providers. Eleven backends ship with the extension, and additional ones can be dropped in as JARs.
+Custom AI Agent is backend-agnostic. You can run the built-in Burp AI backend, local models, cloud CLI providers, or OpenAI-compatible HTTP providers. Twelve backends ship with the extension, and additional ones can be dropped in as JARs.
 
 ## Backend Selection Guide
 
@@ -35,6 +35,7 @@ flowchart TD
 | **LM Studio** | Local HTTP | High | Local models with GUI management. |
 | **NVIDIA NIM** | Cloud HTTP | Medium | NVIDIA-hosted models (e.g. `moonshotai/kimi-k2.5`) via `integrate.api.nvidia.com`. |
 | **Perplexity** | Cloud HTTP | Medium | Sonar family of web-aware reasoning models via `api.perplexity.ai`. |
+| **Anthropic** | Cloud HTTP | Medium | Native Anthropic Messages API (Claude) via `api.anthropic.com`; encrypted key + token counting (v0.9.0). |
 | **Generic (OpenAI-compatible)** | HTTP | Medium | Any compatible provider endpoint. |
 | **Gemini CLI** | Cloud CLI | Medium | Large-context cloud workflows. |
 | **Claude CLI** | Cloud CLI | Medium | Reasoning-heavy analysis. |
@@ -43,7 +44,7 @@ flowchart TD
 | **OpenCode CLI** | Cloud CLI | Medium | Multi-provider via one CLI. |
 
 {% hint style="info" %}
-**Network transport:** the HTTP backends (Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible) send and health-check exclusively through Burp's own Montoya HTTP stack — there is no direct out-of-band HTTP client. AI-backend traffic therefore respects Burp's upstream proxy, TLS, and logging configuration and is visible in Burp like any other request (#69).
+**Network transport:** the HTTP backends (Ollama, LM Studio, NVIDIA NIM, Perplexity, Anthropic, Generic OpenAI-compatible) send and health-check exclusively through Burp's own Montoya HTTP stack — there is no direct out-of-band HTTP client. AI-backend traffic therefore respects Burp's upstream proxy, TLS, and logging configuration and is visible in Burp like any other request (#69).
 {% endhint %}
 
 ### Capability Matrix
@@ -55,6 +56,7 @@ flowchart TD
 | **LM Studio** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | Yes (`lms server start`) |
 | **NVIDIA NIM** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | N/A |
 | **Perplexity** | Yes (SSE) | **No** (Sonar API rejects `response_format=json_object`) | Yes | N/A |
+| **Anthropic** | Yes (buffered, proxy-visible) | No — enforced via prompt | Yes (native `system`) | N/A |
 | **Generic OpenAI-compatible** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | N/A |
 | **Gemini CLI** | Line-by-line stdout | No | No (prepended) | N/A |
 | **Claude CLI** | Line-by-line stdout | No | No (prepended) | N/A |
@@ -170,6 +172,7 @@ CLI backends manage their own output limits through their respective configurati
 * [LM Studio (Local)](lm-studio.md)
 * [NVIDIA NIM](nvidia-nim.md)
 * [Perplexity](perplexity.md)
+* [Anthropic (API)](anthropic.md)
 * [Generic (OpenAI-compatible)](openai-compatible.md)
 * [Gemini CLI](gemini-cli.md)
 * [Claude CLI](claude-cli.md)

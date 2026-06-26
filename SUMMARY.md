@@ -41,6 +41,7 @@
 * [LM Studio (Local)](backends/lm-studio.md)
 * [NVIDIA NIM](backends/nvidia-nim.md)
 * [Perplexity](backends/perplexity.md)
+* [Anthropic (API)](backends/anthropic.md)
 * [Generic (OpenAI-compatible)](backends/openai-compatible.md)
 * [Backend Troubleshooting](backends/troubleshooting.md)
 * [Gemini CLI](backends/gemini-cli.md)
@@ -54,6 +55,7 @@
 * [MCP Overview](mcp/overview.md)
 * [Security Model](mcp/security-model.md)
 * [Tools Reference](mcp/tools-reference.md)
+* [External MCP Servers](mcp/external-servers.md)
 * [Issue Creation (MCP)](mcp/issue-create.md)
 
 ## Examples
