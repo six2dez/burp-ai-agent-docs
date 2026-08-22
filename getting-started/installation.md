@@ -24,7 +24,7 @@ The *store build* referenced throughout this documentation is a real build targe
 
 {% tab title="Download from Releases" %}
 1. Open [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases).
-2. Download the latest full build `Custom-AI-Agent-full-<version>.jar` plus its `*.jar.sha256` checksum and, optionally, the `bom.json` CycloneDX SBOM. (The store build is published as `Custom-AI-Agent-<version>.jar` — the artifact that will be distributed via the BApp Store once the submission is accepted.)
+2. Download the latest full build `Custom-AI-Agent-full-<version>.jar` plus its `*.jar.sha256` checksum and, optionally, the `bom.json` CycloneDX SBOM. These three are what a release publishes. (The store build, `Custom-AI-Agent-<version>.jar`, is **not** attached to releases — it is the artifact that will be distributed through the BApp Store once the submission is accepted, and you can build it yourself with `-PstoreBuild=true`.)
 3. Verify the JAR integrity (see [Verify JAR Integrity](#verify-jar-integrity-sha-256)) before loading.
 {% endtab %}
 
