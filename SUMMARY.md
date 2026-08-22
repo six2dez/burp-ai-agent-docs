@@ -25,6 +25,10 @@
 * [Passive AI Scanner](scanners/passive.md)
 * [Active AI Scanner](scanners/active.md)
 
+## Security
+
+* [Security Advisories](security/advisories.md)
+
 ## Privacy & Logging
 
 * [Privacy Modes](privacy/privacy-modes.md)

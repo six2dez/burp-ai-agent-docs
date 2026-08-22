@@ -9,7 +9,7 @@ The Anthropic backend calls the native [Anthropic Messages API](https://docs.ant
 ## Setup
 
 1. Open the **AI Backend** settings tab and select **Anthropic** as the Preferred Backend.
-2. Enter your **API key**. It is encrypted at rest (AES-256-GCM, `ENC1:`-prefixed) and never written to logs or exported settings.
+2. Enter your **API key**. It is encrypted at rest (AES-256-GCM, `ENC1:`-prefixed) and never written to logs or exported settings — see [Encrypted key](#notes) below for what that encryption does and does not protect against.
 3. Set the **Model** — a free-form field, so you can use any current Anthropic model without an extension update. Defaults to a current Claude Sonnet alias (e.g. `claude-3-5-sonnet-20241022`).
 4. Click **Save**, then **Test connection** to confirm the key and model are accepted.
 
@@ -18,7 +18,7 @@ The Anthropic backend calls the native [Anthropic Messages API](https://docs.ant
 | Setting | Value |
 | :--- | :--- |
 | **Preferred Backend** | `Anthropic` |
-| **Anthropic API Key** | `sk-ant-…` (stored AES-256-GCM encrypted) |
+| **Anthropic API Key** | `sk-ant-…` (stored AES-256-GCM encrypted; master key is in Burp Preferences too — see Notes) |
 | **Anthropic Model** | free-form; default `claude-3-5-sonnet-20241022` |
 | **Base URL** | `https://api.anthropic.com` (`/v1/messages`) |
 | **Timeout** | 30 s (raise for large prompts or slow links) |
@@ -27,7 +27,7 @@ The Anthropic backend calls the native [Anthropic Messages API](https://docs.ant
 
 * **Proxy-visible by design.** All requests to `api.anthropic.com` route through `MontoyaHttpTransport` — not a vendored Anthropic SDK — so they respect Burp's upstream proxy, TLS, and logging and appear in Proxy > HTTP history like any other request (#69).
 * **Token counting.** Anthropic's usage fields (input / output / cache-read / cache-write) are surfaced per request and feed the [token-budget guardrails](../user-guide/token-management.md).
-* **Encrypted key.** The API key is encrypted with a per-install master key; the plaintext value never appears in logs or exported settings.
+* **Encrypted key.** The API key is encrypted with a per-install master key and the plaintext value never appears in logs or exported settings. **The master key is itself stored in Burp Preferences, Base64-encoded, beside the ciphertext** (preference `secret.master.key.v1`), so this protects against casual inspection of a preferences file or an export — not against a local attacker who can read those preferences. See [Secrets at Rest](../privacy/limitations.md#secrets-at-rest--what-the-encryption-does-not-do).
 * **Scope (v0.9.0).** Ships streaming (single-chunk, proxy-visible — the transport buffers the response, matching every other HTTP backend), token counting, model selection, and the encrypted key. **Native tool-use and prompt caching are deferred to a future release.**
 
 ## Error Handling

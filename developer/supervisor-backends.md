@@ -98,7 +98,9 @@ stateDiagram-v2
 
 1. Bind attempt fails with `BindException`.
 2. Supervisor probes `/__mcp/health` on the same host:port.
-3. If the response carries `X-Burp-AI-Agent: mcp`, the port holder is a previous Custom AI Agent server — supervisor posts `POST /__mcp/shutdown` with the current bearer token, waits 1 s, then retries the bind. Up to `DEFAULT_MAX_TAKEOVER_ATTEMPTS = 3` tries.
+3. If the response carries `X-Burp-AI-Agent: mcp`, the port holder is most likely a previous Custom AI Agent server — supervisor posts `POST /__mcp/shutdown`, waits 1 s, then retries the bind. Up to `DEFAULT_MAX_TAKEOVER_ATTEMPTS = 3` tries.
+
+   The request carries a `X-Mcp-Takeover-Proof` header, **not** the bearer token: `McpTakeoverProof.forTarget` computes `HMAC-SHA256(key = token, message = "burp-ai-agent/mcp-takeover|v1|<host>:<port>|<10s window>")`, and the server-side `McpTakeoverProof.accepts` validates it in constant time against the current and previous window. The token is used as an HMAC key and never becomes an outbound header value, because `probeExistingServer` cannot establish the port holder's identity — the `X-Burp-AI-Agent` marker is echoable by any process. Under TLS the client also pins the server's leaf certificate to the one in `tlsKeystorePath` and installs no TLS override at all when no pin can be read, so an unidentified listener cannot complete the handshake.
 4. If the response does not carry the marker, takeover is aborted and the failure surfaces in the UI. No unsolicited shutdown is sent to unknown services.
 
 ## HTTP Backend Circuit Breaker

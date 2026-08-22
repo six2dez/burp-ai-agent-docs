@@ -69,6 +69,20 @@ Response bodies, error messages, and headers captured from the target are attack
 | **Small local models** (Llama 8B, Mistral 7B) | Free, private, fast. | Limited reasoning depth, may miss subtle vulnerabilities, shorter context windows. |
 | **Code-focused models** (CodeLlama, DeepSeek Coder) | Good at JS/code analysis. | May struggle with non-code security concepts. |
 
+## Secrets at Rest — What the Encryption Does Not Do
+
+Stored API keys and tokens are encrypted with AES-256-GCM under a per-install random master key
+(`SecretCipher`). **That master key is itself stored in Burp Preferences, Base64-encoded, beside the
+ciphertext it protects** (preference `secret.master.key.v1`).
+
+Anyone who can read your Burp Preferences can therefore also read the key and decrypt the secrets. It
+does **not** protect against a local attacker or a malicious process running as your user; treat it
+as obfuscation against casual inspection of a preferences file or an exported project.
+
+**Mitigation**: if a credential must survive a local-attacker threat model, keep it in a dedicated
+secret store and paste it per session rather than saving it in extension settings. Treat
+preference-file access as equivalent to credential access.
+
 ## Responsible Use
 
 *   Always have **explicit authorization** before testing any target.

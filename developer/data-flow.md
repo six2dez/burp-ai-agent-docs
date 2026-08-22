@@ -152,7 +152,7 @@ flowchart LR
 
 ## Auto Tool Chaining Flow
 
-When the AI needs to call MCP tools to answer a user question, tool calls are executed automatically in a loop:
+When the AI needs to call MCP tools to answer a user question, tool calls run in a loop — but every parsed call passes through the SEC-06 approval gate first (`ToolApprovalGate.evaluate`). Only a tool whose tier is `AUTO` executes with no user decision; `CONFIRM` and `CONFIRM_EACH` park the call and render an approval card in the transcript until the user resolves it. A denial returns a neutral "not authorised, do not retry" result to the model, not an error, and the chain continues without that tool:
 
 ```mermaid
 flowchart TD
@@ -160,7 +160,12 @@ flowchart TD
     AI1[AI processes prompt]
     Check{Response contains tool call?}
     Parse[ToolCallParser extracts tool + args]
+    Gate{"ToolApprovalGate.evaluate: tier?"}
+    Card[ToolApprovalCard in transcript]
+    Decide{User decision}
     Exec[Execute MCP tool]
+    Deny[Return DENIAL_RESULT to model]
+    Report[ToolDecisionReporter: audit event + Burp Output line]
     Log[Log to AI Request Logger with trace ID]
     Followup[Build follow-up prompt with tool result]
     Limit{Iteration <= 8?}
@@ -169,7 +174,14 @@ flowchart TD
 
     User --> AI1 --> Check
     Check -->|No| Final
-    Check -->|Yes| Parse --> Exec --> Log --> Followup --> Limit
+    Check -->|Yes| Parse --> Gate
+    Gate -->|AUTO| Exec
+    Gate -->|"CONFIRM / CONFIRM_EACH"| Card --> Decide
+    Decide -->|Approve| Exec
+    Decide -->|Deny| Deny
+    Exec --> Report
+    Deny --> Report
+    Report --> Log --> Followup --> Limit
     Limit -->|Yes| AI2 --> Check
     Limit -->|No| Final
 ```

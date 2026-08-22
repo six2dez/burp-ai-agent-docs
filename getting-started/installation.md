@@ -14,16 +14,17 @@
 ## Install Path
 
 {% tabs %}
-{% tab title="Install from the BApp Store" %}
-1. In Burp, open **Extensions -> BApp Store** and search for **Custom AI Agent**.
-2. Click **Install**.
+{% tab title="BApp Store (not yet available)" %}
+{% hint style="warning" %}
+**Custom AI Agent is not on the BApp Store yet.** The [submission](https://github.com/PortSwigger/extension-portal/issues/231) is still open with PortSwigger. Install from [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases) — see the next tab.
+{% endhint %}
 
-The BApp Store build registers only the 8 extension-native AI MCP tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). For the full set of 59 MCP tools, download the full build from GitHub Releases.
+The *store build* referenced throughout this documentation is a real build target you can produce yourself (`-PstoreBuild=true`), and it is the artifact that will be published once the submission is accepted. It registers only the 8 extension-native AI MCP tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). For the full set of 59 MCP tools, use the full build.
 {% endtab %}
 
 {% tab title="Download from Releases" %}
 1. Open [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases).
-2. Download the latest full build `Custom-AI-Agent-full-<version>.jar` plus its `*.jar.sha256` checksum and, optionally, the `bom.json` CycloneDX SBOM. (The store build is published as `Custom-AI-Agent-<version>.jar` and is the same artifact distributed via the BApp Store.)
+2. Download the latest full build `Custom-AI-Agent-full-<version>.jar` plus its `*.jar.sha256` checksum and, optionally, the `bom.json` CycloneDX SBOM. (The store build is published as `Custom-AI-Agent-<version>.jar` — the artifact that will be distributed via the BApp Store once the submission is accepted.)
 3. Verify the JAR integrity (see [Verify JAR Integrity](#verify-jar-integrity-sha-256)) before loading.
 {% endtab %}
 

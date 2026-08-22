@@ -40,8 +40,8 @@ You control MCP exposure from **Burp Integration** and **MCP Server** tabs. The 
 
 There are two build artifacts, and which tools are even registered depends on the build:
 
-* **Full build** (default, GitHub releases — `Custom-AI-Agent-full-0.8.0.jar`): registers all **59** MCP tools, including the generic Montoya-API tools (proxy history, Repeater, scanner, scope, site map, Intruder, Collaborator, utilities, etc.).
-* **Store build** (BApp Store — `Custom-AI-Agent-0.8.0.jar`): registers only the **8** extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). The generic Montoya-API tools are not exposed over MCP in this build — PortSwigger's official Burp MCP Server provides those.
+* **Full build** (default, GitHub releases — `Custom-AI-Agent-full-<version>.jar`): registers all **59** MCP tools, including the generic Montoya-API tools (proxy history, Repeater, scanner, scope, site map, Intruder, Collaborator, utilities, etc.).
+* **Store build** (BApp Store — `Custom-AI-Agent-<version>.jar`): registers only the **8** extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). The generic Montoya-API tools are not exposed over MCP in this build — PortSwigger's official Burp MCP Server provides those.
 
 The tags in the panel show which group each tool belongs to so you can see at a glance what is available in your build.
 

@@ -8,16 +8,16 @@
 
 Custom AI Agent is an extension for Burp Suite that integrates AI capabilities into your security workflow. It offers:
 
-* **Pluggable Backends**: Use the built-in Burp AI backend (Burp Pro with _Use AI for extensions_ enabled), local models (Ollama, LM Studio), NVIDIA NIM, Perplexity, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs. Only the **Burp AI** backend depends on Burp Pro's _Use AI for extensions_ toggle; every other backend runs independently and works on Burp Community too.
+* **Pluggable Backends**: Use the built-in Burp AI backend (Burp Pro with _Use AI for extensions_ enabled), the native Anthropic API, local models (Ollama, LM Studio), NVIDIA NIM, Perplexity, generic OpenAI-compatible providers, or cloud CLI providers (Gemini, Claude, Codex, Copilot, OpenCode). Add custom backends via drop-in JARs. Only the **Burp AI** backend depends on Burp Pro's _Use AI for extensions_ toggle; every other backend runs independently and works on Burp Community too.
 * **Privacy-First Design**: Configurable redaction modes (Strict/Balanced/Off) default to **Balanced**; cookies, auth headers, inline Bearer/Basic/JWT tokens, and sensitive URL query parameters are stripped before data leaves Burp. A preview dialog shows the exact payload before any auto-captured context is sent.
-* **MCP Server**: An embedded Model Context Protocol (MCP) server with 59 tools for Burp history, Repeater, Scanner, scope, and issue workflows. The BApp Store build exposes the 8 extension-native AI tools; the full build (GitHub releases) registers all 59.
+* **MCP Server**: An embedded Model Context Protocol (MCP) server with 59 tools for Burp history, Repeater, Scanner, scope, and issue workflows. The full build (GitHub releases) registers all 59; the store build exposes the 8 extension-native AI tools.
 * **AI Scanners**: Passive and Active scanners that analyze traffic automatically across 62 vulnerability classes. The passive scanner runs as a Burp `PassiveScanCheck` (Burp Pro).
 * **Refreshed UI**: A theme-aware internal design system styles the whole settings panel and re-themes automatically when Burp switches between light and dark.
 * **Curated BountyPrompt Actions**: Optional, tag-aware context menu actions loaded from JSON prompt files.
 * **Custom Prompt Library**: Save free-form prompts tagged per context (HTTP request or scanner issue), managed from Settings, surfaced in a right-click **Custom prompts** submenu, with an ad-hoc editor for one-offs.
 * **Audit Logging**: JSONL-based logging with per-event SHA-256 payload hashes for compliance and reproducibility.
 * **AI Request Logger**: Real-time activity log with trace ID correlation, preset filters, rolling JSONL persistence, and full metadata for prompts, responses, MCP calls, retries, and scanner operations.
-* **Auto Tool Chaining**: Automatic multi-step MCP tool execution where the AI autonomously chains up to 8 tool calls to complete complex tasks.
+* **Auto Tool Chaining**: Multi-step MCP tool execution, up to 8 tool calls per interaction. Tool calls the AI emits are gated: only read-only tools with bounded output run without asking, everything else surfaces an approval card in the chat transcript first. See [MCP Security Model](mcp/security-model.md#7-tool-call-confirmation-sec-06).
 
 
 
@@ -27,9 +27,9 @@ Custom AI Agent is an extension for Burp Suite that integrates AI capabilities i
 
 | Feature | Description |
 | :--- | :--- |
-| **11 Built-in Backends** | Burp AI (built-in), Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
-| **59 MCP Tools** | 8 extension-native AI tools in the BApp Store build; all 59 (History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more) in the full build. |
-| **Auto Tool Chaining** | AI autonomously chains up to 8 MCP tool calls per interaction to complete multi-step tasks. |
+| **12 Built-in Backends** | Burp AI (built-in), Anthropic, Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible, Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI. |
+| **59 MCP Tools** | All 59 (History, Repeater, Intruder, Scanner, Scope, Site Map, Collaborator, Utilities, and more) in the full build; 8 extension-native AI tools in the store build. |
+| **Auto Tool Chaining** | Up to 8 MCP tool calls chained per interaction, each subject to the SEC-06 confirmation gate — silent only for read-only, bounded-output tools. |
 | **AI Request Logger** | Real-time activity log with trace ID correlation, preset filters, and optional rolling JSONL persistence. |
 | **62 Vulnerability Classes** | From SQLi and XSS to cache poisoning, JWT attacks, and API security issues. |
 | **3 Scan Modes** | `BUG_BOUNTY`, `PENTEST`, and `FULL` for different engagement styles. |
@@ -38,7 +38,7 @@ Custom AI Agent is an extension for Burp Suite that integrates AI capabilities i
 | **Custom Prompt Library** | User-defined free-form prompts per context (HTTP request / scanner issue), with ordered menu and audit-tracked launch metadata. |
 | **8 Curated BountyPrompt Actions** | Detection, recon, and advisory prompts with selective context tags. |
 | **Token-Aware Controls** | Passive scanner and manual context caps, dedup windows, and prompt-result caching to reduce model spend. |
-| **Burp Pro Integration** | Native `ScanCheck`, Collaborator OAST, and scanner issue actions. |
+| **Burp Pro Integration** | Native `PassiveScanCheck` / `ActiveScanCheck`, Collaborator OAST, and scanner issue actions. |
 
 ## Use Cases
 

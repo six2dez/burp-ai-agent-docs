@@ -297,7 +297,7 @@ When **Auto-Queue to Active** is enabled in the passive scanner settings, high-c
 
 ## Burp Pro Integration
 
-On Burp Suite Professional, the Active AI Scanner integrates with the native scan engine via `ScanCheck`. This means AI-generated scan checks run alongside Burp's built-in scanner. On Burp Community Edition, the scanner operates independently using manual queue management.
+On Burp Suite Professional, the Active AI Scanner integrates with the native scan engine via `ActiveScanCheck` (registered per insertion point). This means AI-generated scan checks run alongside Burp's built-in scanner. On Burp Community Edition, the scanner operates independently using manual queue management.
 
 ## Recommended Practices
 
