@@ -4,7 +4,7 @@ Use this checklist after installation before starting a real assessment.
 
 ## Essential Setup
 
-* [ ] **Extension loaded**: `AI Agent` tab is visible.
+* [ ] **Extension loaded**: `Custom AI Agent` tab is visible.
 * [ ] **Burp AI prerequisite checked** — if you plan to use the built-in **Burp AI** backend, open Burp's **Settings → Burp AI** and confirm *Use AI for extensions* is **ON** (Burp Pro only). Without this, the backend stays `Offline` and cannot be selected. See [Burp AI (Built-in)](../backends/burp-ai.md).
 * [ ] **Backend selected**: backend set in **AI Backend** tab.
 * [ ] **Backend configured**: command/URL/model/auth values are valid (or leave blank when using Burp AI built-in).
@@ -20,7 +20,7 @@ Use this checklist after installation before starting a real assessment.
 ## Privacy & Security
 
 {% hint style="info" %}
-Default privacy mode is `BALANCED` (cookies stripped, tokens redacted, hosts preserved). Switch to `STRICT` for sensitive targets on cloud backends, or `OFF` only for local-model testing.
+Default privacy mode is `BALANCED` (recognized cookie/token carriers sanitized, hosts preserved). Switch to `STRICT` when covered host carriers also need anonymization, or `OFF` only for controlled local-model testing. Custom regexes still run under `OFF`; review [Privacy Modes](../privacy/privacy-modes.md) and the [known boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries).
 {% endhint %}
 
 * [ ] **Privacy mode set** intentionally (`STRICT`/`BALANCED`/`OFF`).
@@ -40,10 +40,8 @@ Default privacy mode is `BALANCED` (cookies stripped, tokens redacted, hosts pre
 1. Browse through Burp Proxy.
 2. Right-click a request in **Proxy -> HTTP History**.
 3. Select **Extensions -> Custom AI Agent -> Find vulnerabilities**.
-4. Verify a chat session opens and response streams.
+4. Verify a chat session opens and the completed response is rendered (current built-in backends deliver one chunk).
 
 If any step fails, use [Troubleshooting](../reference/troubleshooting.md).
 
-<figure><img src="../.gitbook/assets/first-run-context-menu.png" alt="Context menu showing Custom AI Agent actions during first-run verification"><figcaption></figcaption></figure>
-<!-- TODO: refresh first-run-context-menu.png — menu now includes "AI Scan on Selected Insertion Point" when text is selected, and the Custom prompts submenu has favorites/search. -->
-
+The exact menu contents depend on the invocation context: selecting request-side text can add **AI Scan on Selected Insertion Point**, and saved/favorite entries appear under **Custom prompts**.

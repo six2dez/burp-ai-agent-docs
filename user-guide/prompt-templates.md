@@ -33,21 +33,13 @@ These templates are used for scanner issue actions:
 | **Impact & Severity** | `Impact & severity` | Impact and severity reasoning. |
 | **Full Report** | `Full report` | Complete report structure for delivery. |
 
-## BountyPrompt Integration Controls
+## BountyPrompt Controls
 
-The same tab includes BountyPrompt controls:
-
-* **Enable BountyPrompt actions**: Shows/hides curated submenu actions in request/response context menus.
-* **Prompt directory**: Filesystem location containing BountyPrompt JSON prompt files.
-* **Auto-create issues**: Enables automatic Burp issue creation for eligible BountyPrompt outputs.
-* **Issue confidence threshold**: Minimum confidence score (0-100) required for automatic issue creation.
-* **Enabled prompt IDs**: Comma- or newline-separated allowlist of curated IDs.
-
-See [BountyPrompt Actions](bountyprompt-actions.md) for operational behavior and curated IDs.
+BountyPrompt settings are no longer part of **Prompt Templates**. They live beside the saved prompt library in **Custom Prompts → BountyPrompt integration**. See [BountyPrompt Actions](bountyprompt-actions.md) for the controls, runtime behavior, and curated IDs.
 
 ## Custom Prompt Library
 
-The saved free-form prompt library has moved to its own **Custom Prompts** settings tab, alongside the canned templates above. Manage entries (add/edit/duplicate, ★ favorites, live search, JSON import/export, per-entry context-menu visibility) from that tab; the right-click submenu surfaces the result.
+The saved free-form prompt library has its own **Custom Prompts** settings tab, alongside the BountyPrompt integration controls. Manage entries (add/edit/duplicate, ★ favorites, live search, JSON import/export, per-entry context-menu visibility) from that tab; the right-click submenu surfaces the result.
 
 See [Custom Prompts](../reference/settings-reference.md#custom-prompts) for the full field/control reference and [Context Menus → Custom Prompt Library](context-menus.md#custom-prompt-library) for the launch flow and audit metadata.
 

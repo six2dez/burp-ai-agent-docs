@@ -20,9 +20,8 @@ The directory is created on first start. `AGENTS/` is populated with bundled pro
 ├── bundles/
 ├── contexts/
 ├── cache/
-│   └── <projectId>/
-│       ├── index.json
-│       └── entries/
+│   └── <projectId-prefix>/
+│       └── <prompt-sha256>.json
 ├── backends/
 │   └── my-backend.jar        # optional drop-in
 ├── AGENTS/
@@ -42,15 +41,17 @@ The directory is created on first start. `AGENTS/` is populated with bundled pro
 
 | Entry | Created by | Purpose | Contains secrets? |
 | :--- | :--- | :--- | :--- |
-| `audit.jsonl` | `AuditLogger` when **Audit Logging** is enabled | Append-only JSONL of prompt, scanner, and MCP events with per-event SHA-256 payload hashes. | Yes (redacted prompts and tool results). |
-| `bundles/` | `AuditLogger.writePromptBundle` | Frozen `PromptBundle` JSON (and exported ZIP) snapshots of context-driven prompts for reproducibility. | Yes. |
-| `contexts/` | `AuditLogger.writeContextFile` | Context JSON files indexed by SHA-256. Referenced from bundles. | Yes. |
-| `cache/<projectId>/` | `PersistentPromptCache` | Per-project on-disk cache of scanner AI results. Invalidated by `Response Fingerprint` changes; TTL and max size set in **Passive Scanner** settings. | No (only parsed AI output, which obeys the active privacy mode). |
+| `audit.jsonl` | `AuditLogger` when **Audit Logging** is enabled | Append-oriented JSONL of prompt, scanner, and MCP events with per-event SHA-256 payload hashes. | Yes. It reflects the mode and carrier coverage active when each event was created. |
+| `bundles/` | `AuditLogger.writePromptBundle` | `PromptBundle` JSON snapshots of dispatched prompt text and embedded context for reproducibility. A ZIP-export helper exists in code but has no production UI/caller in the current release. | Yes. Treat as engagement evidence, not sanitized public output. |
+| `contexts/` | `AuditLogger` initialization | Reserved directory. The runtime creates it, but no production caller currently invokes `writeContextFile`; bundle JSON embeds `contextJson` directly. | Empty in normal current operation; treat future contents as sensitive. |
+| `cache/<projectId-prefix>/` | `PersistentPromptCache` | Per-project on-disk cache of parsed scanner AI results. The directory name is the first eight characters of `api.project().id()` (or `default` on lookup failure); JSON files are keyed by prompt SHA-256. TTL and max size come from **Passive Scanner** settings. | Potentially. Model output can repeat source values, and cached entries are not retroactively rewritten when privacy mode changes. |
 | `backends/*.jar` | User | Drop-in backend JARs loaded via `ServiceLoader` at startup; see [Adding a Backend](../developer/adding-backend.md). | Depends on the JAR. |
 | `AGENTS/*.md` | Extension at first launch + user | Agent profiles. Editable; changes are picked up on the next action without restart. | No. |
 | `AGENTS/default` | `AgentProfileLoader` | Plain-text marker file with the active profile name (matches a sibling `*.md`). | No. |
 | `certs/mcp-keystore.p12` | `McpTls` auto-generation | PKCS12 keystore for the MCP TLS listener (RSA 2048 / SHA256withRSA / 365 d / `CN=burp-mcp`). | Yes — keystore password is stored in Burp preferences. |
 | `logs/*.jsonl` | `AiRequestLogger` when rolling persistence is enabled via JVM properties | Rolling JSONL copies of the in-memory activity log. | Yes. |
+
+The privacy mode is a processing control, not a classification label for these files. `OFF`, stored scanner findings, model-echoed content, and [known carrier limits](../privacy/limitations.md#redaction-coverage-and-known-boundaries) can all leave sensitive values at rest.
 
 ## Chat Sessions Are Not Here
 
@@ -58,15 +59,16 @@ Chat sessions do **not** live in this directory. They are stored in Burp's `exte
 
 ## Backup and Portability
 
-* **Safe to copy between machines**: `AGENTS/*.md`, `backends/*.jar`, `audit.jsonl` (for archival). These contain no host-specific state.
-* **Do not copy between machines**: `cache/<projectId>/`. The cache is indexed by project ID and response fingerprints that include local-only values; promoting a copy from another host produces irrelevant hits.
+* **Portable between machines**: `AGENTS/*.md` and intentionally selected `backends/*.jar`. Treat backend JARs as executable code and re-verify their source/checksum on the destination.
+* **Portable but sensitive**: `audit.jsonl` and `bundles/` can be archived or moved, but may contain engagement traffic, prompts, and model output. Treat any future `contexts/` contents the same way. Transfer them only through an approved encrypted channel.
+* **Do not copy between machines**: `cache/<projectId-prefix>/`. The namespace is derived from the local Burp project ID and entries are keyed by prompt hash; moving it to another host can produce irrelevant hits.
 * **Secrets**: the MCP keystore at `certs/mcp-keystore.p12` and its password (stored in Burp preferences, not here) together authenticate the local MCP listener. Rotate both when a host is retired.
 
 ## Cleanup
 
 | Goal | Action |
 | :--- | :--- |
-| Forget one project's cached analyses | Delete `cache/<projectId>/`. |
+| Forget one project's cached analyses | With the passive scanner disabled, delete only `cache/<projectId-prefix>/`; reload the extension as well if you need to clear its in-memory caches. |
 | Reset MCP TLS | Delete `certs/mcp-keystore.p12`; the next MCP start will regenerate it. |
 | Start fresh for a new client engagement | Move the directory aside (`mv ~/.burp-ai-agent ~/.burp-ai-agent.bak`) before launching Burp. |
 | Disable rolling logs | Unset the `-Dburp.ai.logger.rolling.enabled=true` JVM flag at Burp startup (the `logs/` directory remains but no new entries are appended). |
@@ -79,9 +81,9 @@ The product is called **Custom AI Agent** but several internal identifiers still
 | :--- | :--- | :--- |
 | Product and Burp extension name | `Custom AI Agent` | Visible in Burp's Extensions list and in the main tab. |
 | Release artifact (full build) | `Custom-AI-Agent-full-<version>.jar` | Published on GitHub Releases; registers all 59 MCP tools. Built with `./gradlew shadowJar`. |
-| Release artifact (BApp Store build) | `Custom-AI-Agent-<version>.jar` | BApp Store listing; registers only the 8 extension-native AI MCP tools. Built with `./gradlew shadowJar -PstoreBuild=true`. |
-| Checksum / SBOM | `Custom-AI-Agent-<version>.jar.sha256`, `bom.json` | Attached to every GitHub release. |
-| Burp tab title | `AI Agent` | Short form; does not include the word "Custom". |
+| BApp Store-targeted artifact | `Custom-AI-Agent-<version>.jar` | Not currently published while submission #231 remains open; build locally with `./gradlew shadowJar -PstoreBuild=true`. Registers only the 8 extension-native AI MCP tools. |
+| Checksum / SBOM | `Custom-AI-Agent-full-<version>.jar.sha256`, `bom.json` | The current release workflow attaches both beside the full JAR. |
+| Burp tab title | `Custom AI Agent` | Registered by `App` and shown in Burp's main tab navigation. |
 | GitHub repository | `github.com/six2dez/burp-ai-agent` | Repo URL kept to avoid breaking external links, issues, and forks. |
 | Runtime directory | `~/.burp-ai-agent/` (Windows: `%USERPROFILE%\.burp-ai-agent\`) | Documented above. |
 | Java package | `com.six2dez.burp.aiagent` | Kept to preserve backend SPI compatibility for drop-in JARs. |
@@ -108,8 +110,8 @@ The product is called **Custom AI Agent** because PortSwigger naming guidance as
 
 When wiring scripts, automation, or dashboards against this extension:
 
-* Scripts that download or pin the release JAR should target `Custom-AI-Agent-*.jar`.
-* Dashboards or Slack messages that reference the Burp tab should use the short form **`AI Agent`** (the user-visible tab name).
+* Scripts that download or pin the GitHub release JAR should target `Custom-AI-Agent-full-*.jar` and its matching `.jar.sha256` file.
+* Dashboards or Slack messages that reference the Burp tab should use **`Custom AI Agent`**, matching the user-visible tab name.
 
 Scripts that reference `~/.burp-ai-agent/`, the GitHub repo URL, the Java package, or the MCP implementation string follow the legacy identifier form — those do **not** need to match the product name.
 

@@ -65,15 +65,15 @@ Deep-dive into client-side code for security issues.
 
 ## Compliance Audit with Audit Logging
 
-Produce a verifiable record of all AI interactions for compliance.
+Produce a reviewable, correlatable record of extension activity for compliance workflows. Authenticity requires an external integrity control, and prompt bundles do not contain separate system-role profile text or reconstructed history.
 
 1.  Enable **Audit Logging** in **Privacy & Logging tab in the bottom settings panel**.
 2.  Set **Privacy Mode** to **STRICT** for sensitive engagements.
-3.  Enable **Determinism Mode** for reproducible prompts.
+3.  Enable **Determinism Mode** for stable covered ordering and host pseudonyms; this improves comparisons but does not make model output deterministic.
 4.  Perform your assessment normally using context menus and chat.
-5.  After the assessment, review `~/.burp-ai-agent/audit.jsonl` for the full interaction log.
+5.  After the assessment, review `~/.burp-ai-agent/audit.jsonl` for the captured audit event stream. It is not a complete provider wire transcript and does not attach a trace ID to every event.
 6.  Use the per-event SHA-256 payload hashes (`payloadSha256`) in the audit log to detect edits to individual records. Note that there is no Merkle chain — deletion of entire lines cannot be detected from the file alone.
-7.  Export prompt bundles via the audit logger's ZIP export for archival.
+7.  Archive the generated JSON bundles from `~/.burp-ai-agent/bundles/`. The code contains a ZIP-export helper, but the current production UI does not invoke it.
 
 ## Terminal-First Workflow (Burp Scan Skill)
 
@@ -83,4 +83,4 @@ Drive Burp from a terminal-based AI (Claude Code, Gemini CLI, etc.) while keepin
 2.  Install the `/burp-scan` skill ([Burp Scan Skill](burp-scan-skill.md)) into your terminal AI's skills directory.
 3.  From the terminal, invoke `/burp-scan` — the skill instructs the AI to call MCP tools like `proxy_http_history`, `http1_request`, `scanner_issues`, and `issue_create`.
 4.  The AI narrates each step; confirmed findings land as Burp issues via `issue_create` and appear in Burp's Target view without you leaving the terminal.
-5.  Audit log entries are tagged with `chat-turn-*` / `scanner-job-*` trace IDs so the entire terminal-driven run is reproducible alongside UI work. See [Audit Logging](../privacy/audit-logging.md).
+5.  External MCP calls produce audit/tool telemetry, but they do not automatically become one `chat-turn-*` trace. Use trace IDs in the AI Request Logger for extension-driven chat/scanner chains and correlate terminal-client calls by tool metadata and timestamps. See [Audit Logging](../privacy/audit-logging.md).

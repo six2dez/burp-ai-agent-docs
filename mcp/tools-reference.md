@@ -34,12 +34,31 @@ Conventions:
 * **Native = Yes** means the tool is extension-native and registered in both the BApp Store and full builds. **Native = No** means it is a generic Montoya tool, registered only in the full build.
 * **Unsafe = Yes** means the tool can mutate Burp state or send traffic to targets. Tools marked unsafe are gated behind the **Enable Unsafe Tools** master switch in **Settings → MCP Server**.
 * **Default enabled = Yes** means the tool is available in agent profiles without an explicit opt-in.
-* **Pro only = Yes** means the tool requires Burp Suite Professional. Community-edition clients see it return an error if invoked.
+* **Pro only = Yes** means the tool requires Burp Suite Professional. Its handler is not registered for Community edition.
 * **Input fields: none** means the tool takes no parameters.
+* **Required** follows runtime decoding behavior. The reflection-based MCP schema currently advertises every non-null Kotlin property as required, including properties that have runtime defaults; strict schema-driven clients may therefore send more fields than the tables require. Kotlin deserialization accepts the documented omissions. Separately, the three scope models give `url` an empty-string default but reject blank input at construction time, so clients must supply it as shown below.
+
+### Model-Emitted Confirmation Tiers
+
+The confirmation tier is independent of **Unsafe** and **Default enabled**. It applies when the extension's own AI emits a tool call in chat; direct calls from an external MCP client remain governed by server authentication, tool enablement, edition, unsafe, and scope gates.
+
+| Tier | Count | Current catalog entries |
+| :--- | ---: | :--- |
+| `AUTO` | 19 | `ai_backends_list`, `base64_decode`, `base64_encode`, `decode_as`, `diff_requests`, `find_reflected`, `hash_compute`, `insertion_points`, `jwt_decode`, `params_extract`, `random_string`, `redact_preview`, `request_parse`, `response_parse`, `scan_task_status`, `scope_check`, `status`, `url_decode`, `url_encode` |
+| `CONFIRM` | 24 | `ai_audit_query`, `ai_findings_recent`, `collaborator_generate`, `collaborator_poll`, `comparer_send`, `cookie_jar_get`, `editor_get`, `editor_set`, `issue_create`, `project_options_get`, `proxy_history_annotate`, `proxy_http_history`, `proxy_http_history_regex`, `proxy_intercept`, `proxy_ws_history`, `proxy_ws_history_regex`, `response_body_search`, `scan_task_delete`, `scanner_issues`, `scope_exclude`, `site_map`, `site_map_regex`, `task_engine_state`, `user_options_get` |
+| `CONFIRM_EACH` | 16 | `ai_analyze`, `ai_passive_scan`, `http1_request`, `http2_request`, `intruder`, `intruder_prepare`, `project_options_set`, `repeater_tab`, `repeater_tab_with_payload`, `scan_audit_start`, `scan_audit_start_mode`, `scan_audit_start_requests`, `scan_crawl_start`, `scan_report`, `scope_include`, `user_options_set` |
+
+Unknown names and every `ext:` external-server tool fail closed to `CONFIRM_EACH`. See [MCP Security Model → Tool-Call Confirmation](security-model.md#7-tool-call-confirmation-sec-06).
+
+### Privacy Behavior of Tool Results
+
+All normal tool results pass through `McpToolContext.redactIfNeeded` under the current privacy mode. Tools that preserve type information also sanitize before serialization: parsed headers use `sanitizeHeaders`, parsed parameters use `sanitizeParameters`, and cookie-jar values are suppressed unless mode is `OFF`.
+
+The generic pass cannot infer every structured carrier. Current boundaries include real hosts in some raw history/site-map/scanner fields and non-cookie URL/body parameter values stored under a generic JSON `value` key. A scanner issue created under an earlier mode is not rewritten when read later. See [Redaction Coverage and Known Boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries) before feeding bulk results to a hosted model.
 
 ## AI (extension-native)
 
-These tools call or support the extension's AI engine and are present in every build. The AI-calling tools (`ai_analyze`, `ai_passive_scan`) check `ai.isEnabled()` before issuing a request, so the configured AI setting is respected.
+These tools call or support the extension's AI engine and are present in every build. There is a current gate mismatch to know about: `ai_analyze` and `ai_passive_scan` call Burp's `api.ai().isEnabled()` unconditionally before using the extension supervisor. They therefore refuse on Community or when **Use AI for extensions** is off, even if the selected backend is Ollama, Anthropic, or another independent backend. Chat and the normal scanner pipelines do not have that extra gate.
 
 | Tool | Native | Unsafe | Default enabled | Pro only | Description |
 |---|---|---|---|---|---|
@@ -202,6 +221,8 @@ Input fields: none.
 | `targetPort` | Int | No | `443` |
 | `usesHttps` | Boolean | No | `true` |
 
+When `httpRequest` is supplied, `targetHostname` must be non-blank and `targetPort` positive despite their model defaults. `httpResponseContent` is used only with `httpRequest`; otherwise the handler looks for a Proxy history match by `baseUrl`.
+
 See [Issue Creation (MCP)](issue-create.md) for guidance on building well-formed issue payloads.
 
 ## Extension
@@ -225,7 +246,7 @@ Input fields: none.
 | `proxy_ws_history_regex` | No | No | Yes | No | Displays WebSocket history items matching a regex. |
 | `response_body_search` | No | No | Yes | No | Searches response bodies in proxy history using a regex. |
 
-History tools that surface proxy data flow through the MCP proxy-history preprocessor (see **Settings → MCP Server → MCP Proxy History Preprocessing**).
+`proxy_http_history`, `proxy_http_history_regex`, and `response_body_search` use the MCP proxy-history preprocessing controls (see **Settings → MCP Server → MCP Proxy History Preprocessing**). WebSocket history has its own direct serialization path.
 
 ### proxy_history_annotate
 
@@ -241,31 +262,38 @@ History tools that surface proxy data flow through the MCP proxy-history preproc
 
 | Name | Type | Required | Default |
 |---|---|---|---|
-| `count` | Int | Yes | — |
-| `offset` | Int | Yes | — |
+| `count` | Int | No | `5` |
+| `offset` | Int | No | `0` |
+| `listenerPort` | Int? | No | `null` |
+| `includeUnpreprocessedResponse` | Boolean | No | `false` |
+
+`includeUnpreprocessedResponse` is advertised only when **Allow unpreprocessed proxy history** is enabled. The `listenerPort` filter remains available in either schema shape.
 
 ### proxy_http_history_regex
 
 | Name | Type | Required | Default |
 |---|---|---|---|
 | `regex` | String | Yes | — |
-| `count` | Int | Yes | — |
-| `offset` | Int | Yes | — |
+| `count` | Int | No | `5` |
+| `offset` | Int | No | `0` |
+| `includeUnpreprocessedResponse` | Boolean | No | `false` |
+
+`includeUnpreprocessedResponse` is omitted from the advertised schema when raw history is disabled.
 
 ### proxy_ws_history
 
 | Name | Type | Required | Default |
 |---|---|---|---|
-| `count` | Int | Yes | — |
-| `offset` | Int | Yes | — |
+| `count` | Int | No | `5` |
+| `offset` | Int | No | `0` |
 
 ### proxy_ws_history_regex
 
 | Name | Type | Required | Default |
 |---|---|---|---|
 | `regex` | String | Yes | — |
-| `count` | Int | Yes | — |
-| `offset` | Int | Yes | — |
+| `count` | Int | No | `5` |
+| `offset` | Int | No | `0` |
 
 ### response_body_search
 
@@ -283,8 +311,8 @@ History tools that surface proxy data flow through the MCP proxy-history preproc
 | `comparer_send` | No | Yes | No | No | Sends one or more items to Burp Comparer. |
 | `diff_requests` | No | No | Yes | No | Produces a line diff between two requests. |
 | `find_reflected` | No | No | Yes | No | Finds reflected parameter values in a response. |
-| `http1_request` | No | Yes | No | No | Issues an HTTP/1.1 request and returns the response. Optional in agent profiles. |
-| `http2_request` | No | Yes | No | No | Issues an HTTP/2 request and returns the response. Optional in agent profiles. |
+| `http1_request` | No | Yes | Yes | No | Issues an HTTP/1.1 request and returns the response. Enabled in the catalog by default, but still blocked until the Unsafe Tools master switch is on. |
+| `http2_request` | No | Yes | Yes | No | Issues an HTTP/2 request and returns the response. Enabled in the catalog by default, but still blocked until the Unsafe Tools master switch is on. |
 | `insertion_points` | No | No | Yes | No | Lists insertion point offsets for a request. |
 | `intruder` | No | Yes | No | No | Sends a request to Intruder. |
 | `intruder_prepare` | No | Yes | No | No | Creates an Intruder tab with explicit insertion points. |
@@ -373,6 +401,8 @@ History tools that surface proxy data flow through the MCP proxy-history preproc
 |---|---|---|---|
 | `content` | String | Yes | — |
 
+Cookie-typed parameters are returned with `[STRIPPED]` in `STRICT` and `BALANCED`. Other parameter types preserve their value; a sensitive-looking parameter name alone does not make this structured result type `COOKIE`.
+
 ### repeater_tab
 
 | Name | Type | Required | Default |
@@ -401,12 +431,16 @@ History tools that surface proxy data flow through the MCP proxy-history preproc
 | `content` | String | Yes | — |
 | `includeBody` | Boolean | No | `false` |
 
+Recognized cookie headers and cookie-typed parameters are sanitized before JSON serialization. URL/body parameter values can remain visible under the generic `value` field; inspect the result or pre-sanitize caller-supplied content when that distinction matters.
+
 ### response_parse
 
 | Name | Type | Required | Default |
 |---|---|---|---|
 | `content` | String | Yes | — |
 | `includeBody` | Boolean | No | `false` |
+
+Recognized cookie and credential headers are sanitized before JSON serialization. The final serialized result also passes through the current read-time text policy.
 
 ## Scanner
 
@@ -478,8 +512,8 @@ History tools that surface proxy data flow through the MCP proxy-history preproc
 
 | Name | Type | Required | Default |
 |---|---|---|---|
-| `count` | Int | Yes | — |
-| `offset` | Int | Yes | — |
+| `count` | Int | No | `5` |
+| `offset` | Int | No | `0` |
 
 ## Scope
 
@@ -518,16 +552,16 @@ History tools that surface proxy data flow through the MCP proxy-history preproc
 
 | Name | Type | Required | Default |
 |---|---|---|---|
-| `count` | Int | Yes | — |
-| `offset` | Int | Yes | — |
+| `count` | Int | No | `5` |
+| `offset` | Int | No | `0` |
 
 ### site_map_regex
 
 | Name | Type | Required | Default |
 |---|---|---|---|
 | `regex` | String | Yes | — |
-| `count` | Int | Yes | — |
-| `offset` | Int | Yes | — |
+| `count` | Int | No | `5` |
+| `offset` | Int | No | `0` |
 
 ## Utilities
 

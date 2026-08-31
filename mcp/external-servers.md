@@ -20,11 +20,11 @@ Beyond Burp's built-in MCP tools, Custom AI Agent can connect to **external or c
 ## Security Model
 
 {% hint style="warning" %}
-External MCP servers are **untrusted by default**. Their output is wrapped in an explicit trust-boundary marker before it ever enters the AI prompt, so a compromised or malicious server cannot smuggle instructions into the agent.
+External MCP servers are **untrusted by default**. Their output is wrapped in an explicit trust-boundary marker before it enters the AI prompt. This makes the trust boundary explicit and escapes forged closing markers, but it is prompt-injection mitigation rather than proof that a model will ignore malicious instructions.
 {% endhint %}
 
 * **Encrypted auth tokens.** SSE bearer tokens are stored encrypted at rest (AES-256-GCM, `ENC1:`-prefixed) — the same path as every other API key — masked in the UI behind a show/hide toggle, and never logged. The AES master key is itself stored in Burp Preferences beside the ciphertext (`secret.master.key.v1`), so this protects against casual inspection of a preferences file, not against a local attacker. See [Secrets at Rest](../privacy/limitations.md#secrets-at-rest--what-the-encryption-does-not-do).
-* **Trust-boundary wrapping.** Every external tool result is wrapped as `[EXTERNAL-TOOL-RESULT:<server>]…[/EXTERNAL-TOOL-RESULT]` (with close-marker escaping), marking it as untrusted data rather than agent instructions — a prompt-injection guard.
+* **Trust-boundary wrapping.** Every external tool result is wrapped as `[EXTERNAL-TOOL-RESULT:<server>]…[/EXTERNAL-TOOL-RESULT]` (with close-marker escaping), marking it as untrusted data rather than agent instructions. Treat it as defense in depth, not a semantic sandbox.
 * **SSRF guard.** Configuring an external URL that resolves to a non-loopback private/link-local address triggers the same soft SSRF warning used for backend URLs — non-blocking, so deliberate internal use is still possible.
 * **Audit logging.** Every external tool invocation is recorded in the [audit log](../privacy/audit-logging.md) (when enabled) with the server name, tool name, and a result summary.
 * **Always confirmed.** When the extension's own AI emits a call to an `ext:`-namespaced tool, it asks you every single time — no "approve for session" option. External tools never inherit a built-in tool's silent tier. See [Tool-Call Confirmation](security-model.md#7-tool-call-confirmation-sec-06).

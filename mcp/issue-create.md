@@ -50,6 +50,8 @@ sequenceDiagram
 | `targetPort` | Int | No | Port for attachment context (default `443`). |
 | `usesHttps` | Boolean | No | HTTPS flag for attachment context (default `true`). |
 
+If `httpRequest` is present, `targetHostname` must also be non-blank (with a valid positive `targetPort`); otherwise the handler returns an error instead of creating the issue. `httpResponseContent` is attached only together with `httpRequest`. Without an explicit request, the handler tries to find a matching Proxy history item by `baseUrl`.
+
 ## Recommended Practices
 
 * Create issues after evidence is verified.
@@ -79,6 +81,6 @@ Typical chain:
 3. Summarize exploit evidence.
 4. Create issue (`issue_create`).
 
-The intermediate steps above use generic Montoya tools (`proxy_http_history_regex`, `http1_request`, `http2_request`), which are only present in the full build. In the BApp Store build, `issue_create` is still available, but pair it with PortSwigger's official Burp MCP Server (or `ai_passive_scan` / `ai_findings_recent`) to gather and validate evidence.
+The intermediate steps above use generic Montoya tools (`proxy_http_history_regex`, `http1_request`, `http2_request`), which are only present in the full build. In the BApp Store build, `issue_create` is still available, but pair it with PortSwigger's official Burp MCP Server (or `ai_findings_recent`) to gather and validate evidence. The current `ai_passive_scan` MCP handler additionally requires Burp's **Use AI for extensions** gate even when an independent backend is selected.
 
 See [Typical Workflows](../examples/typical-workflows.md).

@@ -86,7 +86,7 @@ The extension ships two build artifacts, and the build you load determines which
 * **BApp Store build** (`./gradlew shadowJar -PstoreBuild=true` → `Custom-AI-Agent-<version>.jar`): registers **only the 8 extension-native AI tools** — `status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`. Generic Burp/Montoya tools (proxy history, repeater, scanner, scope, site map, intruder, Collaborator, utilities, etc.) are intentionally **not** exposed here. For those, use PortSwigger's official Burp MCP Server alongside this extension.
 * **Full build** (`./gradlew shadowJar` → `Custom-AI-Agent-full-<version>.jar`, GitHub releases): registers **all 59 MCP tools**, including the generic Montoya tools above.
 
-A compile-time `BuildFlags.STORE_BUILD` constant gates which tools register. The AI-calling tools (`ai_analyze`, `ai_passive_scan`, …) also check `ai.isEnabled()` before issuing a request, so the configured AI setting is respected; independent third-party backends still work when Burp's built-in AI is off.
+A compile-time `BuildFlags.STORE_BUILD` constant gates which tools register. Independent backends continue to work for chat and scanner pipelines when Burp's built-in AI is off. The current `ai_analyze` and `ai_passive_scan` MCP handlers are an exception: both call Burp's `api.ai().isEnabled()` unconditionally, so those two tools refuse on Community or with **Use AI for extensions** disabled regardless of the selected backend.
 
 When loaded, the extension appears in Burp's **Extensions** list and as a Suite tab titled **Custom AI Agent** (named that way to distinguish it from Burp's built-in "Burp AI" provider).
 
@@ -98,7 +98,7 @@ When loaded, the extension appears in Burp's **Extensions** list and as a Suite 
 * Optional **Restrict MCP tools to in-scope hosts** (`mcpScopeOnly`) that confines every scope-aware tool to Burp's defined scope.
 * Configurable request limiter and body-size caps.
 * Proxy-history preprocessing pipeline (binary filter, size cap, content-type allowlist, newest-first, raw opt-in). See [MCP Proxy History Preprocessing](../reference/settings-reference.md#mcp-proxy-history-preprocessing).
-* Administrative endpoints (`GET /__mcp/health`, `POST /__mcp/shutdown`) used for health checks and safe takeover.
+* Administrative endpoints (`GET /__mcp/health`, `POST /__mcp/shutdown`) used for health checks and bounded takeover.
 * Auto-restart of the MCP listener on unexpected termination.
 * Privacy-aware tool output filtering.
 * Inline advisory banner in the **MCP Server** settings tab that surfaces risky combinations (external access without allowed origins, external access with **Enable Unsafe Tools** on, etc.). See [UI Tour → Advisory Banner (SubtleNotice)](../user-guide/ui-tour.md#advisory-banner-subtlenotice).
@@ -109,7 +109,7 @@ When loaded, the extension appears in Burp's **Extensions** list and as a Suite 
 
 | Endpoint          | Method | Auth                            | Purpose                                                                                                                                                                                   |
 | ----------------- | ------ | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/__mcp/health`   | GET    | None — loopback only            | Returns `"ok"` with the marker header `X-Burp-AI-Agent: mcp`. Used by the MCP Supervisor to detect a pre-existing Custom AI Agent listener on the same port before attempting a takeover. |
+| `/__mcp/health`   | GET    | None                            | Returns `"ok"`. Local mode also emits `X-Burp-AI-Agent: mcp`; external mode omits the identifying header. Used as a bind-conflict liveness probe. |
 | `/__mcp/shutdown` | POST   | `Authorization: Bearer <token>` **or** `X-Mcp-Takeover-Proof` | Used during port takeover: a new MCP server instance sends this to ask a colliding older instance to release the port. Accepts either credential form and rejects a request carrying neither. The automatic takeover client sends only the proof (see §Port Takeover); the bearer form remains for manual use. |
 
 ## Port Conflict Handling and Takeover
@@ -117,10 +117,12 @@ When loaded, the extension appears in Burp's **Extensions** list and as a Suite 
 When the MCP Supervisor starts a server and the port is already in use:
 
 1. It probes `GET <scheme>://<host>:<port>/__mcp/health` with a short timeout.
-2. If the response contains the `X-Burp-AI-Agent: mcp` header, the occupant is most likely a previous Custom AI Agent instance (same Burp process restarted, duplicate extension load, etc.). The supervisor issues `POST /__mcp/shutdown` and waits 1 s before retrying the bind. Up to 3 takeover attempts are made.
+2. In local mode, takeover proceeds only when the response contains `X-Burp-AI-Agent: mcp`. In external mode that header is deliberately absent, so a successful health response is treated as liveness without an identity claim. The supervisor then issues `POST /__mcp/shutdown`, waits 1 s, and retries the bind. Up to 3 takeover attempts are made.
 
-   **The MCP token is never sent on this request.** The automatic bind-conflict takeover presents a **proof of possession** (`X-Mcp-Takeover-Proof`: HMAC-SHA256 keyed by the MCP token and bound to host, port and a 10-second window) instead of the token itself, so the token is never disclosed to whatever holds the port. The bearer form still works for an operator driving the endpoint by hand. A process squatting the port and echoing the identity header therefore learns nothing it can reuse — the header is a cheap filter, not a security control.
-3. If the occupant does not advertise the marker header, the supervisor refuses to proceed and surfaces a `BindException` in the UI — no shutdown is sent to unknown processes.
+   **The MCP token is never sent on this automatic request.** Bind-conflict takeover presents a **proof of possession** (`X-Mcp-Takeover-Proof`: HMAC-SHA256 keyed by the MCP token and bound to host, port and a 10-second window) instead of the token itself. The bearer form still works for an operator driving the endpoint by hand. A port squatter can replay the proof during the current/previous acceptance window to shut down a freshly bound server, but cannot turn it into the reusable bearer token; this is a bounded denial-of-service residual, not listener authentication.
+3. In **local mode**, if the occupant does not advertise the marker header, the supervisor refuses to proceed and surfaces the bind failure — no shutdown is sent. In **external mode**, the deliberately headerless health response is only a liveness signal; the proof prevents bearer-token disclosure but does not establish listener identity.
+
+For TLS takeover, certificate pinning is installed only for `localhost`, `127.0.0.1`, or `::1`. A non-loopback TLS bind is left running and the extension logs that the operator must free the port manually before restarting MCP.
 
 Outside of port conflicts, the supervisor monitors the listener and attempts up to 4 automatic restarts with a 2-second delay on unexpected termination.
 

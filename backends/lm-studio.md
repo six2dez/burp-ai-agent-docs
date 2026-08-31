@@ -18,7 +18,7 @@ LM Studio provides local model execution with an OpenAI-compatible API and a GUI
 
 | Setting | Default | Description |
 | :--- | :--- | :--- |
-| **Preferred Backend** | `LM Studio` | Select backend. |
+| **Preferred Backend** | `lmstudio` | Select backend. |
 | **LM Studio URL** | `http://127.0.0.1:1234` | Server API base URL. |
 | **LM Studio Model** | `lmstudio` | Model identifier. |
 | **LM Studio API Key** | *(empty)* | Optional bearer token. |
@@ -33,7 +33,7 @@ Use Auto-Start only if your LM Studio server command is stable in the same runti
 
 ## Output Token Limits
 
-The extension sets `max_tokens` automatically per request type to ensure complete responses:
+The extension sets `max_tokens` per request type to bound output and reduce avoidable truncation:
 
 | Request Type | `max_tokens` |
 | :--- | :--- |
@@ -53,7 +53,7 @@ The extension sets `max_tokens` automatically per request type to ensure complet
 
 ## Retry Behavior
 
-If a request fails due to a transient network error, the extension retries automatically up to 6 attempts using a bounded stepped backoff (500/1000/1500/2000/3000/4000 ms). A circuit breaker opens after 5 consecutive failures and resets after 30 s. Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md). See [Backends Overview → Retry Behavior](overview.md#retry-behavior).
+If a request throws a classified transient transport exception, the extension makes up to 6 total attempts with five possible delays (500/1000/1500/2000/3000 ms). The connection's circuit breaker opens after 5 recorded transient failures and allows one half-open model request after 30 seconds. Each actual retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md). See [Backends Overview → Retry Behavior](overview.md#retry-behavior).
 
 ## Related Pages
 

@@ -1,6 +1,6 @@
 # Audit Logging
 
-Audit logs provide a tamper-evident record of interactions between Burp context and AI backend outputs.
+Audit logs provide a hash-annotated record of interactions between Burp context and AI backend outputs. They support review and accidental-corruption checks, but the current unkeyed hashes do not authenticate a record against an editor who can rewrite both payload and hash. Universal trace correlation lives in the separate AI Request Logger; the audit event stream does not attach a trace ID to every event.
 
 ## Event Chain
 
@@ -17,8 +17,8 @@ sequenceDiagram
     App->>Hash: Hash payload/event data
     Hash-->>App: Digest
     App->>Log: Append JSONL event line
-    App->>Logger: Log activity entry with trace ID
-    App->>Log: Append streaming chunks/events
+    App->>Logger: Log correlated activity metadata
+    App->>Log: Append response callback events
     App->>Log: Append completion event
     App->>Logger: Log completion with duration and metadata
 ```
@@ -29,11 +29,13 @@ Each event entry can include:
 
 * timestamp,
 * event type (`prompt`, `agent_chunk`, `prompt_complete`, scanner/MCP events),
-* trace ID for correlation across related entries,
+* a trace ID on selected scanner/MCP event families (not on every supervisor prompt/chunk/completion event),
 * redacted prompt bundle and hashes,
 * backend metadata,
-* streamed response chunks,
+* response callback chunks (currently one complete chunk for built-in backends),
 * launch metadata (see below).
+
+For chat dispatches, the prompt bundle records the current `text` argument sent through `AgentSupervisor.sendChat`. It is not a full wire transcript: conversation history is supplied separately, and HTTP-capable backends can receive the active agent profile through a separate `systemPrompt` argument that is not serialized into the bundle. CLI backends instead prepend that profile to their user text. Treat the bundle as a review artifact for the captured dispatch, not as proof of every byte a provider received.
 
 ## Launch Metadata
 
@@ -58,7 +60,7 @@ tail -n 500 ~/.burp-ai-agent/audit.jsonl \
 
 ## Trace ID Correlation
 
-Every operation generates a trace ID that links all related log entries:
+The AI Request Logger generates and carries the following correlation IDs. Do not assume the same ID is present in every `audit.jsonl` event: current supervisor `prompt`, `agent_chunk`, and `prompt_complete` records omit it, while selected scanner/MCP audit payloads may include one.
 
 | Trace ID pattern | Emitted by | Links |
 | :--- | :--- | :--- |
@@ -68,7 +70,7 @@ Every operation generates a trace ID that links all related log entries:
 | `scanner-batch-{UUID}` | Passive scanner batch analysis (`BatchAnalysisQueue`) | A single AI call covering 3–5 grouped requests, with per-request dispatch events sharing the ID. |
 | `adaptive-payload-{VULN_CLASS}` | `AdaptivePayloadEngine` | AI-driven context-aware payload generation, cached by `{vulnClass}:{techStack}` for 30 minutes. |
 
-Trace IDs are visible in both the audit log entries and the [AI Request Logger](ai-request-logger.md) UI. The trace ID can be overridden at the supervisor level when re-driving a cached conversation, so the same UUID may appear across multiple dispatches.
+Use the [AI Request Logger](ai-request-logger.md) UI or its optional rolling JSONL files for end-to-end trace filtering. Join audit prompt bundles by their session/backend/timestamp and launch metadata where necessary.
 
 ## Log Format
 
@@ -76,10 +78,10 @@ Logs use **JSON Lines (`.jsonl`)**; each line is a standalone JSON object.
 
 ## Security & Integrity
 
-* Each event carries a **per-event SHA-256 hash** of the serialized payload in the `payloadSha256` field. The hash is independent per record — there is no Merkle chain linking entries.
-* MCP tool calls include argument and result hashes (`argsSha256`, `resultSha256`) so tampering with either the request or the response can be detected when the log line is inspected later.
+* Each event carries a **per-event SHA-256 checksum** of the serialized payload in the `payloadSha256` field. The checksum is independent per record — there is no keyed MAC, signature, external anchor, or Merkle chain linking entries.
+* MCP tool calls include argument and result checksums (`argsSha256`, `resultSha256`) for correlation and comparison across records.
 * With determinism enabled, identical inputs are easier to compare across runs (see [Determinism & Salt](determinism-salt.md)).
-* Because the file is append-only plaintext, rely on filesystem ACLs or disk encryption if stronger tamper-evidence is required; the hashes catch payload edits but not line deletion.
+* The file is ordinary append-oriented plaintext. A process with write access can alter a payload and recompute its checksum, or delete/reorder lines. Use filesystem ACLs, append-only storage, remote log shipping, signatures, or another external integrity control when authenticity matters.
 
 ## How to Enable
 
@@ -90,17 +92,17 @@ Logs use **JSON Lines (`.jsonl`)**; each line is a standalone JSON object.
 
 | Path | Contents |
 | :--- | :--- |
-| `~/.burp-ai-agent/audit.jsonl` | Main append-only event log. |
+| `~/.burp-ai-agent/audit.jsonl` | Main append-oriented event log. |
 | `~/.burp-ai-agent/bundles/` | Prompt bundle snapshots. |
-| `~/.burp-ai-agent/contexts/` | Context snapshot files indexed by hash. |
+| `~/.burp-ai-agent/contexts/` | Reserved context directory. The current runtime creates it, but no production caller writes standalone context snapshots. Context may still be embedded in prompt bundles. |
 | `~/.burp-ai-agent/logs/` | Rolling AI Request Logger JSONL files (opt-in). |
 
 ## Use Cases
 
-* Compliance evidence.
+* Supporting compliance evidence when paired with external retention/integrity controls.
 * Reproducibility and review of AI-assisted findings.
 * Team quality control and diagnostics.
-* Trace ID-based debugging of multi-step tool chains.
+* Review of captured prompt metadata and response chunks; use the AI Request Logger for complete trace-ID filtering.
 
 ## Related Pages
 

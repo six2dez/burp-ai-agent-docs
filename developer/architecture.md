@@ -94,7 +94,7 @@ sequenceDiagram
 * **Testability**: keep parsing and privacy logic unit-testable.
 * **Extensibility**: backend/tool additions should not require core refactors.
 * **Determinism**: stable ordering and stable anonymization when configured.
-* **Privacy-first**: redaction happens before outbound backend or MCP output.
+* **Privacy-aware**: outbound backend and MCP paths apply the active policy, with typed sanitizers at producers and a shared read-time pass.
 
 ## Key Modules
 
@@ -113,9 +113,13 @@ sequenceDiagram
 | `supervisor/*` | Backend and MCP lifecycle supervision. |
 | `mcp/*` | MCP manager, catalog, limiter, and transports. |
 | `scanner/*` | Passive/active scanner engines and analyzers. The AI passive scanner runs as a Montoya `PassiveScanCheck` (registered via `api.scanner().registerPassiveScanCheck(check, ScanCheckType.PER_REQUEST)` — a Burp Pro feature). |
-| `audit/*` | JSONL writer, integrity hashes, AI Request Logger (activity buffer, rolling persistence, trace correlation). |
+| `audit/*` | JSONL writer, per-record checksums, AI Request Logger (activity buffer, rolling persistence, trace correlation). |
 | `alerts/*` | Optional webhook notifications. |
 | `config/*` | Settings model, persistence, defaults, migration. |
+
+### Redaction Ownership
+
+The diagram's redaction layer is a shared capability, not one physical choke point. Manual context capture, passive prompts, BountyPrompt tags, MCP structured results, and scanner issue details each own part of the transformation before the common `Redaction.apply` pass. New carriers therefore require an ownership test as well as a regex test; see [Redaction Pipeline](redaction-pipeline.md).
 
 ## Related Pages
 

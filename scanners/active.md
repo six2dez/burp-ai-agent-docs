@@ -105,6 +105,7 @@ Additionally, confirmed findings from the active scanner are recorded back into 
 * Issue details are sanitized to plain text (Markdown formatting removed).
 * Issues are named by class (e.g., `[AI Active] SQLI`) and consolidated if an existing issue with the same name and base URL already exists.
 * Findings include byte-range markers in Burp's request/response viewer, highlighting injected payloads in requests and evidence strings in responses.
+* Cookie-typed original values and rendered payloads are stripped at the current write sites in `STRICT` and `BALANCED`. A finding already stored under an earlier mode is not rewritten, and a narrow evidence path can still retain cookie bytes when those bytes are themselves the matched vulnerability signature. See [Redaction Coverage and Known Boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries).
 
 ## Vulnerability Classes
 

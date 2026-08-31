@@ -27,10 +27,10 @@ export GOOGLE_API_KEY="..."
 
 | Setting | Value |
 | :--- | :--- |
-| **Preferred Backend** | `OpenCode CLI` |
-| **OpenCode CLI Command** | `opencode --model anthropic/claude-sonnet-4-5` |
+| **Preferred Backend** | `opencode-cli` |
+| **OpenCode CLI Command** | `opencode` (default), or add an explicit `--model` override |
 
-Other model examples:
+Explicit model examples:
 
 ```text
 opencode --model openai/gpt-4o
@@ -41,7 +41,7 @@ opencode --model google/gemini-1.5-pro
 
 ### Model Configuration
 
-If no default model is configured and no `--model` is provided, embedded runs can fail with `process has not exited`.
+The default extension command is `opencode`, so configure a default model in OpenCode or add `--model` to the command. If neither is set, embedded runs can fail with `process has not exited`.
 
 ### Output Parsing
 

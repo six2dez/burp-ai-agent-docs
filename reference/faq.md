@@ -2,7 +2,7 @@
 
 ## Does it work with Burp Community Edition?
 
-Yes. Core chat, context actions, and most MCP functionality work in Community. Pro-only capabilities remain gated — including the AI passive scanner, which is registered as a Burp `PassiveScanCheck` (a Pro feature; on Community the registration fails silently and is logged), the active scanner APIs, and some tools.
+Yes. Core chat, context actions, manual scanner queues, independent backends, and non-Pro MCP functionality work in Community. Native Burp Scanner registration, the built-in Burp AI backend, active scanner APIs, and some MCP tools remain Pro-only. The current `ai_analyze` and `ai_passive_scan` MCP handlers also refuse when Burp's AI surface is unavailable, even if an independent backend is selected; see the [MCP Tools Reference](../mcp/tools-reference.md#ai-extension-native).
 
 ## Does the passive scanner send extra traffic?
 
@@ -10,7 +10,7 @@ No. The passive scanner is a Burp `PassiveScanCheck` that runs per request on tr
 
 ## Are my data safe with cloud backends?
 
-Use `STRICT` or `BALANCED` privacy modes and review context before sending prompts. For maximum control, use local backends (Ollama/LM Studio).
+`STRICT` and `BALANCED` reduce exposure of recognized carriers, but no mode proves arbitrary secrets cannot leave Burp. Review the manual-action preview, test representative shapes with `redact_preview`, read the [known redaction boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries), and use a local backend or upstream pre-sanitization when the engagement requires a harder boundary.
 
 ## Which model/backend should I choose?
 
@@ -38,7 +38,7 @@ Check tool toggles in **Burp Integration**, unsafe-tool master switch in **MCP S
 
 ## What is the AI Request Logger?
 
-The AI Request Logger is a real-time activity log that records all AI interactions: prompts, responses, MCP tool calls, retries, errors, and scanner operations. It appears as the **AI Logger** tab in the settings panel and supports filtering by type, source, preset, and trace ID. See [AI Request Logger](../privacy/ai-request-logger.md).
+The AI Request Logger records lifecycle metadata for prompts/responses, MCP tool calls, retries, errors, passive-scanner dispatches, and local JS discovery. Active scanner request execution is not independently instrumented there. It does not retain full prompt/response bodies. It appears as the **AI Logger** tab in the settings panel and supports filtering by type, source, preset, and trace ID. See [AI Request Logger](../privacy/ai-request-logger.md).
 
 ## Why does the AI call tools instead of answering directly?
 
@@ -54,7 +54,7 @@ Agent profiles list available MCP tools including `http1_request` and `http2_req
 
 ## How do I correlate related log entries?
 
-Every operation generates a trace ID (e.g., `chat-turn-{UUID}`) that is shared across all related entries. Use the **Trace** filter in the AI Logger tab to isolate entries for a specific operation.
+Chat, supervisor, and passive-scanner AI dispatches generate a trace ID (for example, `chat-turn-{UUID}`) shared by their related entries. Direct calls from an external MCP client and local JS endpoint-discovery entries can appear without one. Use the **Trace** filter to isolate the correlated flows.
 
 ## Why does the scanner use a different backend than the one I selected?
 
@@ -88,4 +88,4 @@ Yes. Disabling the passive scanner clears the ScanKnowledgeBase to prevent stale
 
 ## Why are responses no longer truncated?
 
-All HTTP backends now set `max_tokens` (OpenAI-compatible, LM Studio) or `num_predict` (Ollama) automatically per request type. Chat uses 4096 output tokens, single scanner analysis uses 2048, batch analysis uses 4096, and adaptive payload generation uses 1024. This eliminates premature truncation without manual configuration.
+HTTP backends receive a request-specific output limit (`max_tokens` for the OpenAI-compatible/LM Studio/Anthropic paths and `num_predict` for Ollama): 4096 for chat, 2048 for single scanner analysis, 4096 for batch analysis, and 1024 for adaptive payload generation. This reduces avoidable truncation and bounds output size, but a provider may impose a lower cap or stop early.

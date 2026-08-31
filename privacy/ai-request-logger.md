@@ -1,6 +1,6 @@
 # AI Request Logger
 
-The AI Request Logger provides real-time visibility into all AI-related activity within the extension. It captures prompts, responses, MCP tool calls, retry events, errors, and scanner operations in a unified, searchable log with correlation support.
+The AI Request Logger provides real-time visibility into AI-related activity within the extension. It records prompt/response lifecycle metadata, MCP tool calls, retry events, errors, passive-scanner dispatches, and local JS endpoint discovery in a unified, searchable log with correlation support. Active scanner request execution is not a separate logger event. It does not store full prompt or response bodies; use the separate audit bundle/log facilities when payload capture is enabled and appropriate.
 
 ## Overview
 
@@ -23,7 +23,7 @@ flowchart LR
     Logger --> File
 ```
 
-Every AI interaction is recorded as an `AiActivityEntry` with a consistent schema: timestamp, activity type, source, backend, detail text, duration, character counts, token usage estimates, and arbitrary metadata.
+Instrumented AI activity is recorded as an `AiActivityEntry` with a consistent schema: timestamp, activity type, source, backend, detail text, duration, character counts, token usage estimates, and arbitrary metadata. Backend health-poll transitions are not logger entries.
 
 ## Activity Types
 
@@ -38,17 +38,17 @@ Every AI interaction is recorded as an `AiActivityEntry` with a consistent schem
 
 ## Trace IDs (Correlation)
 
-Every operation generates a trace ID that links related log entries together:
+Instrumented model and passive-scanner dispatches generate a trace ID that links their related log entries. A direct call from an external MCP client is logged as an `MCP_TOOL_CALL`, but the server handler does not synthesize a trace ID for it. Local JS endpoint-discovery entries and backend health transitions are also uncorrelated (health transitions are not logger entries at all).
 
 | Source | Trace ID Format | Scope |
 | :--- | :--- | :--- |
 | Chat / context menu | `chat-turn-{UUID}` | Prompt → tool chain steps → final response. |
 | Agent supervisor | `agent-turn-{UUID}` | Prompt → response/error. |
-| Passive and active scanner (single request) | `scanner-job-{UUID}` | Analysis dispatch → outcome. |
+| Passive scanner (single request) | `scanner-job-{UUID}` | Analysis dispatch → outcome. Active scanner request execution is not independently instrumented by this logger; only any adaptive AI generation goes through the supervisor. |
 | Passive scanner batch analysis | `scanner-batch-{UUID}` | One AI call covering 3–5 grouped requests. Per-request events share the same trace ID so findings can be mapped back to originators. |
 | Adaptive payload generation | `adaptive-payload-{VULN_CLASS}` | AI-driven context-aware payload generation. Identifier is the vulnerability class (e.g. `adaptive-payload-SQLI`) rather than a UUID so repeated generations for the same class share a trace. |
 
-Use the **Trace** filter in the AI Logger tab to isolate all entries for a single operation. This is especially useful for debugging multi-step tool chains where a single user prompt triggers multiple MCP tool calls and follow-up AI requests.
+Use the **Trace** filter in the AI Logger tab to isolate correlated entries for a single supported operation. This is especially useful for debugging multi-step tool chains where a single user prompt triggers multiple MCP tool calls and follow-up AI requests.
 
 ## Metadata Fields
 
@@ -56,9 +56,9 @@ Log entries carry structured metadata beyond the core fields:
 
 | Field | Present In | Description |
 | :--- | :--- | :--- |
-| `traceId` | All entries | Correlation identifier. |
+| `traceId` | Correlated chat, agent, scanner, retry, error, and MCP entries | Correlation identifier. |
 | `operation` | Prompts, responses | Operation type (`chat_turn`, `agent_send`). |
-| `status` | All entries | Outcome (`sent`, `ok`, `error`, `blocked`, `timeout`). |
+| `status` | Most lifecycle and policy entries | Outcome (`sent`, `ok`, `error`, `blocked`, `timeout`). |
 | `toolId` | MCP tool calls | Tool identifier (e.g., `proxy_http_history`). |
 | `policyDecision` | MCP tool calls | Gating result: `allowed`, `disabled`, `unsafe_blocked`, `pro_only`, `concurrency_limited`. |
 | `argsSha256` | MCP tool calls | SHA-256 hash of tool arguments. |
@@ -122,7 +122,7 @@ Selecting a row shows the full entry in the lower detail pane, including complet
 
 ## In-Memory Buffer
 
-The logger maintains a bounded circular buffer (default 500 entries, configurable from 10 to any upper limit). When the buffer is full, the oldest entries are evicted. The buffer is thread-safe and suitable for high-throughput scanner workloads.
+The logger maintains a bounded circular buffer (default 500 entries). Persisted settings clamp the value to `50-5000` entries. When the buffer is full, the oldest entries are evicted. The buffer is thread-safe and suitable for high-throughput scanner workloads.
 
 ## Rolling JSONL Persistence
 
@@ -146,14 +146,15 @@ For long-running engagements or compliance needs, the logger can persist entries
 
 ### Enabling via Burp
 
-Add these JVM arguments when launching Burp Suite:
+Add these JVM arguments **before** `-jar` when launching Burp Suite:
 
 ```bash
-java -jar burpsuite.jar \
+java \
   -Dburp.ai.logger.rolling.enabled=true \
   -Dburp.ai.logger.rolling.dir=/path/to/logs \
   -Dburp.ai.logger.rolling.maxBytes=2097152 \
-  -Dburp.ai.logger.rolling.maxFiles=10
+  -Dburp.ai.logger.rolling.maxFiles=10 \
+  -jar burpsuite.jar
 ```
 
 ## How to Enable

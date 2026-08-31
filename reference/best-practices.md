@@ -8,8 +8,8 @@ Pick the privacy mode that matches the trust level of the **AI backend**, not th
 
 | Environment | Backend | Recommended mode | Why |
 | :--- | :--- | :--- | :--- |
-| Public bug bounty / customer engagement on a cloud LLM | Cloud HTTP (Perplexity, NVIDIA NIM, OpenAI-compatible) or Cloud CLI (Claude/Gemini/Codex/Copilot/OpenCode) | `STRICT` | Anonymizes hostnames and strips all tokens. Limits data leakage if the provider logs prompts. |
-| Mixed workflow where the target hostname is part of the report context | Any cloud backend | `BALANCED` (default) | Preserves hostnames, redacts tokens and cookies. Cheap on prompt size, still safe. |
+| Public bug bounty / customer engagement on a cloud LLM | Cloud HTTP (Anthropic, Perplexity, NVIDIA NIM, OpenAI-compatible) or Cloud CLI (Claude/Gemini/Codex/Copilot/OpenCode) | `STRICT` | Anonymizes covered hostname carriers and sanitizes recognized secrets. Reduces leakage if the provider logs prompts; does not replace pre-sanitization for a hard egress policy. |
+| Mixed workflow where the target hostname is part of the report context | Any cloud backend | `BALANCED` (default) | Preserves hostnames and sanitizes recognized token/cookie carriers. Review the emitted shape before relying on it. |
 | Internal lab / private model with no third-party transit | Ollama, LM Studio, or Burp AI (Burp Pro built-in) | `BALANCED` for shared infra, `OFF` only for genuinely isolated single-user setups | Local does not mean unaccountable — keep redaction on unless you can prove no second copy of the prompts is being kept. |
 
 Cross-references: [Privacy Modes](../privacy/privacy-modes.md), [Backends Overview](../backends/overview.md).
@@ -17,9 +17,11 @@ Cross-references: [Privacy Modes](../privacy/privacy-modes.md), [Backends Overvi
 ### Pre-engagement checks
 
 - [ ] Privacy mode pill in the top bar matches the engagement's policy.
-- [ ] Redaction salt is set (not the default placeholder) if anyone else on the team will need stable host pseudonyms.
-- [ ] Determinism mode is enabled if you need reproducible prompt bundles for audit.
+- [ ] The auto-generated redaction salt is retained and shared through an approved secret channel if teammates need the same stable host pseudonyms; rotate it when mappings must be invalidated.
+- [ ] Determinism mode is enabled when you need more stable ordering and host pseudonyms for comparing captured prompt bundles; model output and omitted wire-envelope data remain outside that guarantee.
 - [ ] Run one right-click action on a sample request and inspect the **Context Preview Dialog** before sending — confirm the JSON envelope matches expectations.
+- [ ] Exercise `redact_preview` with representative raw HTTP, parsed-parameter JSON, and nested JSON strings used by the engagement. The right-click preview covers only that manual action.
+- [ ] If "no credential may leave Burp" is contractual, pre-sanitize at the proxy boundary; privacy modes are pattern- and carrier-aware controls, not DLP.
 
 ## MCP Hardening Checklist
 
@@ -30,12 +32,12 @@ The MCP server is **off by default**. Turn it on intentionally and review these 
   - [ ] **TLS** is enabled.
   - [ ] **Auto-Generate Certificate** is on **or** a custom keystore at `certs/mcp-keystore.p12` is in place with a non-default password.
   - [ ] Bearer **Token** has been rotated from any pre-shared value. Treat it like a credential — do not commit it.
-  - [ ] **Allowed Origins** is populated with the explicit hostnames/origins of your clients. Empty means loopback-only.
-- [ ] **Max Body Bytes** is sized to the largest legitimate tool response, not arbitrarily high.
+  - [ ] **Allowed Origins** is populated with the explicit origins of browser-based clients. Empty means permissive CORS in external mode, not loopback-only; bearer authentication still protects non-health routes.
+- [ ] **Max body size (KB)** is sized to the largest legitimate tool response, not arbitrarily high.
 - [ ] **Max Concurrent Requests** is sized to the host's capacity (default `4` is conservative).
 - [ ] **Enable Unsafe Tools** is off unless an agent profile explicitly requires `http1_request`, `http2_request`, `intruder*`, `repeater_tab*`, scope mutation, or scanner-start tools.
 - [ ] **Burp Integration** per-tool toggles match the agent profile in use — disable categories the profile never invokes.
-- [ ] **Scan Task TTL** and **Collaborator Client TTL** are short enough that abandoned references do not accumulate (defaults `120` / `60` min).
+- [ ] Account for the internal **Scan Task TTL** and **Collaborator Client TTL** defaults (`120` / `60` min). The redesigned panel preserves these values but does not currently expose controls for them.
 - [ ] `/__mcp/health` returns `200` from the loopback before any external client is wired up.
 
 Cross-references: [MCP Overview](../mcp/overview.md), [MCP Security Model](../mcp/security-model.md), [Tools Reference](../mcp/tools-reference.md).
@@ -57,14 +59,14 @@ Cross-references: [Active AI Scanner](../scanners/active.md), [Insertion Point S
 
 ## Audit Logging for Compliance
 
-Audit logs are off by default and append-only when enabled. Use them when you need to prove what data left Burp.
+Audit logs are off by default and append-oriented when enabled. Use them to reconstruct and correlate extension activity; the file's unkeyed checksums do not prove authenticity or capture every byte of the provider request.
 
 - [ ] **Audit Logging** toggle is on for any engagement that has a written reporting requirement.
 - [ ] `~/.burp-ai-agent/audit.jsonl` is on a volume with **enough headroom for the engagement** — JSONL grows with traffic.
 - [ ] You have a backup script (or a cron-style copy) that pulls the JSONL file off the workstation before retention rotates it. The plugin does not rotate `audit.jsonl` itself.
 - [ ] When running a sensitive engagement, also turn on **AI Request Logger** rolling persistence (`-Dburp.ai.logger.rolling.enabled=true`) so the chat/scanner activity stream is captured alongside the audit record.
-- [ ] If you must show a third party that the prompts were redacted, freeze a prompt bundle (`bundles/`) for one representative action — bundles include the redacted payload and a SHA-256 hash.
-- [ ] When the engagement closes, archive `audit.jsonl` + `bundles/` + relevant `contexts/` together. Each bundle is self-contained but references its context by hash.
+- [ ] If you must show a third party how one action was processed, freeze its prompt bundle (`bundles/`) and externally timestamp/sign or ship it to controlled storage. The bundle includes the captured payload and a SHA-256 comparison hash, but omits separate system-role profile text and reconstructed conversation history.
+- [ ] When the engagement closes, archive `audit.jsonl` and `bundles/` together. Current bundle JSON embeds `contextJson`; the runtime creates `contexts/` but does not write standalone context files in normal production paths.
 
 Cross-references: [Audit Logging](../privacy/audit-logging.md), [AI Request Logger](../privacy/ai-request-logger.md).
 
@@ -72,11 +74,11 @@ Cross-references: [Audit Logging](../privacy/audit-logging.md), [AI Request Logg
 
 The persistent prompt cache speeds re-scans dramatically and is project-scoped so it does not leak across engagements — but it is a copy of AI output that survives Burp restarts.
 
-- [ ] Per-engagement, confirm `~/.burp-ai-agent/cache/<projectId>/` belongs to the active Burp project. Stray subdirectories from old projects are safe to delete.
+- [ ] Per-engagement, identify the `~/.burp-ai-agent/cache/<projectId-prefix>/` directory for the active Burp project (the prefix is the first eight characters of `api.project().id()`). Disable the passive scanner before deleting a stale namespace.
 - [ ] **Persistent max (MB)** is sized to the engagement — defaults to `50 MB`, which is fine for typical bug-bounty workflows but tight for long-running pentests.
 - [ ] **Persistent TTL (hrs)** is short enough that you do not return stale findings on a re-scan after the target patched something (default `24 h` is a sensible ceiling).
-- [ ] At engagement closeout, decide explicitly: keep the cache (faster re-scan if the customer asks for a re-test) or delete it (`rm -rf ~/.burp-ai-agent/cache/<projectId>/`) — there is no in-UI clear.
-- [ ] If you swap models mid-engagement, remember the cache key is the *normalized prompt*, not the backend. Cached findings will be returned regardless of which backend produced them — clear the project's cache if you want to compare backends apples-to-apples.
+- [ ] At engagement closeout, decide explicitly: keep the cache (faster re-scan if the customer asks for a re-test) or delete only that project's namespace while the scanner is disabled — there is no in-UI clear, and reloading the extension is required to clear in-memory entries immediately.
+- [ ] If you swap models mid-engagement, remember the cache key is the exact constructed prompt string, not the backend. A byte-identical prompt can return findings produced by the prior backend — clear both disk and in-memory cache state if you want to compare backends apples-to-apples.
 
 Cross-references: [Passive AI Scanner → Cache Behavior](../scanners/passive.md#cache-key-prompt-hash), [Configuration Directory](configuration-directory.md).
 

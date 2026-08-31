@@ -4,6 +4,8 @@ This page mirrors the advisories in the project's [`SECURITY.md`](https://github
 
 Both defects below were confirmed by **running** the shipped code during a review of `0.9.2` on 2026-08-05, not by reading it. Both affect every published `0.9.x` release, and both are fixed in **1.0.0**.
 
+The `PRIV-05` statement is scoped to the original passive-scanner cookies section described below. Post-tag work on `main` widened coverage to structured headers, cookie-typed parameters, serialized MCP results, and scanner issue details, but it also records [remaining carrier boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries). “Fixed in 1.0.0” is therefore not a global guarantee that every cookie- or secret-shaped value is removed on every path.
+
 {% hint style="warning" %}
 **No CVE and no GHSA identifier has been issued for either finding.** Do not look for one — none exists at the time of writing.
 
@@ -65,7 +67,7 @@ If your backend was a local runner (Ollama, LM Studio) the data did not leave yo
 
 Beyond the two advisories above, the 1.0.0 line closed a set of defects found by the same review. None of them was confirmed exploitable in a shipped release, so none carries an advisory — but they are the reason several behaviours described elsewhere in this documentation changed:
 
-* **The MCP token is no longer sent during a port takeover.** A local process that squatted the MCP port and echoed the identity header could previously collect the bearer token. The takeover client now presents a proof of possession instead. See [Security Model §5](../mcp/security-model.md).
+* **The MCP token is no longer sent during a port takeover.** A local process that squatted the MCP port and echoed the identity header could previously collect the bearer token. The takeover client now presents a proof of possession instead. See [Security Model §4](../mcp/security-model.md#4-origin-and-host-validation).
 * **Model-emitted tool calls now require your approval.** See [Tool-Call Confirmation](../mcp/security-model.md#7-tool-call-confirmation-sec-06).
 * **`SsrfGuard` classifies alternate IP notations.** A backend URL written as `http://2852039166/` (decimal for `169.254.169.254`) previously bypassed the private/link-local advisory warning by notation alone.
 * **Shell arguments are quoted by allowlist.** A settings value containing shell metacharacters without whitespace (`foo;id`, `$(cmd)`) could previously reach `sh -c` unquoted.

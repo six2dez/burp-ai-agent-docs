@@ -18,12 +18,12 @@ Use this backend for any provider exposing an OpenAI-compatible Chat Completions
 
 | Setting | Value |
 | :--- | :--- |
-| **Preferred Backend** | `Generic (OpenAI-compatible)` |
+| **Preferred Backend** | `openai-compatible` |
 | **Base URL** | provider URL |
 | **Model** | provider model id |
 | **API Key (Bearer)** | optional |
 | **Extra Headers** | optional (`Header: value`) |
-| **Timeout (seconds)** | increase for heavy prompts |
+| **Timeout (seconds)** | `120` by default (accepted range: 30-3600) |
 
 ### URL Behavior
 
@@ -50,7 +50,7 @@ X-Project: myproj
 
 ## Output Token Limits
 
-The extension sets `max_tokens` automatically per request type to ensure complete responses:
+The extension sets `max_tokens` per request type to bound output and reduce avoidable truncation:
 
 | Request Type | `max_tokens` |
 | :--- | :--- |
@@ -69,7 +69,7 @@ The extension sets `max_tokens` automatically per request type to ensure complet
 
 ## Retry Behavior
 
-If a request fails due to a transient network error, the extension retries automatically up to 6 attempts using a bounded stepped backoff (500/1000/1500/2000/3000/4000 ms). A circuit breaker opens after 5 consecutive failures and resets after 30 s. Each retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md). See [Backends Overview → Retry Behavior](overview.md#retry-behavior).
+If a request throws a classified transient transport exception, the extension makes up to 6 total attempts with five possible delays (500/1000/1500/2000/3000 ms). The connection's circuit breaker opens after 5 recorded transient failures and allows one half-open model request after 30 seconds. HTTP error responses are not retried inside the same call, although 429/5xx responses count toward the breaker. Each actual retry is logged in the [AI Request Logger](../privacy/ai-request-logger.md). See [Backends Overview → Retry Behavior](overview.md#retry-behavior).
 
 ## Related Pages
 

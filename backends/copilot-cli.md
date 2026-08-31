@@ -33,7 +33,7 @@ copilot -p "hello"
 
 | Setting | Value |
 | :--- | :--- |
-| **Preferred Backend** | `Copilot CLI` |
+| **Preferred Backend** | `copilot-cli` |
 | **Copilot CLI Command** | `copilot` or full path |
 
 Model examples:
@@ -44,7 +44,7 @@ copilot --model gpt-5.2
 copilot --model gemini-3-pro-preview
 ```
 
-Available models include: `claude-sonnet-4.6`, `claude-sonnet-4.5`, `claude-haiku-4.5`, `claude-opus-4.6`, `gpt-5.2`, `gpt-5.1-codex`, `gpt-5-mini`, `gemini-3-pro-preview`, and others.
+The extension does not maintain a Copilot model allowlist: it forwards the configured command. Available models therefore depend on the installed Copilot CLI version and the authenticated account; use `copilot --help` to confirm identifiers before saving one.
 
 ## Notes
 

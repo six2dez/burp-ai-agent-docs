@@ -14,11 +14,6 @@ Each chat session is an independent conversation with the AI. Sessions store:
 
 Session context is preserved per session. Follow-up prompts in the same session reuse the conversation history so the AI can keep track of previous responses and decisions.
 
-<!-- TODO: screenshot of the sessions sidebar showing multiple parallel sessions with per-session token bars (green/yellow/orange color coding) and the title/backend metadata visible. Save as .gitbook/assets/chat-sessions-sidebar.png and reference with:
-![Screenshot: Chat sessions sidebar with token bars](../.gitbook/assets/chat-sessions-sidebar.png)
--->
-
-
 History is trimmed to keep runtime bounded:
 
 * HTTP backends: up to `20` messages and `40000` total characters (minimum latest 2 messages retained).
@@ -50,14 +45,14 @@ Sessions are stored **per Burp project** (in `extensionData()` rather than globa
 * Live backend chat connections (conversation history held inside CLI processes or HTTP session loops) are shut down — the next prompt opens a fresh connection.
 
 {% hint style="warning" %}
-Anything held purely in-memory (like the conversation context inside a running CLI process) is **lost** on a project switch. Persisted sessions, audit logs, and per-project cache directories under `~/.burp-ai-agent/cache/<project>/` survive — see [Passive AI Scanner → Cache Behavior](../scanners/passive.md#cache-key-prompt-hash) for cache details.
+Anything held purely in-memory (like the conversation context inside a running CLI process) is **lost** on a project switch. Persisted sessions, audit logs, and per-project cache directories under `~/.burp-ai-agent/cache/<projectId-prefix>/` survive — see [Passive AI Scanner → Cache Behavior](../scanners/passive.md#cache-key-prompt-hash) for cache details.
 {% endhint %}
 
 ## Chat Interface
 
-### Streaming Responses
+### Response Delivery
 
-AI responses stream in real time as tokens are generated. You see the response building incrementally rather than waiting for the full output.
+The chat renderer accepts incremental chunks, but every built-in backend currently buffers/parses a complete response and invokes the UI once. Burp AI, HTTP backends, and CLI adapters therefore appear as a single completed block rather than token-by-token streaming. See the [backend capability matrix](../backends/overview.md#capability-matrix), including the current NVIDIA NIM/Perplexity framing caveat.
 
 ### Markdown Rendering
 
@@ -73,7 +68,7 @@ AI responses are rendered as formatted Markdown, supporting:
 
 ### Context Preview
 
-Before the prompt is sent, you can see a preview of the redacted context. This shows exactly what data will leave Burp, allowing you to verify that sensitive information is properly handled.
+Before a manual context action is sent, you can preview that action's composed, redacted context. It shows the payload for the action you are confirming; later MCP tool results and background scanner output follow their own carrier-specific paths. See [Privacy Modes](../privacy/privacy-modes.md).
 
 ### Error Display
 
@@ -97,7 +92,7 @@ The **Tools** button opens a menu of available MCP tools. Selecting a tool inser
 
 ## Auto Tool Chaining
 
-When the AI determines it needs to call an MCP tool to answer a request, it executes the tool automatically and feeds the result back into the conversation. This process repeats until the AI has all the information it needs or the chain limit is reached.
+When the AI emits an MCP tool call, the SEC-06 approval gate evaluates it before execution. `AUTO` tools can run without a prompt; `CONFIRM` tools require approval once per matching approval scope, and `CONFIRM_EACH` tools require approval every time. An approved result is fed back into the conversation and the process can repeat until the model answers or the chain limit is reached.
 
 * **Maximum chain depth**: 8 sequential tool calls per interaction.
 * **Transparent execution**: Each tool call is logged in the [AI Request Logger](../privacy/ai-request-logger.md) with a shared trace ID so you can follow the full chain.
@@ -107,8 +102,8 @@ When the AI determines it needs to call an MCP tool to answer a request, it exec
 ### How It Works
 
 1. You ask a question (e.g., "Generate a PoC for this issue").
-2. The AI decides it needs data from Burp and calls an MCP tool (e.g., `proxy_http_history`).
-3. The tool result is sent back to the AI along with the original question.
+2. The AI decides it needs data from Burp and emits an MCP tool call (e.g., `proxy_http_history`).
+3. The approval gate either allows it automatically, asks you, or denies it. For an approved call, the tool result is sent back to the AI along with the original question.
 4. The AI may call another tool or produce the final answer.
 5. Steps 2–4 repeat until the AI responds without a tool call, or 8 iterations are reached.
 

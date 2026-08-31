@@ -22,7 +22,7 @@ The extension integrates directly with Burp tools and workflows so AI analysis s
 | Context menu actions (requests) | Yes | Yes |
 | Context menu actions (issues) | No | Yes |
 | Chat & sessions | Yes | Yes |
-| All AI backends | Yes | Yes |
+| AI backends | Independent backends only; Burp AI unavailable | All, subject to provider configuration and Burp AI entitlement |
 | MCP server | Yes (non-Pro tools) | Yes (all tools) |
 | Passive AI Scanner | Manual queue path | Automatic passive scan check + manual queue |
 | Active AI Scanner | Manual queue path | Native scanner integration + queue |
@@ -31,6 +31,8 @@ The extension integrates directly with Burp tools and workflows so AI analysis s
 | Scan reports via MCP | No | Yes |
 
 The extension detects Burp edition at startup and disables unsupported capabilities automatically.
+
+The current `ai_analyze` and `ai_passive_scan` MCP handlers have an additional Burp-AI availability check. They refuse on Community or when **Use AI for extensions** is off even if an independent backend is selected; this does not affect normal chat or the manual scanner queues. See the [MCP Tools Reference](../mcp/tools-reference.md#ai-extension-native).
 
 ## MCP Tool Toggles
 

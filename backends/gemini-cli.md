@@ -28,14 +28,12 @@ gemini "hello"
 
 | Setting | Value |
 | :--- | :--- |
-| **Preferred Backend** | `Gemini CLI` |
+| **Preferred Backend** | `gemini-cli` |
 | **Gemini CLI Command** | `gemini --output-format text --model gemini-2.5-flash --yolo` |
 
-## Notes
+## Non-Interactive Mode
 
 `--yolo` is used by default to avoid interactive approval prompts that can block embedded MCP workflows.
-
-## Notes
 
 ### Windows
 

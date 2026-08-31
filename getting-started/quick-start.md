@@ -13,7 +13,7 @@ If you skip this step, the backend will show `Offline` in the top bar until the 
 
 ## 1. Enable MCP (Optional but Recommended)
 
-* Click **MCP** toggle in the top bar of the **AI Agent** tab.
+* Click **MCP** toggle in the top bar of the **Custom AI Agent** tab.
 * Verify indicator turns active.
 
 
@@ -48,13 +48,17 @@ For backend-specific values, see [Backends Overview](../backends/overview.md).
 
 ![Screenshot: Context menu on request](../.gitbook/assets/context-menu-request.png)
 
-## 5. Review Response
+## 5. Review and Confirm the Context
+
+The **Context Preview** dialog shows the action prompt, current privacy mode, and the composed JSON for this manual action. Review it and choose **Send** or **Cancel**. This preview does not cover later MCP tool results or background scanner findings; see [Privacy Modes](../privacy/privacy-modes.md).
+
+## 6. Review Response
 
 A new chat session opens and streams AI analysis.
 
 ![Screenshot: Chat response](../.gitbook/assets/chat-response.png)
 
-## 6. Enable Background Scanning (Advanced)
+## 7. Enable Background Scanning (Advanced)
 
 1. Toggle **Passive** ON in top bar.
 2. Browse target traffic.

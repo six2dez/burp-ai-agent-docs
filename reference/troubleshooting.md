@@ -47,7 +47,7 @@ The built-in Burp AI backend depends on Burp Pro's native AI feature. If the top
 
 ### AI responses are truncated
 
-All HTTP backends now set `max_tokens` (OpenAI-compatible, LM Studio) or `num_predict` (Ollama) automatically per request type: 4096 for chat, 2048 for single scanner analysis, 4096 for batch, and 1024 for adaptive payloads. If responses were previously cut short, this is now handled without manual configuration.
+HTTP backends receive a request-specific output limit: 4096 for chat, 2048 for single scanner analysis, 4096 for batch, and 1024 for adaptive payloads. This avoids the old undersized defaults on supported providers, but it cannot prevent a provider-side lower cap or early stop.
 
 ### Empty or low-value responses
 
@@ -76,7 +76,7 @@ If the scanner logs show a different backend than what you selected, re-select t
 
 When Burp is launched from Finder / Dock / Start Menu, it inherits a minimal `PATH` that often does not include directories where CLI tools live (Homebrew, `~/.local/bin`, npm global install prefix, etc.). The extension mitigates this automatically via a two-strategy **PATH discovery**:
 
-1. **Login-shell capture** — on first launch the extension runs your login shell (`$SHELL` → `/bin/zsh` → `/usr/bin/zsh` → `/bin/bash` → `/usr/bin/bash` → `/bin/sh`) with `-l -c "echo ___BURP_PATH___$PATH"` and captures the printed `PATH`. Timeout: 5 seconds. The result is cached globally for the lifetime of the extension.
+1. **Login-shell capture** — on first launch the extension runs your login shell (`$SHELL` → `/bin/zsh` → `/usr/bin/zsh` → `/bin/bash` → `/usr/bin/bash` → `/bin/sh`) with `-l -c "echo ___BURP_PATH___$PATH"` and captures the printed `PATH`. The result is cached globally for the lifetime of the extension. The implementation calls `readText()` before its five-second `waitFor`, so a shell startup script that never closes stdout can still stall this best-effort capture; keep login-shell initialization non-interactive.
 2. **Zsh re-source fallback** — if strategy 1 returns an unusable PATH and your shell is zsh, the extension retries with `-c "source ~/.zshrc 2>/dev/null; ..."` to pick up PATH mutations from rc files that login-shell mode skipped.
 
 If both strategies fail (for example, you use an uncommon shell without an rc file), set the full absolute path to the CLI in **Settings → AI Backend** instead of relying on PATH lookup.
@@ -154,7 +154,7 @@ Fixed by clearing the ScanKnowledgeBase when the passive scanner is disabled and
 
 ### BountyPrompt submenu is disabled
 
-* Enable **Enable BountyPrompt actions** in **Prompt Templates**.
+* Enable **BountyPrompt integration → Enabled** in **Custom Prompts**.
 * Confirm MCP server is running.
 
 ### No BountyPrompt items appear

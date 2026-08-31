@@ -20,7 +20,7 @@ Stable replacement of sensitive values so identical inputs map to identical pseu
 
 ### Redaction Salt
 
-Secret used to produce stable host pseudonyms in STRICT mode.
+Secret HKDF salt used with HMAC-SHA256 to produce stable `host-<12 hex>.local` pseudonyms on covered hostname carriers in STRICT mode.
 
 ### Backend Supervisor
 
@@ -112,11 +112,11 @@ Markdown-based system instruction set selected from `~/.burp-ai-agent/AGENTS/`.
 
 ### AI Request Logger
 
-Real-time activity log capturing prompts, responses, MCP calls, retries, errors, and scanner operations with trace correlation.
+Real-time lifecycle-metadata log for prompts, responses, MCP calls, retries, errors, and passive-scanner operations. It does not retain prompt/response bodies, and only instrumented flows carry trace correlation.
 
 ### Trace ID
 
-Unique correlation identifier linking related log entries across a single operation (e.g., `chat-turn-{UUID}`).
+Correlation identifier linking related entries for supported instrumented operations (e.g., `chat-turn-{UUID}`). Some entries, including direct external MCP calls, have no trace ID.
 
 ### Auto Tool Chaining
 

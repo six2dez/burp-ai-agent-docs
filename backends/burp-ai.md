@@ -14,15 +14,15 @@ This backend is only available on Burp Suite **Professional** with AI credits an
 When *Use AI for extensions* is off, the extension's supervisor refuses to start a Burp AI session and you'll see `AI: Offline` in the top bar even when the backend is selected. Switching it on takes effect immediately without restarting Burp.
 
 {% hint style="info" %}
-This gate is scoped to the **Burp AI** backend only. The supervisor refuses to start a session and the scanners refuse to enqueue work **only when** the *selected* Preferred Backend is `burp-ai` and Burp's *Use AI for extensions* toggle is off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, and the Gemini / Claude / Codex / Copilot / OpenCode CLI agents — keeps working whether that toggle is on, off, or you're on Burp Community (where the toggle does not exist).
+This gate is scoped to the **Burp AI** backend for normal chat and scanner pipelines. The supervisor refuses to start a session and the scanners refuse to enqueue work **only when** the *selected* Preferred Backend is `burp-ai` and Burp's *Use AI for extensions* toggle is off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, and the Gemini / Claude / Codex / Copilot / OpenCode CLI agents — keeps working whether that toggle is on, off, or you're on Burp Community (where the toggle does not exist).
 
-The AI-calling MCP tools (`ai_analyze`, `ai_passive_scan`, and friends) honour the same `api.ai().isEnabled()` check before issuing a request, so they respect Burp's *Use AI for extensions* setting when the Burp AI backend is selected. Independent third-party backends still answer those tools even when Burp's built-in AI is off.
+There is a current MCP exception: the `ai_analyze` and `ai_passive_scan` handlers call `api.ai().isEnabled()` unconditionally before invoking the selected backend. Those two tools therefore refuse when Burp AI is disabled or unavailable even if the selected backend is independent. See the [MCP Tools Reference](../mcp/tools-reference.md#ai-extension-native).
 {% endhint %}
 
 ## Selecting Burp AI
 
 1. Open **Custom AI Agent → Settings → AI Backend**.
-2. In **Preferred Backend** choose **Burp AI (built-in)**.
+2. In **Preferred Backend** choose `burp-ai` (Burp AI built-in).
 3. Optionally click **Test connection**. A healthy backend reports `Healthy`; if Burp AI is disabled in Burp settings the health check returns `Unavailable: Burp AI is not enabled. Enable 'Use AI' in Burp Suite settings.`
 
 There is no URL, model, token, or custom command — configuration lives entirely inside Burp's own AI settings.
@@ -39,7 +39,7 @@ There is no URL, model, token, or custom command — configuration lives entirel
 
 ## Privacy Posture
 
-Burp AI keeps requests inside Burp's own AI route. The plugin does not open additional outbound connections when this backend is selected — the prompt, context, and conversation history all flow through the Montoya `api.ai()` channel. Privacy-mode redaction is still applied to the payload before handoff, so cookies, tokens, and (in STRICT mode) hostnames are stripped just as with any other backend.
+Burp AI keeps requests inside Burp's own AI route. The plugin does not open an additional backend connection when this backend is selected—the prompt, context, and conversation history flow through the Montoya `api.ai()` channel. The same privacy-mode pipeline used by other backends runs before handoff, including producer-specific sanitizers and the shared text pass. Its [carrier boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries) still apply; selecting Burp AI does not turn pattern-based redaction into a no-secret-egress guarantee.
 
 See [Privacy Modes](../privacy/privacy-modes.md) for what gets redacted.
 
@@ -55,7 +55,7 @@ See [Privacy Modes](../privacy/privacy-modes.md) for what gets redacted.
 
 * **`AI: Offline` in the top bar with Burp Pro running** — open **Burp Settings → Burp AI** and toggle **Use AI for extensions** on. The plugin polls `api.ai().isEnabled()` on every health cycle and will pick the change up automatically.
 * **AI credits exhausted** — Burp Pro surfaces quota errors directly; the plugin relays them as an `ERROR` entry in the [AI Request Logger](../privacy/ai-request-logger.md).
-* **`api.ai().isEnabled()` throws on custom builds** — on older Montoya API versions the `ai()` surface may be missing; the backend falls back to `Unavailable` and disappears from the Preferred Backend dropdown automatically.
+* **`api.ai().isEnabled()` throws on custom builds** — on older Montoya API versions the `ai()` surface may be missing; the backend health check falls back to `Unavailable`. Registered backends remain listed in **Preferred Backend** even when their health check fails.
 
 ## Related Pages
 

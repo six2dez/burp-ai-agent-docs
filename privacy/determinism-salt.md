@@ -28,7 +28,7 @@ It does **not** guarantee:
 
 ## Host Anonymization Salt
 
-The **Host Anonymization Salt** is used in `STRICT` mode to produce deterministic pseudonyms.
+The **Host Anonymization Salt** is used in `STRICT` mode to produce deterministic pseudonyms through RFC 5869 HKDF (HMAC-SHA256 extract and expand). The hostname is the input keying material, the configured salt is the HKDF salt, and the application context is `burp-ai-agent:host`.
 
 * Same hostname + same salt -> same pseudonym.
 * Same hostname + different salt -> different pseudonym.
@@ -37,11 +37,13 @@ Example:
 
 ```text
 Project A salt: red-team-2026-a
-api.customer.tld -> host-91f2aa.local
+api.customer.tld -> host-c94eca5715a9.local
 
 Project B salt: red-team-2026-b
-api.customer.tld -> host-4a0c13.local
+api.customer.tld -> host-b850547ba166.local
 ```
+
+The values above follow the current implementation. The format is `host-` plus the first 6 HKDF output bytes encoded as 12 lowercase hexadecimal characters, followed by `.local`.
 
 ## Salt Rotation Guidance
 
@@ -77,6 +79,7 @@ This combination is recommended for regulated workflows.
 * Reusing the same salt across unrelated client engagements.
 * Assuming determinism means model output is always identical.
 * Forgetting that active scanner requests still hit real targets.
+* Assuming every hostname-shaped field is covered. `STRICT` anonymizes the carriers wired to the host redactor; see [Redaction Coverage and Known Boundaries](limitations.md#redaction-coverage-and-known-boundaries).
 
 ## Related Pages
 

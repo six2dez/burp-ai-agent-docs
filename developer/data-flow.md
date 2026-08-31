@@ -6,15 +6,15 @@ This page describes how data moves from Burp context to AI output, scanner findi
 
 ```mermaid
 flowchart TD
-    Sel[User selection in Burp]\nRequest, response, or issue
-    Act[Context action]\nFind vulnerabilities, Explain JS, etc.
-    Col[ContextCollector]\ncollects selected data
-    Red[Redaction Pipeline]\nSTRICT or BALANCED or OFF
-    Cap[Manual context controls]\nbody caps and compact JSON
-    Prompt[Prompt composition]\ntemplate and context
-    Backend[Backend adapter]\nCLI or HTTP
-    Chat[Chat panel]\nstreamed response
-    Audit[Audit log]\nprompt and chunks
+    Sel["User selection in Burp<br/>request, response, or issue"]
+    Act["Context action<br/>Find vulnerabilities, Explain JS, etc."]
+    Col["ContextCollector<br/>collects selected data"]
+    Red["Redaction pipeline<br/>STRICT, BALANCED, or OFF"]
+    Cap["Manual context controls<br/>body caps and compact JSON"]
+    Prompt["Prompt composition<br/>template and context"]
+    Backend["Backend adapter<br/>CLI or HTTP"]
+    Chat["Chat panel<br/>response callback"]
+    Audit["Audit log<br/>prompt and chunks"]
 
     Sel --> Col
     Act --> Col
@@ -26,7 +26,7 @@ flowchart TD
 **Operational notes**:
 
 1. Context is collected from the selected Burp item(s).
-2. Redaction is applied before any outbound AI call.
+2. The manual-context path applies the active policy before the outbound AI call. The preview represents this action's composed context; other scanner and MCP carriers have their own producer controls.
 3. Manual context size controls are applied for context-menu actions.
 4. Audit logging (when enabled) records prompt and stream events.
 
@@ -35,16 +35,20 @@ flowchart TD
 ```mermaid
 flowchart TD
     Start[User selects BountyPrompt action]
-    Load[BountyPrompt loader]\ncurated JSON prompts and enabled IDs
-    Resolve[Tag resolver]\nredaction-aware HTTP tags
-    Compose[Prompt composer]\nsystem and user prompt
-    Run[Backend stream to chat]
-    Parse[Output parser]\nJSON extraction and fallback
+    Cache["Read pre-parsed prompt cache<br/>loaded off the EDT at startup or save"]
+    Resolve["Tag resolver<br/>carrier-aware HTTP tags"]
+    Compose["Prompt composer<br/>system and user prompt"]
+    Preview[Action prompt/context preview]
+    Run[Backend response to chat]
+    Type{Issue output and auto-create enabled?}
+    Parse["Output parser<br/>JSON extraction or raw-text fallback"]
     Gate{Confidence >= threshold?}
-    Issue[Create Burp issue]\nAI/BountyPrompt prefix
-    ChatOnly[Chat only]\nno issue creation
+    Issue["Create Burp issue<br/>AI/BountyPrompt prefix"]
+    ChatOnly["Chat only<br/>no issue creation"]
 
-    Start --> Load --> Resolve --> Compose --> Run --> Parse --> Gate
+    Start --> Cache --> Resolve --> Compose --> Preview --> Run --> Type
+    Type -->|Yes| Parse --> Gate
+    Type -->|No| ChatOnly
     Gate -->|Yes| Issue
     Gate -->|No| ChatOnly
 ```
@@ -56,14 +60,14 @@ The AI passive scanner is registered as a Montoya `PassiveScanCheck` (via `api.s
 ```mermaid
 flowchart LR
     T[PassiveScanCheck.doCheck per request]
-    F[Filters]\nMIME, scope, size, stream patterns
-    L[Local checks]\ncsrf, smuggling, upload, deserialization
-    D[Dedup filters]\nendpoint and fingerprint windows
+    F["Filters<br/>MIME, scope, size, stream patterns"]
+    L["Local checks<br/>CSRF, smuggling, upload, deserialization"]
+    D["Dedup filters<br/>endpoint and fingerprint windows"]
     C[Prompt cache lookup]
     Hit[Cached findings]
     AI[AI analysis]
     Conf{Confidence >= 85%?}
-    Issue[Burp issue]\n[AI Passive]
+    Issue["Burp issue<br/>[AI Passive]"]
     Queue{Auto-queue to active enabled?}
     ActiveQ[Active scanner queue]
 
@@ -120,17 +124,19 @@ flowchart LR
 ```mermaid
 flowchart LR
     Target[Target request]
-    Points[Injection point extraction]\nurl, body, header, cookie, json, xml, path
-    Payloads[Payload selection]\nby risk level and scan mode
-    Send[Request execution]\nrate and timeout controlled
-    Analyze[Response analysis]\nerror, reflection, timing, OAST
+    Points["Injection point extraction<br/>URL, body, header, cookie, JSON, XML, path"]
+    Payloads["Payload selection<br/>by risk level and scan mode"]
+    Send["Request execution<br/>rate and timeout controlled"]
+    Analyze["Response analysis<br/>error, reflection, timing, OAST"]
     Confirm{Confirmed finding?}
-    Issue[Burp issue]\n[AI Active]
+    Issue["Burp issue<br/>[AI Active]"]
 
     Target --> Points --> Payloads --> Send --> Analyze --> Confirm
     Confirm -->|Yes| Issue
     Confirm -->|No| NoIssue[No issue]
 ```
+
+Issue details are built under the privacy mode active at creation time. Burp `AuditIssue` instances are immutable for this purpose, and consolidation can retain an older issue, so changing privacy mode does not rewrite findings already stored.
 
 ## MCP Tool Flow
 
@@ -149,6 +155,8 @@ flowchart LR
     Client --> Transport --> Auth --> Limit --> Handler --> Burp --> Privacy --> Resp
     Handler --> Log
 ```
+
+`Privacy filter` represents two layers: producer-specific sanitization for structured fields (for example headers and cookie-typed parameters), followed by `McpToolContext.redactIfNeeded` on the serialized result. The read-time pass uses the current mode, but it cannot recover semantic type information that the producer discarded. See [Redaction Coverage and Known Boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries).
 
 ## Auto Tool Chaining Flow
 
@@ -205,4 +213,4 @@ flowchart LR
     Next -->|same traceId| Tool
 ```
 
-Trace IDs are generated at the entry point and propagated through the entire call chain. Scanner jobs generate `scanner-job-{UUID}`, batch passive analyses share `scanner-batch-{UUID}` across all requests in the batch, and adaptive payload generation uses `adaptive-payload-{VULN_CLASS}` so the same identifier is reused for repeated generations of the same class. See [Audit Logging → Trace ID Correlation](../privacy/audit-logging.md#trace-id-correlation) for the full list.
+Trace IDs are generated at the entry point and propagated through the AI Request Logger call chain. Scanner jobs generate `scanner-job-{UUID}`, batch passive analyses share `scanner-batch-{UUID}` across all requests in the batch, and adaptive payload generation uses `adaptive-payload-{VULN_CLASS}` so the same identifier is reused for repeated generations of the same class. See [AI Request Logger → Trace IDs](../privacy/ai-request-logger.md#trace-ids-correlation) for the full list; the separate audit JSONL stream does not attach the ID to every event.

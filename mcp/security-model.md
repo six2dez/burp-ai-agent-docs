@@ -9,13 +9,13 @@ By default, server bind address is `127.0.0.1`. Only local processes can connect
 ## 2. Token Authentication
 
 * Token is auto-generated on first run with `SecureRandom` (32 bytes, base64) and can be rotated in **MCP Server** settings.
-* When **External Access** is enabled, every request must include `Authorization: Bearer <token>`.
+* When **External Access** is enabled, every non-health request must include `Authorization: Bearer <token>`; `GET /__mcp/health` remains unauthenticated for liveness checks.
 * When external access is disabled (default), loopback clients are **not** required to send the bearer token — the server instead rejects the request when the `Host`/`Origin`/`Referer` look browser-originated or non-local (see §4). The `POST /__mcp/shutdown` administrative endpoint still requires a credential in both modes — either the bearer token or a takeover proof of possession (see §4).
 
 ## 3. Tool Gating (Safe vs Unsafe)
 
-* **Safe tools**: read-only operations, enabled by default.
-* **Unsafe tools**: state/traffic modifying operations, disabled by default.
+* **Safe tools**: read-only operations; many are catalog-enabled by default, subject to their per-tool toggle.
+* **Unsafe tools**: state/traffic modifying operations. The global unsafe master switch is off by default, so they cannot run even if an individual descriptor (such as `http1_request`) is catalog-enabled.
 
 {% hint style="warning" %}
 Unsafe tools can modify Burp state and generate outbound traffic. Enable only when needed and only for trusted clients.
@@ -33,7 +33,7 @@ The build you load is the first gate on what MCP can reach:
 * The **BApp Store build** exposes **only the 8 extension-native AI tools** (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). It does **not** expose generic Burp/Montoya tools (proxy history, repeater, scanner, scope, site map, intruder, Collaborator, utilities, etc.) — for those, run PortSwigger's official Burp MCP Server.
 * The **full build** (GitHub releases) exposes all 59 MCP tools.
 
-The AI-calling tools additionally check `ai.isEnabled()` before issuing a request, so the configured AI setting is honored even when a client invokes them directly.
+The `ai_analyze` and `ai_passive_scan` handlers currently check Burp's `api.ai().isEnabled()` unconditionally before invoking the extension supervisor. As a result, those two MCP tools are unavailable on Community or with **Use AI for extensions** off even when an independent backend is selected. This is narrower than the normal chat/scanner backend gate, which only blocks the `burp-ai` backend.
 
 ### Scope Restriction
 
@@ -41,26 +41,28 @@ When **Restrict MCP tools to in-scope hosts** (`mcpScopeOnly`) is enabled in **M
 
 ## 4. Origin and Host Validation
 
-The server validates `Host`, `Origin`, `Referer` and rejects browser `User-Agent` strings (configurable via **Allowed Origins**) to reduce CSRF and cross-origin abuse paths, even for loopback clients.
+In local mode, the access-control gate validates `Host`, `Origin`, and `Referer`, and rejects browser-like `User-Agent` requests when no acceptable loopback origin is present. In external mode, Ktor CORS owns origin filtering and the bearer gate owns authorization; **Allowed Origins** configures that CORS list. Leaving it empty in external mode calls `anyHost()`, so set an explicit list when browser-origin restrictions matter. The unauthenticated health route is the documented exception.
 
 ### Administrative Endpoints
 
-* `GET /__mcp/health` — returns `"ok"` and the `X-Burp-AI-Agent: mcp` header. Used internally by the MCP Supervisor to detect another live Custom AI Agent MCP instance on the same port (takeover probe).
+* `GET /__mcp/health` — returns `"ok"` without authentication. In local mode it also returns `X-Burp-AI-Agent: mcp`; external mode deliberately omits that identifying header. The MCP Supervisor uses the route as a bind-conflict liveness probe.
 * `POST /__mcp/shutdown` — requires either `Authorization: Bearer <token>` or a valid `X-Mcp-Takeover-Proof` header. Used by a new MCP server instance to ask a colliding older instance to release the port during a graceful takeover.
 
-  **The automatic takeover never sends the token.** It presents an HMAC-SHA256 proof of possession keyed by the MCP token and bound to the target host, port and a 10-second window (`McpTakeoverProof`), so a local process that squats the port and echoes `X-Burp-AI-Agent: mcp` cannot harvest a credential that would grant it full MCP tool access to your Burp. The residual is narrow and accepted: within its window that proof could be replayed to shut down the freshly-bound server — a denial of service by a process that is already denying service by holding the port. Under TLS the client additionally pins the server certificate to the one in its own keystore and fails closed if no pin can be computed.
+  **The automatic takeover never sends the token.** It presents an HMAC-SHA256 proof of possession keyed by the MCP token and bound to the target host, port and a 10-second window (`McpTakeoverProof`), so a local process that squats the port and echoes `X-Burp-AI-Agent: mcp` cannot harvest a credential that would grant it full MCP tool access to your Burp. The residual is narrow and accepted: within its window that proof could be replayed to shut down the freshly-bound server — a denial of service by a process that is already denying service by holding the port. Under TLS on a loopback bind, the client additionally pins the server certificate to the one in its own keystore and fails closed if no pin can be computed. Automatic takeover is not supported for a non-loopback TLS bind: free the port manually and restart MCP.
 
 ## 5. Privacy Mode Integration
 
-MCP output is filtered through active privacy mode before leaving Burp.
+MCP tool results pass through the active read-time privacy mode before leaving Burp. Structured producers also sanitize recognized headers, URLs, and cookie-typed parameters before serialization.
 
-* `STRICT`: host anonymization + sensitive token/cookie filtering.
-* `BALANCED`: token/cookie filtering with real hostnames.
-* `OFF`: no redaction.
+* `STRICT`: recognized token/cookie filtering plus host anonymization on covered carriers.
+* `BALANCED`: recognized token/cookie filtering with real hostnames.
+* `OFF`: built-in filtering disabled; configured custom redaction patterns still run.
 
-## 6. TLS (Optional)
+This is not a field-independent DLP guarantee. In particular, raw HTTP/serialized URL carriers, generic `value` fields, and stored scanner issue details have [documented boundaries](../privacy/limitations.md#redaction-coverage-and-known-boundaries). Use `redact_preview` for representative payload shapes and keep bulk traffic tools in a confirmation tier.
 
-TLS can be enabled for external access:
+## 6. TLS
+
+TLS is optional for loopback-only operation and mandatory when **External Access** is enabled. It can use:
 
 * Auto-generated self-signed certificate (default), or
 * Custom PKCS12 keystores for enterprise environments.
@@ -73,7 +75,7 @@ When auto-generation is active, the extension shells out to the JDK-bundled `key
 * Subject `CN=burp-mcp`
 * Stored at `~/.burp-ai-agent/certs/mcp-keystore.p12`
 
-This implementation works on JDK 8 through JDK 25+ without additional dependencies.
+Certificate generation depends on the `keytool` binary from the active Java runtime. The project builds against Java 21; use that supported toolchain (or the compatible runtime bundled with Burp) rather than assuming a blanket Java 8–25 runtime contract.
 
 ## 7. Tool-Call Confirmation (SEC-06)
 
@@ -117,9 +119,9 @@ users see.
 
 ### Credential Storage
 
-Both the MCP bearer token and the TLS keystore password are persisted in Burp's preferences store (keys `mcp.token` and `mcp.tls.keystore.password`). Burp preferences are stored in the user's project file and are only as protected as that file.
+Both the MCP bearer token and the TLS keystore password are persisted in Burp's preferences store (keys `mcp.token` and `mcp.tls.keystore.password`). They are encrypted with the extension's `ENC1:` format, but the AES master key is stored in the same Burp preferences domain. Treat access to the preferences store or its exports as credential access.
 
-* If the project file or a preferences export could leak (shared backups, multi-user hosts), treat both the bearer token and the TLS keystore as compromised and rotate them.
+* If Burp preferences or an export could leak (shared backups, multi-user hosts), treat both the bearer token and the TLS keystore as compromised and rotate them.
 * The MCP bearer token is generated with `SecureRandom` (32 bytes, base64). Rotate it whenever an external client is decommissioned.
 * For high-assurance setups, generate the keystore offline with your own `keytool` invocation and point the extension at it via settings, so the password never touches Burp preferences.
 
@@ -128,12 +130,12 @@ Both the MCP bearer token and the TLS keystore password are persisted in Burp's 
 Every MCP tool call is logged to the [AI Request Logger](../privacy/ai-request-logger.md) with:
 
 * **Policy decision**: `allowed`, `disabled`, `unsafe_blocked`, `pro_only`, `concurrency_limited`.
-* **Argument hash** (`argsSha256`): SHA-256 of the tool arguments for tamper detection.
-* **Result hash** (`resultSha256`): SHA-256 of the tool output.
+* **Argument hash** (`argsSha256`): SHA-256 checksum of the tool arguments for correlation and comparison.
+* **Result hash** (`resultSha256`): SHA-256 checksum of the tool output.
 * **Status**: `ok`, `error`, `blocked`.
 * **Duration**: Execution time in milliseconds.
 
-This provides a complete audit trail for all tool invocations regardless of whether they originate from chat tool chaining or external MCP clients.
+This provides execution telemetry for tool invocations from chat tool chaining and external MCP clients. The hashes are unkeyed and stored beside the record, so they do not authenticate it against a writer who can edit both value and hash. The AI Request Logger is enabled by default but bounded in memory; durable retention requires its rolling JSONL option or Audit Logging, and filesystem protection remains the operator's responsibility.
 
 ## Related Pages
 

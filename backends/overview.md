@@ -16,7 +16,7 @@ flowchart TD
     BurpPro -->|Yes| BurpAi[Burp AI built-in]
     BurpPro -->|No| Privacy
 
-    Privacy -->|Yes| Local[Local backends\nOllama or LM Studio]
+    Privacy -->|Yes| Local["Local backends<br/>Ollama or LM Studio"]
     Privacy -->|No| Cli
 
     Cli -->|Yes| CloudCli[Gemini CLI / Claude CLI / Codex CLI / Copilot CLI / OpenCode CLI]
@@ -44,25 +44,27 @@ flowchart TD
 | **OpenCode CLI** | Cloud CLI | Medium | Multi-provider via one CLI. |
 
 {% hint style="info" %}
-**Network transport:** the HTTP backends (Ollama, LM Studio, NVIDIA NIM, Perplexity, Anthropic, Generic OpenAI-compatible) send and health-check exclusively through Burp's own Montoya HTTP stack — there is no direct out-of-band HTTP client. AI-backend traffic therefore respects Burp's upstream proxy, TLS, and logging configuration and is visible in Burp like any other request (#69).
+**Network transport:** normal chat and scanner requests from every built-in HTTP backend use Burp's `MontoyaHttpTransport`, so those requests respect Burp's upstream proxy/TLS configuration and are visible in Proxy history. There is one current health-check exception: while **Perplexity** is selected, its five-second status check sends a fixed, minimal `"Hey"` chat completion through the shared direct HTTP client rather than Montoya. It carries no captured Burp context, but it bypasses Burp's upstream proxy and may count toward provider usage. NVIDIA NIM uses a similar live completion for health, but routes it through Montoya. Anthropic performs no live health request; a non-empty key is treated as healthy until an actual request proves otherwise.
 {% endhint %}
 
 ### Capability Matrix
 
-| Backend | Streaming | JSON mode | System role | Auto-start |
+| Backend | Response delivery in current runtime | JSON mode | System role | Auto-start |
 | :--- | :-: | :-: | :-: | :-: |
 | **Burp AI (built-in)** | No (single `execute`) | No — enforced via prompt | Yes | N/A |
-| **Ollama** | Yes (SSE) | Yes (`format=json`) | Yes | Yes (`ollama serve`) |
-| **LM Studio** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | Yes (`lms server start`) |
-| **NVIDIA NIM** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | N/A |
-| **Perplexity** | Yes (SSE) | **No** (Sonar API rejects `response_format=json_object`) | Yes | N/A |
-| **Anthropic** | Yes (buffered, proxy-visible) | No — enforced via prompt | Yes (native `system`) | N/A |
-| **Generic OpenAI-compatible** | Yes (SSE) | Yes (`response_format=json_object`) | Yes | N/A |
-| **Gemini CLI** | Line-by-line stdout | No | No (prepended) | N/A |
-| **Claude CLI** | Line-by-line stdout | No | No (prepended) | N/A |
-| **Codex CLI** | Line-by-line stdout | No | No (prepended) | N/A |
-| **Copilot CLI** | Line-by-line stdout | No | No (prepended) | N/A |
-| **OpenCode CLI** | Line-by-line stdout | No | No (prepended) | N/A |
+| **Ollama** | Single chunk (`stream=false`) | Yes (`format=json`) | Yes | Yes (`ollama serve`) |
+| **LM Studio** | Single chunk (`stream=false`) | Yes (`response_format=json_object`) | Yes | Yes (`lms server start`) |
+| **NVIDIA NIM** | Single parsed response; see caveat below | Yes (`response_format=json_object`) | Yes | N/A |
+| **Perplexity** | Single parsed response; see caveat below | **No** (Sonar API rejects `response_format=json_object`) | Yes | N/A |
+| **Anthropic** | Single chunk (`stream=false`, proxy-visible) | No — enforced via prompt | Yes (native `system`) | N/A |
+| **Generic OpenAI-compatible** | Single chunk (`stream=false`) | Yes (`response_format=json_object`) | Yes | N/A |
+| **Gemini CLI** | Buffered process output, then one chunk | No | No (prepended) | N/A |
+| **Claude CLI** | Buffered process output, then one chunk | No | No (prepended) | N/A |
+| **Codex CLI** | Buffered process/output file, then one chunk | No | No (prepended) | N/A |
+| **Copilot CLI** | Buffered process output, then one chunk | No | No (prepended) | N/A |
+| **OpenCode CLI** | Buffered process output, then one chunk | No | No (prepended) | N/A |
+
+The `AgentConnection` API supports repeated `onChunk` callbacks, but the current built-ins call it once after a complete response has been buffered and parsed. NVIDIA NIM and Perplexity currently set `stream: true` in their normal chat-completions payload while the shared Montoya path parses the returned body as one JSON document; a provider that returns actual SSE `data:` frames is not decoded by that path. Treat this as a current compatibility limitation, not working UI streaming.
 
 See [Agent Profiles → How It Works](../user-guide/agent-profiles.md#how-it-works) for how the system-role difference affects profile delivery.
 
@@ -120,41 +122,45 @@ Backends are available in both Community and Professional editions. MCP tool ava
 
 ## Health States
 
-A timer in the main tab polls the active backend every **5 seconds** and renders the result as a colored pill in the top bar:
+The UI polls the selected backend every **5 seconds** and renders the backend-specific result as a colored pill in the top bar. Separately, the supervisor checks an already-running agent connection every 2 seconds for crash/restart handling; that liveness monitor does not drive the pill.
 
 | Pill | Internal state | Meaning | Typical cause |
 | :--- | :--- | :--- | :--- |
-| **AI: OK** (green) | `Healthy` | Last health probe succeeded. Backend accepted a minimal test request and returned a usable response. | Normal steady state. |
-| **AI: Degraded** (amber) | `Degraded` | Probe succeeded with warnings (e.g., elevated latency, partial response, soft-error returned by the model API). The tooltip shows the diagnostic message. | Slow first token from a cold cloud model; transient rate limiting that did not fail; CLI backend responding but with stderr noise. |
-| **AI: Offline** (red) | `Offline` / `Unavailable` | Probe failed or the backend is structurally unavailable (selected backend is **Burp AI (built-in)** without *Use AI for extensions* enabled, CLI binary not on PATH, HTTP endpoint refusing connections, circuit breaker open). The tooltip carries the underlying message. The *Use AI for extensions* gate only affects the **Burp AI** backend — picking any other backend keeps the plugin running even with the toggle off. | Missing API key, model name typo, local model server not started, CLI authentication expired, circuit breaker tripped after 5 consecutive failures. |
+| **AI: OK** (green) | `Healthy` | The backend-specific check passed. This can mean HTTP reachability/live completion, an executable CLI command, Burp AI enabled, or—for Anthropic—only that a key is present. It does not guarantee the next inference will succeed. | Normal configured state. |
+| **AI: Degraded** (amber) | `Degraded` | A live HTTP check reached the endpoint but received an authentication failure; NVIDIA NIM and Perplexity also map HTTP 429 to this state. The tooltip carries the status. | Invalid/expired API key or rate limiting on a live cloud health completion. |
+| **AI: Offline** (red) | `Unavailable` | The configured check failed or required configuration is absent. The *Use AI for extensions* gate affects only **Burp AI (built-in)**. | Missing URL/model, unreachable endpoint, unresolved CLI executable, or Burp AI disabled. |
 
-The probe is asynchronous so UI threading is never blocked. Each transition between states is recorded in the [AI Request Logger](../privacy/ai-request-logger.md) so you can correlate dips with specific traffic spikes or backend errors.
+The check runs off the Swing event thread. Status transitions themselves are not written to the AI Request Logger; actual prompt failures and transport retries are.
 
 If a backend stays `Offline` longer than expected, see [Backend Troubleshooting](troubleshooting.md) for per-backend error signatures.
 
 ## Retry Behavior
 
-HTTP backends (Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity) include automatic retry logic with bounded stepped backoff:
+HTTP backends (Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, Anthropic) include automatic retry logic with bounded stepped backoff:
 
-* **Maximum attempts**: 6.
-* **Retryable errors**: Connection timeouts, connection refused, and other transient network failures.
-* **Backoff schedule** (fixed, per attempt number): `500 ms`, `1000 ms`, `1500 ms`, `2000 ms`, `3000 ms`, `4000 ms`. The delay does not grow exponentially; it is capped at 4 seconds so retries stay bounded.
+* **Maximum attempts**: 6 total (the initial attempt plus at most 5 retries).
+* **Retryable errors**: Transport exceptions classified as transient, including connection timeout/refused, unexpected end of stream, stream reset, and end-of-input conditions. HTTP error responses are returned immediately rather than retried inside the same call.
+* **Backoff before the five retries**: `500 ms`, `1000 ms`, `1500 ms`, `2000 ms`, `3000 ms`.
 * **Diagnostics**: Each retry attempt is logged to the [AI Request Logger](../privacy/ai-request-logger.md) as a `RETRY` activity with the attempt number, delay, and reason.
 
 ### Circuit Breaker
 
-HTTP backends are additionally wrapped in a circuit breaker:
+Each launched HTTP connection has its own circuit breaker:
 
-* **Failure threshold**: 5 consecutive failures open the circuit.
-* **Reset timeout**: 30 seconds before the breaker transitions to half-open.
-* **Half-open probes**: a single attempt is allowed; success closes the breaker, failure reopens it.
+* **Failure threshold**: 5 recorded transient failures open the circuit. Transport exceptions count per failed attempt; HTTP 429 and 5xx responses count once, while other 4xx responses do not.
+* **Reset timeout**: 30 seconds before the next model request can become the one half-open attempt.
+* **Half-open request**: success closes the breaker; failure reopens it.
 * When the circuit is open the backend fails fast with `"<backend> backend is temporarily unavailable (circuit open)"`.
+
+The top-bar health checker is independent of this per-connection breaker. Starting a new chat session creates a new connection; it does not mutate the breaker held by an existing session.
 
 The **Burp AI (built-in)** backend uses Burp Pro's own retry and error handling, so the schedule above does not apply to it. CLI backends handle failures through the supervisor restart mechanism rather than per-request retries.
 
+CLI processes also have a shared **120-second hard runtime ceiling**. OpenCode adds a separate 30-second idle-output timeout; either limit can terminate its run first. The current settings panel does not expose the shared CLI timeout as an editable field.
+
 ## Output Token Limits
 
-HTTP backends (Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity) automatically set output token limits per request type to ensure complete responses:
+HTTP backends (Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, Anthropic) pass output-token limits per request type to bound response size. A limit cannot guarantee that a model completes the requested answer:
 
 | Request Type | Max Output Tokens |
 | :--- | :--- |

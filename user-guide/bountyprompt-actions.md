@@ -1,6 +1,6 @@
 # BountyPrompt Actions
 
-BountyPrompt integration adds curated, tag-aware actions to the request/response context menu. It is optional and fully controlled from the **Prompt Templates** settings tab.
+BountyPrompt integration adds curated, tag-aware actions to the request/response context menu. It is optional and configured from the **Custom Prompts** settings tab.
 
 ## What This Adds
 
@@ -11,12 +11,12 @@ BountyPrompt integration adds curated, tag-aware actions to the request/response
 
 ## Enable and Configure
 
-Open **Prompt Templates** in the bottom settings panel and configure:
+Open **Custom Prompts** in the bottom settings panel and configure the **BountyPrompt integration** section:
 
-* **Enable BountyPrompt actions**
+* **Enabled**
 * **Prompt directory**
 * **Auto-create issues**
-* **Issue confidence threshold**
+* **Issue threshold**
 * **Enabled prompt IDs**
 
 Reference defaults are documented in [Settings Reference](../reference/settings-reference.md).
@@ -50,7 +50,7 @@ BountyPrompt JSON `userPrompt` values can include these tags:
 | :--- | :--- |
 | `[HTTP_Requests]` | Redacted raw HTTP requests |
 | `[HTTP_Requests_Headers]` | Request headers only |
-| `[HTTP_Requests_Parameters]` | Parsed request parameters |
+| `[HTTP_Requests_Parameters]` | Parsed request parameters; cookie-typed values are `[STRIPPED]` and values with sensitive-looking parameter names are `[REDACTED]` in STRICT/BALANCED |
 | `[HTTP_Request_Body]` | Request body only |
 | `[HTTP_Responses]` | Redacted raw HTTP responses |
 | `[HTTP_Response_Headers]` | Response headers only |
@@ -64,9 +64,10 @@ Unknown `[HTTP_*]` tokens are removed at resolution time.
 
 BountyPrompt actions follow the same privacy controls as other actions:
 
-* Redaction runs before tag resolution.
+* Each raw request/response tag value is passed through the active redaction policy while the tag is resolved.
 * STRICT/BALANCED/OFF policies apply to the selected fields.
-* Determinism mode controls stable ordering and host anonymization consistency.
+* Host pseudonyms are stable for the same anonymization salt. The resolver preserves the request/response order supplied by Burp; the determinism toggle is reported in the preview but does not reorder BountyPrompt selections.
+* Parameter rendering is carrier-aware, not value-complete. In `[HTTP_Requests_Parameters]`, a secret-shaped value in a URL/body parameter whose name does not look sensitive can remain unchanged even in `STRICT` or `BALANCED`. Review the action preview before sending; see [Redaction Coverage](../privacy/limitations.md#redaction-coverage-and-known-boundaries).
 
 ## Prompt Composition
 
@@ -75,7 +76,7 @@ Each action composes two parts:
 1. **System Instructions** from the BountyPrompt JSON `systemPrompt`.
 2. **User Task** from resolved `userPrompt` after tag substitution.
 
-The resulting text is sent as a standard chat action through the selected backend.
+The resulting action text is shown in the standard context preview and, after confirmation, sent as a chat action through the selected backend. Backend framing and any separate system-role profile are added after that preview.
 
 ## Issue Creation Rules
 
@@ -84,13 +85,13 @@ Issue creation is attempted only when all conditions are true:
 1. Prompt `outputType` is `issue`.
 2. **Auto-create issues** is enabled.
 3. Parser extracts one or more findings.
-4. Parsed confidence is greater than or equal to **Issue confidence threshold**.
+4. Parsed confidence is greater than or equal to **Issue threshold**.
 
 Additional behavior:
 
 * Findings containing `NONE` are treated as no finding.
 * JSON outputs are parsed from direct JSON or fenced JSON blocks.
-* Fallback parsing stores raw output as issue detail if valid JSON findings are not extracted.
+* If valid JSON findings are not extracted, fallback parsing treats up to 12,000 characters of raw model output as one finding using the prompt definition's severity and confidence. That fallback can cross the issue threshold, so every auto-created issue still requires manual validation.
 * Issue names are prefixed as `[AI][BountyPrompt] ...`.
 * Duplicate issues (same base URL and same issue name) are skipped.
 
@@ -98,13 +99,14 @@ Additional behavior:
 
 * Menu appears as **BountyPrompt** under request/response actions.
 * Entries are grouped in **Detection**, **Recon**, and **Advisory**.
-* Entry label includes selected item count.
+* Entry labels are the prompt titles; the submenu itself does not include the selected-item count.
 * If disabled or unresolved, submenu is shown disabled with tooltip guidance.
 
 ## Operational Limits
 
 * Only curated IDs are loaded.
 * Only IDs listed in **Enabled prompt IDs** are allowed.
+* Definitions are parsed into an off-EDT cache at startup and after settings are saved. While the first cache load is pending, the submenu is disabled with a loading tooltip.
 * Per-tag context is truncated before model submission:
   * **Detection**: `2500` chars per chunk, `10000` chars per tag.
   * **Recon**: `3500` chars per chunk, `14000` chars per tag.

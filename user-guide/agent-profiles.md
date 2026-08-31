@@ -1,6 +1,6 @@
 # Agent Profiles
 
-Agent Profiles allow you to customize the AI's system instructions based on your engagement type. Profiles are Markdown files stored in `~/.burp-ai-agent/AGENTS/` that inject role-specific guidance into every AI interaction.
+Agent Profiles allow you to customize the AI's system instructions based on your engagement type. Profiles are Markdown files stored in `~/.burp-ai-agent/AGENTS/` that inject role-specific guidance into chat turns and context-menu actions routed through the chat panel. Scanner and direct MCP AI calls do not load these profile sections.
 
 ## Installation
 
@@ -16,7 +16,7 @@ If you delete them, simply re-run Burp or drop the files back into the directory
 4. **Delivery depends on the backend:**
    * **HTTP backends** that advertise `supportsSystemRole = true` (Burp AI, Ollama, LM Studio, Generic OpenAI-compatible, NVIDIA NIM, Perplexity) receive the profile text as a dedicated **system-role message** at the start of the conversation, separate from the user prompt.
    * **CLI backends** (Gemini, Claude, Codex, Copilot, OpenCode) do not have a system-role channel, so the profile text is **prepended to the user prompt** before the command is invoked.
-   * For either path, the text is labeled `System instructions (AGENTS):` so it is auditable in logs.
+   * For either path, the delivered block is labeled `System instructions (AGENTS):`. On CLI backends it becomes part of the logged prompt text. On system-role HTTP backends it is passed separately and is not serialized into the current prompt bundle; the AI Request Logger records dispatch metadata, not the profile body.
 
 ```mermaid
 flowchart TD
@@ -117,7 +117,7 @@ The profile loader caches the parsed profile and checks the file modification ti
 * Keep global instructions concise (2-3 sentences) to avoid consuming too much of the model's context window.
 * Use section-specific instructions for detailed guidance per action type.
 * The `[DEFAULT]` section is a good place for general output formatting preferences.
-* Profile instructions appear as `System instructions (AGENTS):` in the payload sent to the backend (inside the system-role message on HTTP backends, at the top of the combined text on CLI backends).
+* Profile instructions appear as `System instructions (AGENTS):` in the payload sent to the backend (inside the system-role message on supporting HTTP backends, at the top of the combined text on CLI backends). The [audit prompt bundle](../privacy/audit-logging.md) does not currently capture the separate HTTP `systemPrompt` argument.
 
 
 ## Profile Validation

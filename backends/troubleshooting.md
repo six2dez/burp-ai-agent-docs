@@ -4,19 +4,15 @@ When the **AI: OK / Degraded / Offline** pill in the top bar reports a problem, 
 
 ## Health States Recap
 
-The plugin polls the active backend every five seconds. The polled state is rendered as a colored pill plus tooltip:
+The plugin polls the selected backend every five seconds. The backend-specific result is rendered as a colored pill plus tooltip:
 
 | Pill | Internal state | What you should do |
 | :--- | :--- | :--- |
-| **AI: OK** | `Healthy` | Nothing — backend is responding. |
-| **AI: Degraded** | `Degraded` | Read the tooltip. Usually transient (slow first token, soft rate-limit) — retry the in-flight request before changing anything. |
-| **AI: Offline** | `Offline` / `Unavailable` | Read the tooltip. This means the next request will either fail fast (HTTP) or never start (CLI). Fix or switch backend. |
+| **AI: OK** | `Healthy` | The configured check passed. For CLI backends this checks executable resolution, not authentication; for Anthropic it checks only that a key is present. |
+| **AI: Degraded** | `Degraded` | Read the tooltip. Current HTTP checks use this for authentication failures, and NVIDIA NIM/Perplexity also use it for HTTP 429. |
+| **AI: Offline** | `Unavailable` | Read the tooltip. The endpoint/configuration check failed, the CLI executable is unresolved, or Burp AI is disabled. |
 
-Each state transition lands as an entry in the [AI Request Logger](../privacy/ai-request-logger.md). Use the **Type** filter set to `ERROR` / `RETRY` to see the recent failure timeline alongside backend metadata.
-
-<!-- TODO: screenshot strip comparing the three top-bar pill states (AI: OK in green, AI: Degraded in amber, AI: Offline in red) ideally with their tooltips visible. Save as .gitbook/assets/backend-health-states.png and replace this marker with:
-![Screenshot: Backend health pill states](../.gitbook/assets/backend-health-states.png)
--->
+Status transitions are not logger events. Use the [AI Request Logger](../privacy/ai-request-logger.md) **ERROR** / **RETRY** filters for failures and retries produced by actual model requests.
 
 
 ## Diagnostic Flow
@@ -29,15 +25,15 @@ Each state transition lands as an entry in the [AI Request Logger](../privacy/ai
 
 ## When the Circuit Breaker Has Tripped
 
-HTTP backends are wrapped in a circuit breaker that opens after **5 consecutive failures**. While open, the next probe fails fast with `<backend> backend is temporarily unavailable (circuit open)` and the AI Request Logger shows synthetic errors instead of new requests.
+Each launched HTTP connection has a circuit breaker that opens after **5 recorded transient failures**. While open, the next model request on that connection fails fast with `<backend> backend is temporarily unavailable (circuit open)` and the AI Request Logger records the error instead of sending it upstream.
 
-* The breaker stays open for **30 seconds**, then allows a single half-open probe. Success closes it; failure reopens it.
-* The breaker resets immediately when you switch backends — the circuit is per-backend.
-* If you genuinely fixed the upstream issue and do not want to wait, switch backend and switch back to force a fresh probe.
+* The breaker stays open for **30 seconds**, then allows one half-open model request. Success closes it; failure reopens it.
+* Transport exceptions count per failed attempt. HTTP 429 and 5xx responses count once; other 4xx responses do not open the breaker.
+* The breaker belongs to the launched connection, not the top-bar health checker. Start a new chat session for a fresh connection, or wait for the half-open attempt; changing the preferred backend does not rewrite an existing session's breaker.
 
 ## Per-Backend Error Signatures
 
-### HTTP backends (Ollama, LM Studio, NVIDIA NIM, Perplexity, Generic OpenAI-compatible)
+### HTTP backends (Ollama, LM Studio, NVIDIA NIM, Perplexity, Anthropic, Generic OpenAI-compatible)
 
 | Symptom | Likely cause | Fix |
 | :--- | :--- | :--- |
@@ -46,18 +42,18 @@ HTTP backends are wrapped in a circuit breaker that opens after **5 consecutive 
 | `404 Not Found` on the chat endpoint | Wrong base URL or wrong path. Common with Perplexity if pointed via Generic OpenAI-compatible (which expects `/v1/chat/completions`). | Use the dedicated **Perplexity** backend, not Generic. Verify the URL does not double-up `/v1/`. |
 | `400 Bad Request` mentioning `response_format` | Backend does not support JSON mode but a request forced it | Use a backend that supports JSON mode for scanner workflows, or accept text-mode parsing on Perplexity. |
 | `model_not_found` / `invalid_model` | Model identifier typo | Check the model name matches the provider's catalog exactly (case-sensitive). |
-| Slow first token, then `Degraded` recovers to `OK` | Cold-start latency on shared infra (NVIDIA NIM, Perplexity) | Normal. Repeat the request; subsequent ones are fast. |
-| Persistent `Degraded` with retries in the logger | Provider rate limiting (soft 429s wrapped as retryable) | The plugin retries 6 times with stepped backoff. If retries do not clear it, switch to a different model or backend. |
+| `Degraded` with HTTP 401/403 in the tooltip | The live health endpoint was reachable but rejected authentication | Re-paste the key and verify it belongs to the configured endpoint. |
+| `Degraded` with HTTP 429 while NVIDIA NIM or Perplexity is selected | The five-second live completion used for health is being rate-limited | Review quota and provider logs, or select another backend to stop that health traffic. HTTP 429 is not retried inside the same model call. |
 | `<backend> backend is temporarily unavailable (circuit open)` | 5 consecutive failures tripped the breaker | See "When the Circuit Breaker Has Tripped" above. |
 
 ### Burp AI (built-in, Burp Pro only)
 
 | Symptom | Likely cause | Fix |
 | :--- | :--- | :--- |
-| `AI: Offline` with tooltip `Burp AI is not enabled` | **Settings → Burp AI → Use AI for extensions** is off | Toggle it on inside Burp Suite. The plugin picks it up on the next health cycle (within 5 s) — no restart. |
+| `AI: Offline` with tooltip `Burp AI is not enabled` | **Settings → Burp AI → Use AI for extensions** is off | Toggle it on inside Burp Suite. The plugin picks it up on the next UI health cycle (about 5 s) — no restart. |
 | `AI: Offline` and Burp Community | Backend is Pro-only | Switch to any non-Burp-AI backend. |
 | Quota errors surfaced as `ERROR` entries | Burp Pro AI credits exhausted | Top up credits via PortSwigger, or switch backend. |
-| Backend missing from the **Preferred Backend** dropdown | Older Montoya API without `ai()` surface | The plugin auto-hides Burp AI when the API surface is absent. Upgrade Burp Suite. |
+| Burp AI is present in **Preferred Backend** but remains unavailable | Burp Community, disabled **Use AI**, or unavailable Montoya AI surface | Use Burp 2026.2+ Professional with **Use AI for extensions** enabled, or select an independent backend. Registered backends remain listed even when their health check reports unavailable. |
 
 ### CLI backends (Gemini, Claude, Codex, Copilot, OpenCode)
 
@@ -65,9 +61,9 @@ HTTP backends are wrapped in a circuit breaker that opens after **5 consecutive 
 | :--- | :--- | :--- |
 | `command not found` in health output | CLI not on the `PATH` inherited by Burp | Pass an absolute path in the corresponding **CLI Command** setting, or relaunch Burp from a shell where the CLI works. |
 | `CreateProcess error=193` (Windows) | npm-installed CLI shim isn't directly executable from Java | Point to the `.cmd` shim (e.g., `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`). See [Backends Overview → Windows npm Shim Resolution](overview.md#windows-npm-shim-resolution). |
-| Process exits with `1` on first prompt | CLI not authenticated in this user account | Run the CLI's auth command in the same shell environment Burp inherits (`claude /login`, `gemini auth login`, etc.), then retry. |
+| `AI: OK`, but the first prompt exits with an authentication error | CLI health checks executable resolution, not provider authentication | Run the CLI's auth command in the same shell environment Burp inherits (`claude /login`, `gemini auth login`, etc.), then retry. |
 | Output is blank or truncated | OpenCode idle timeout fires before first token | The plugin terminates an OpenCode subprocess after **30 seconds** of idle stdout. Retry after warming the model, or pick a different backend for cold-start workloads. |
-| Very long prompts produce no output | Claude/Copilot CLI fallback path threshold (`32000` chars) | The CLI is being fed a smaller prompt by design. Trim context (lower the **Manual context body chars** caps) or switch to an HTTP backend that streams. |
+| Very long prompts produce no output | Claude/Copilot CLI fallback path threshold (`32000` chars) | The full combined prompt was written to an owner-only temp file where POSIX permissions are supported, and the CLI received an instruction containing that path. Check that the CLI can read the local temp path, or trim the manual-context caps. |
 | `AI: Offline` after a successful run | Supervisor decided the process exited unexpectedly | **Auto-Restart** is on by default — wait one health cycle. If it never recovers, check Burp's Output tab for the supervisor's diagnostic. |
 
 ## Switching Backend Without Losing Work
@@ -87,7 +83,7 @@ For scanners, switching the backend takes effect on the next analysis cycle. Any
 * Per-backend pages — each has its own troubleshooting block for provider-specific quirks:
   * [Burp AI (built-in)](burp-ai.md)
   * [Ollama](ollama.md), [LM Studio](lm-studio.md)
-  * [NVIDIA NIM](nvidia-nim.md), [Perplexity](perplexity.md), [Generic OpenAI-compatible](openai-compatible.md)
+  * [NVIDIA NIM](nvidia-nim.md), [Perplexity](perplexity.md), [Anthropic](anthropic.md), [Generic OpenAI-compatible](openai-compatible.md)
   * [Gemini CLI](gemini-cli.md), [Claude CLI](claude-cli.md), [Codex CLI](codex-cli.md), [Copilot CLI](copilot-cli.md), [OpenCode CLI](opencode-cli.md)
 * [Troubleshooting (general)](../reference/troubleshooting.md)
 * [AI Request Logger](../privacy/ai-request-logger.md)

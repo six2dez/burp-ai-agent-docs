@@ -55,7 +55,7 @@ The supervisor exposes two helpers that scope Burp Pro's *Use AI for extensions*
 * `requiresBurpAiAndDisabled(backendId: String): Boolean` — returns `true` only when `backendId == "burp-ai"` **and** `api.ai().isEnabled()` returns `false`. Used by call sites that know which backend they're about to talk to before starting it.
 * `isBlockedByBurpAiGate(): Boolean` — convenience wrapper that checks `requiresBurpAiAndDisabled` against the currently-running session's backend id.
 
-`startOrAttach`, `send`, and `sendChat` short-circuit through `requiresBurpAiAndDisabled` so they only refuse when the user has selected **Burp AI (built-in)** with Burp's toggle off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, and the Claude / Codex / Gemini / OpenCode / Copilot CLI agents — starts regardless of `api.ai().isEnabled()`. This also unblocks Burp Community users, where `api.ai().isEnabled()` is permanently `false`.
+`startOrAttach`, `send`, and `sendChat` short-circuit through `requiresBurpAiAndDisabled` so they only refuse when the user has selected **Burp AI (built-in)** with Burp's toggle off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, Anthropic, and the Claude / Codex / Gemini / OpenCode / Copilot CLI agents — starts regardless of `api.ai().isEnabled()`. This also unblocks Burp Community users, where `api.ai().isEnabled()` is permanently `false`.
 
 The same helpers gate the two scanner pipelines outside the supervisor: `PassiveAiScanner` and `ActiveAiScanner` call `isBlockedByBurpAiGate()` before scheduling work, and `ChatPanel.send` calls `requiresBurpAiAndDisabled` before opening a session.
 
@@ -72,7 +72,7 @@ Each launch gets a unique session ID (`session-{UUID}`) so chat history, diagnos
 ### Features
 
 * Health checks with bounded restart attempts (`DEFAULT_MAX_RESTART_ATTEMPTS = 4`, `DEFAULT_RESTART_DELAY_MS = 2000`).
-* Existing-server detection and safe handover on occupied ports (`DEFAULT_MAX_TAKEOVER_ATTEMPTS = 3`).
+* Existing-server liveness detection and bounded handover on occupied ports (`DEFAULT_MAX_TAKEOVER_ATTEMPTS = 3`).
 * SSE and STDIO transport lifecycle.
 * Optional TLS with local loopback trust handling.
 
@@ -98,19 +98,19 @@ stateDiagram-v2
 
 1. Bind attempt fails with `BindException`.
 2. Supervisor probes `/__mcp/health` on the same host:port.
-3. If the response carries `X-Burp-AI-Agent: mcp`, the port holder is most likely a previous Custom AI Agent server — supervisor posts `POST /__mcp/shutdown`, waits 1 s, then retries the bind. Up to `DEFAULT_MAX_TAKEOVER_ATTEMPTS = 3` tries.
+3. Local mode requires `X-Burp-AI-Agent: mcp` before takeover. External mode deliberately omits the identity header and proceeds on a successful liveness response alone. The supervisor posts `POST /__mcp/shutdown`, waits 1 s, then retries the bind, up to `DEFAULT_MAX_TAKEOVER_ATTEMPTS = 3` times.
 
-   The request carries a `X-Mcp-Takeover-Proof` header, **not** the bearer token: `McpTakeoverProof.forTarget` computes `HMAC-SHA256(key = token, message = "burp-ai-agent/mcp-takeover|v1|<host>:<port>|<10s window>")`, and the server-side `McpTakeoverProof.accepts` validates it in constant time against the current and previous window. The token is used as an HMAC key and never becomes an outbound header value, because `probeExistingServer` cannot establish the port holder's identity — the `X-Burp-AI-Agent` marker is echoable by any process. Under TLS the client also pins the server's leaf certificate to the one in `tlsKeystorePath` and installs no TLS override at all when no pin can be read, so an unidentified listener cannot complete the handshake.
-4. If the response does not carry the marker, takeover is aborted and the failure surfaces in the UI. No unsolicited shutdown is sent to unknown services.
+   The request carries a `X-Mcp-Takeover-Proof` header, **not** the bearer token: `McpTakeoverProof.forTarget` computes `HMAC-SHA256(key = token, message = "burp-ai-agent/mcp-takeover|v1|<host>:<port>|<10s window>")`, and the server-side `McpTakeoverProof.accepts` validates it in constant time against the current and previous window. The token is used as an HMAC key and never becomes an outbound header value, because `probeExistingServer` cannot establish the port holder's identity — the `X-Burp-AI-Agent` marker is echoable by any process. Under TLS on a loopback bind, the client pins the server's leaf certificate to the one in `tlsKeystorePath` and installs no TLS override at all when no pin can be read, so an unidentified listener cannot complete the handshake.
+4. If a local-mode response does not carry the marker, takeover is aborted and the failure surfaces in the UI. In external mode, liveness is intentionally not an identity guarantee; the HMAC proof avoids disclosing the reusable bearer credential. A non-loopback TLS bind is an explicit unsupported takeover case: no pinning override is installed, the existing listener is left running, and the operator must free the port manually before restarting MCP.
 
 ## HTTP Backend Circuit Breaker
 
-HTTP backends go through `HttpBackendSupport` which wraps all calls in a circuit breaker:
+HTTP model-request connections use `HttpBackendSupport` circuit breakers. Health polling is separate; notably, the current Perplexity health provider uses a direct shared HTTP client and NVIDIA NIM runs its live health POST through Montoya.
 
 * **Failure threshold** (`CIRCUIT_FAILURE_THRESHOLD`): `5` consecutive failures.
 * **Reset timeout** (`CIRCUIT_RESET_TIMEOUT_MS`): `30_000` ms before the breaker moves to half-open.
 * **Half-open max attempts** (`CIRCUIT_HALF_OPEN_MAX_ATTEMPTS`): `1` — a single probe decides whether to close or reopen.
-* **Retry schedule** (`retryDelayMs(attempt)`): `500, 1000, 1500, 2000, 3000, 4000` ms (stepped, capped at 4 s — **not** exponential).
+* **Retry helper** (`retryDelayMs(attempt)`): `500, 1000, 1500, 2000, 3000`, then `4000` ms for later indices. The current six-total-attempt send loops consume only the first five delays because the sixth failure is terminal.
 
 When the breaker is open the backend fails fast with `"<backend> backend is temporarily unavailable (circuit open). Retry in <n>ms."` Retries inside the wrapper are logged to the [AI Request Logger](../privacy/ai-request-logger.md) as `RETRY` entries with `attempt` and `delayMs` metadata.
 
@@ -121,7 +121,7 @@ The built-in Burp AI backend does **not** route through this wrapper — it reli
 ### CLI Backends
 
 * Run as subprocesses from configured commands.
-* Use stdout/stderr streaming for response and diagnostics.
+* Read stdout/stderr continuously into a bounded buffer for liveness/timeout diagnostics, then parse and deliver the final response through one `onChunk` callback after the process completes.
 * Include Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI.
 * **Windows**: npm-installed shims are resolved automatically. The launcher detects `.cmd` siblings for shell script shims and falls back to `cmd /c` wrapping when needed.
 * **Output parsing**: Each CLI backend has a dedicated output parser that strips metadata, status lines, and prompt echoes from raw stdout to extract the AI response.
@@ -130,7 +130,7 @@ The built-in Burp AI backend does **not** route through this wrapper — it reli
 
 * Connect to HTTP APIs of running servers.
 * Optionally auto-start local services (provider-dependent).
-* Include Ollama, LM Studio, and Generic OpenAI-compatible.
+* Include Ollama, LM Studio, NVIDIA NIM, Perplexity, Anthropic, and Generic OpenAI-compatible.
 
 ## Failure Handling
 

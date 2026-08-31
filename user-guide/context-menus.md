@@ -41,7 +41,7 @@ The **BountyPrompt** submenu is grouped by category:
 * **Recon**: Endpoint extraction from observed traffic.
 * **Advisory**: Suggested follow-up attack vectors.
 
-Menu entries show the selected item count, for example `Security Headers Analysis (3)`.
+Menu entries use the prompt title only; neither the entry nor the submenu label includes the selected-item count.
 
 If BountyPrompt integration is disabled or no curated prompts are loadable from the configured directory, the submenu appears disabled with a tooltip.
 
@@ -54,8 +54,8 @@ The **Custom prompts** submenu surfaces saved free-form prompts plus an ad-hoc e
 Click any entry in the submenu to run it against the selected context. The flow is:
 
 1. Context capture runs the same way as canned actions (privacy mode redaction, body-size limits).
-2. The **Context Preview** dialog opens with the saved prompt and the redacted JSON. **No** extra excerpt preview step — custom-prompt flows use only the exact-send preview.
-3. On **Send**, a new chat session opens titled `Custom: <prompt title>` and the response streams in.
+2. The **Context Preview** dialog opens with the saved prompt and the redacted JSON. **No** extra excerpt-preview step — custom-prompt flows use this single action preview.
+3. On **Send**, a new chat session opens titled `Custom: <prompt title>` and the current built-in backend delivers the completed response as one rendered block.
 
 ### Running an ad-hoc prompt
 
@@ -63,9 +63,9 @@ Pick **Custom…** at the bottom of the submenu to open the free-form editor:
 
 * Multi-line `Prompt` text area.
 * Optional **Start from a saved prompt** dropdown (only shown if you have saved prompts tagged for the current context). Picking one fills the text area; you can then edit before sending.
-* `Next: preview & send` opens the exact-send preview; `Cancel` aborts.
+* `Next: preview & send` opens the action preview; `Cancel` aborts.
 
-Ad-hoc prompts do not persist — if you want to reuse, save them from **Settings → Prompt Templates**.
+Ad-hoc prompts do not persist — if you want to reuse one, add it to **Settings → Custom Prompts**.
 
 ### Managing saved prompts
 
@@ -155,27 +155,29 @@ When you right-click scanner issues, these actions are available:
 6. Action prompt/template is composed.
 7. **Context Preview Dialog** opens (see below).
 8. If confirmed, the prompt is sent to the selected AI backend.
-9. Response streams into a chat session.
+9. The response is delivered into a chat session (current built-in backends emit one completed chunk).
 
 For BountyPrompt actions, tag resolution runs after redaction and before prompt composition.
 
 ## Context Preview Dialog
 
-Before any auto-captured context leaves the plugin, a modal confirmation opens showing exactly what the AI will see.
+Before captured context from a menu action is dispatched, a modal confirmation shows the action-level prompt and context produced at that point in the pipeline.
 
 | Field            | What it shows                                                                                                                                   |
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Action**       | The menu action that triggered the capture (e.g. `Analyze this request`).                                                                       |
-| **Privacy mode** | Current mode plus a one-line hint: STRICT, BALANCED (cookies and tokens redacted, hosts kept), or OFF (no redaction; raw traffic will be sent). |
-| **Prompt**       | The exact prompt text that will be sent, after template resolution.                                                                             |
-| **Context**      | The exact redacted JSON envelope that will accompany the prompt.                                                                                |
+| **Privacy mode** | Current mode plus a one-line hint: STRICT, BALANCED (recognized cookies/tokens redacted, hosts kept), or OFF. Under OFF the dialog distinguishes raw built-in behavior from the case where saved custom patterns still apply. |
+| **Prompt**       | The resolved action prompt before backend framing. Tool mode can prepend a tool-use preamble later, and HTTP backends can receive the active agent profile as a separate system-role message. |
+| **Context**      | The post-policy context JSON captured for this action. It is included on the first turn of the new session; BountyPrompt embeds its resolved tag data in the prompt and uses an empty context envelope. |
 
 Two buttons at the bottom:
 
-* **Send** — proceeds with the request, creates the chat session, streams the response.
+* **Send** — proceeds with the request, creates the chat session, and renders the completed response.
 * **Cancel** (default focus) — aborts. No session is created and nothing leaves the plugin.
 
 The dialog applies to context captured from menus (proxy items, scanner issues, site-map nodes, Repeater). Messages you type inside an existing chat session do not open the dialog because you are the author of that text.
+
+The dialog is therefore a confirmation boundary for the captured action data, not a byte-for-byte wire inspector for the complete backend request. The selected backend adds its protocol envelope, conversation history, and—where supported—the separate agent-profile system message after confirmation.
 
 ## Context Size Controls for Manual Actions
 

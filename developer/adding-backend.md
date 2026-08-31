@@ -6,13 +6,13 @@ The extension uses Java's `ServiceLoader` mechanism for backend discovery, makin
 
 ### 1. Implement the Backend Adapter
 
-Create two classes:
+Implement a factory, a backend, and a connection:
 
-*   **`AiBackendFactory`**: Factory that creates backend instances. Provides metadata (ID, display name, type).
-*   **`AiBackend`**: The actual backend that implements `send()` to communicate with the AI.
-*   **`AgentConnection`**: Interface for send/receive operations.
+* **`AiBackendFactory`**: zero-argument ServiceLoader factory whose `create()` returns the backend.
+* **`AiBackend`**: owns `id`, `displayName`, availability/health checks, and `launch(config)`.
+* **`AgentConnection`**: asynchronous send/stream/stop contract returned by `launch`.
 
-For HTTP backends, you can also implement `DiagnosableConnection` to expose exit codes and output for debugging.
+CLI connections can also implement `DiagnosableConnection` to expose exit codes and output tails. HTTP connections commonly implement `UsageAwareConnection` and, when supported, `JsonModeCapable`.
 
 ### 2. Register via ServiceLoader
 
@@ -28,7 +28,7 @@ com.example.mybackend.MyBackendFactory
 
 ### 3. Add UI Configuration Fields (Optional)
 
-If your backend needs custom settings (API URL, model name, etc.), add configuration keys to `AgentSettings.kt` and corresponding UI fields to `SettingsPanel.kt`.
+If your backend needs custom settings (API URL, model name, etc.), add configuration keys to `AgentSettings.kt`, wire load/save in `SettingsPanelSettingsIO.kt`, and place the controls in the appropriate settings panel. If persisted shape changes, add a forward-only schema step as described in [Settings Migration](settings-migration.md).
 
 ### 4. Ensure Audit Logging
 
@@ -45,24 +45,54 @@ Package your backend as a standalone JAR and place it in `~/.burp-ai-agent/backe
 ## Backend Interface
 
 ```kotlin
-interface AiBackendFactory {
-    val id: String           // Unique identifier (e.g., "my-backend")
-    val displayName: String  // UI display name
-    fun create(config: BackendLaunchConfig): AiBackend
+class MyBackendFactory : AiBackendFactory {
+    override fun create(): AiBackend = MyBackend()
 }
 
-interface AiBackend {
-    fun send(prompt: String): AgentConnection
+class MyBackend : AiBackend {
+    override val id = "my-backend"
+    override val displayName = "My Backend"
+    override val supportsSystemRole = true
+
+    override fun launch(config: BackendLaunchConfig): AgentConnection =
+        MyConnection(config)
+
+    override fun isAvailable(settings: AgentSettings): Boolean = true
+
+    override fun healthCheck(settings: AgentSettings): HealthCheckResult =
+        HealthCheckResult.Healthy
 }
 
-interface AgentConnection {
-    fun receive(): String    // Blocking read of response
-    fun close()              // Clean up resources
+class MyConnection(
+    private val config: BackendLaunchConfig,
+) : AgentConnection {
+    override fun isAlive(): Boolean = true
+
+    override fun send(
+        text: String,
+        history: List<ChatMessage>?,
+        onChunk: (String) -> Unit,
+        onComplete: (Throwable?) -> Unit,
+        systemPrompt: String?,
+        jsonMode: Boolean,
+        maxOutputTokens: Int?,
+    ) {
+        // Run network/process work off the Swing EDT, call onChunk as data arrives,
+        // then call onComplete exactly once.
+    }
+
+    override fun stop() {
+        // Cancel I/O and release process/network resources.
+    }
 }
 ```
 
+`BackendLaunchConfig` carries the resolved command or base URL, model, headers, timeouts, session IDs, determinism flag, context window, and shared Montoya HTTP transport. Implement `DiagnosableConnection`, `UsageAwareConnection`, `SessionAwareConnection`, `JsonModeCapable`, or `supportsSystemRole` only when the backend genuinely supports that capability.
+
 ## Tips
 
-*   Follow existing backend implementations as examples (e.g., `OllamaBackendFactory` for HTTP, `CodexCliBackendFactory` or `CopilotCliBackendFactory` for CLI).
-*   HTTP backends should handle connection errors and timeouts gracefully.
-*   CLI backends should manage process lifecycle (stdin/stdout communication, exit handling).
+* Follow existing backend implementations as examples: `OllamaBackendFactory` for HTTP and `CodexCliBackendFactory` or `CopilotCliBackendFactory` for CLI.
+* Use the shared Montoya HTTP transport and retry/circuit-breaker support instead of creating an unrelated client stack.
+* Never block the Swing EDT. The connection callback contract is asynchronous.
+* Ensure `onComplete` fires exactly once on success, error, cancellation, and timeout.
+* CLI backends must manage stdin/stdout, exit status, temporary files, cancellation, and Windows `.cmd` shims.

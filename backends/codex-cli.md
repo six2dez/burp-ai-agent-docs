@@ -5,7 +5,7 @@ Codex CLI provides OpenAI model access for general security analysis and code-or
 ## Requirements
 
 * `codex` CLI installed.
-* `OPENAI_API_KEY` available in the Burp runtime environment.
+* Codex authentication completed (`codex login` or an API-key/configuration method supported by your installed Codex version).
 
 ## Setup
 
@@ -15,16 +15,16 @@ Codex CLI provides OpenAI model access for general security analysis and code-or
 npm install -g @openai/codex
 ```
 
-2. Export API key:
+2. Authenticate. For an interactive login:
 
 ```bash
-export OPENAI_API_KEY="sk-..."
+codex login
 ```
 
 3. Verify locally:
 
 ```bash
-codex "hello"
+codex exec "hello"
 ```
 
 4. Configure in **AI Backend** settings tab.
@@ -33,7 +33,7 @@ codex "hello"
 
 | Setting | Value |
 | :--- | :--- |
-| **Preferred Backend** | `Codex CLI` |
+| **Preferred Backend** | `codex-cli` |
 | **Codex CLI Command** | `codex chat` (default) |
 
 Model example:
@@ -41,6 +41,8 @@ Model example:
 ```bash
 codex --model gpt-5.2
 ```
+
+`codex chat` is retained as the persisted default for compatibility. At dispatch time the adapter removes the legacy `chat` token and invokes `codex exec --color never --skip-git-repo-check`, feeds the prompt on stdin, and reads the final answer through a temporary `--output-last-message` file. That file is deleted in the call's cleanup path; a bounded shutdown registry retries cleanup when Burp exits while a call is still in flight.
 
 ## Notes
 
@@ -75,7 +77,7 @@ exit /b %ERRORLEVEL%
 {% hint style="tip" %}
 * `command not found`: use full binary path or npm shim path.
 * Windows: npm shim paths are resolved automatically. If auto-resolution fails, use the full `.cmd` path: `C:\\Users\\<you>\\AppData\\Roaming\\npm\\codex.cmd`.
-* Auth errors: verify `OPENAI_API_KEY` in Burp runtime env.
+* Auth errors: run `codex login` from the same OS account that launches Burp, or verify the API-key/configuration method used by your Codex installation is visible to the Burp process.
 * Rate limits: check provider quota/tier.
 {% endhint %}
 

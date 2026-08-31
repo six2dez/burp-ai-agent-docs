@@ -12,6 +12,8 @@ Session statistics include:
 
 Passive scanner flow also records token-aware telemetry to help tune background analysis settings.
 
+The counters are cumulative across every recorded flow and backend in the current Burp process. They are not scoped to one chat conversation and reset when the extension process restarts.
+
 ## Where to View Usage
 
 * Session sidebar summary in the chat panel.
@@ -39,6 +41,17 @@ Use these settings in **AI Passive Scanner** tab:
 * `Prompt cache TTL (min)`
 * `Manual context JSON` (compact)
 
+## Token Budget Guardrails
+
+The **AI Passive Scanner > Token budget** section adds two optional process-session thresholds:
+
+| Setting | Default | Effect |
+| :--- | :--- | :--- |
+| **Warn threshold (tokens)** | `0` (off) | Shows an informational banner in chat when cumulative estimated/actual usage reaches the threshold. |
+| **Hard cap (tokens)** | `0` (off) | Pauses passive scanning when usage reaches the cap. Chat remains usable. |
+
+The hard cap takes precedence when both thresholds have been crossed. These controls do not enforce a provider billing limit: they use the extension's cumulative tracker, combining provider-reported counts where available with estimates for the remainder. Restarting Burp starts a new in-memory budget session.
+
 ## Practical Tuning Strategy
 
 1. Keep **Scope Only** ON.
@@ -47,6 +60,7 @@ Use these settings in **AI Passive Scanner** tab:
 4. Then reduce headers/params and max size.
 5. Increase dedup/cache windows for repetitive traffic.
 6. For high-volume targets, increase `Rate Limit`.
+7. Set a warning threshold first, observe a representative session, then add a hard cap if background scanning needs a firm stop.
 
 ## Provider Cost Estimation Tips
 

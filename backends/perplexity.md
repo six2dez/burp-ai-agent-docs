@@ -26,12 +26,12 @@ Do not point the [Generic (OpenAI-compatible)](openai-compatible.md) backend at 
 
 | Setting               | Default                     | Description                                                      |
 | --------------------- | --------------------------- | ---------------------------------------------------------------- |
-| **Preferred Backend** | `Perplexity`                | Select backend.                                                  |
+| **Preferred Backend** | `perplexity`                | Select backend.                                                  |
 | **Base URL**          | `https://api.perplexity.ai` | Override only if you proxy Perplexity through your own gateway.  |
 | **Model**             | _(empty)_                   | Sonar model identifier, e.g. `sonar-pro`.                        |
 | **API Key**           | _(empty)_                   | Your `pplx-…` token. Sent as `Authorization: Bearer …`.          |
 | **Extra Headers**     | _(empty)_                   | Optional extra `Header: value` lines if a gateway requires them. |
-| **Timeout**           | `60`                        | Request timeout in seconds.                                      |
+| **Timeout**           | `120`                       | Request timeout in seconds (accepted range: 30-3600).            |
 
 A working baseline:
 
@@ -44,27 +44,20 @@ API Key: pplx-...
 
 ## Supported Models
 
-The Sonar family (web-aware) plus reasoning variants:
-
-* `sonar` — fast, lightweight.
-* `sonar-pro` — higher-capability default.
-* `sonar-reasoning` — chain-of-thought reasoning.
-* `sonar-reasoning-pro` — extended reasoning.
-* `sonar-deep-research` — multi-step research with broader retrieval.
-* `r1-1776` — uncensored variant of DeepSeek R1.
-
-Always cross-check the current model catalog on Perplexity's API page — names may change.
+The extension does not maintain a model allowlist: it sends the free-form **Model** value unchanged. Use a currently supported Sonar model ID from Perplexity's API catalog; `sonar-pro` is only an example, not an extension default.
 
 ## Capabilities
 
 | Capability  | Value                                                                                                                  |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Streaming   | Yes (SSE).                                                                                                             |
+| Streaming   | Not functionally decoded. The request currently sets `stream: true`, but the production parser expects one complete JSON document and emits one UI chunk. |
 | JSON mode   | **No** — `response_format=json_object` is not supported by Sonar. Use prompt-level instructions for structured output. |
 | System role | Yes — agent profiles are delivered as the `system` message.                                                            |
 | Auto-start  | Not applicable (cloud backend).                                                                                        |
 
-The lack of JSON mode means features that rely on guaranteed JSON output — notably batch passive analysis and adaptive payload generation — fall back to a text-mode parser. The parser scans the model output for fenced JSON blocks first, then a top-level `{` / `[`, then individual field regexes as a last resort. It recovers from prose preambles and markdown wrappers but is more brittle than the strict `response_format=json_object` path: malformed JSON or schemas with unexpected fields are silently dropped. Keep confidence thresholds conservative when using Perplexity for scanner workflows.
+The lack of protocol-level JSON mode means structured scanner workflows—notably batch passive analysis and adaptive payload generation—fall back to a text-mode parser. The parser scans the model output for fenced JSON blocks first, then a top-level `{` / `[`, then individual field regexes as a last resort. It recovers from prose preambles and markdown wrappers but is more brittle than a `response_format=json_object` constraint: malformed JSON or schemas with unexpected fields are silently dropped. Keep confidence thresholds conservative when using Perplexity for scanner workflows.
+
+There is also a response-framing limitation: the normal request sets `stream: true`, while the Montoya transport buffers the body and the shared backend parser calls `readTree` on that body as one JSON document. Actual SSE `data:` frames are not decoded on this path. A provider/gateway that returns a non-streaming JSON envelope can work; strict SSE output can fail parsing.
 
 ## Privacy Considerations
 
@@ -73,6 +66,10 @@ Perplexity is a cloud backend. The same guidance as other cloud providers applie
 * Keep privacy mode at `STRICT` or `BALANCED` (the default) for real targets.
 * Review the context preview dialog before sending auto-captured traffic.
 * Review the [Privacy Modes](../privacy/privacy-modes.md) page for redaction patterns.
+
+## Health Check Traffic
+
+While Perplexity is the selected backend, the top-bar status check runs about every 5 seconds and sends a fixed, non-streaming `"Hey"` completion with `max_tokens: 16`. The current health-check provider uses the shared direct HTTP client rather than Burp's Montoya transport. It contains no captured Burp context, but it bypasses Burp's upstream proxy/Proxy history and may count toward quota or billing. Normal chat and scanner requests still use Montoya.
 
 ## Output Token Limits
 
@@ -98,7 +95,7 @@ The extension sets `max_tokens` automatically per request type:
 
 ## Retry Behavior
 
-Transient network failures trigger automatic retries (max 6 attempts) with the standard stepped backoff (`500 / 1000 / 1500 / 2000 / 3000 / 4000 ms`). Each retry is recorded in the [AI Request Logger](../privacy/ai-request-logger.md) as a `RETRY` activity. After 5 consecutive failures the circuit breaker opens for 30 seconds before allowing a half-open probe.
+Classified transient transport exceptions trigger up to 6 total attempts with five possible delays (`500 / 1000 / 1500 / 2000 / 3000 ms`). HTTP error responses are not retried inside the same call, although 429/5xx responses count toward the connection's circuit breaker. Each actual retry is recorded in the [AI Request Logger](../privacy/ai-request-logger.md) as a `RETRY` activity. After 5 recorded transient failures, that connection allows one half-open model request after 30 seconds.
 
 ## Related Pages
 

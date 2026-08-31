@@ -2,22 +2,22 @@
 
 ## Running Tests
 
-The project uses JUnit 5 for testing.
+The project uses JUnit Platform with JUnit Jupiter `6.0.3` and a Java 21 toolchain.
 
 ### Fast suite (default in CI PR gate)
 ```bash
 ./gradlew test -PexcludeHeavyTests=true
 ```
-Excludes `*IntegrationTest`, `*ConcurrencyTest`, `*BackpressureTest`, `*RestartPolicyTest`. Fast enough to run on every PR across Linux, macOS, and Windows in the matrix defined in `.github/workflows/build.yml`.
+Excludes `*IntegrationTest`, `*ConcurrencyTest`, `*BackpressureTest`, `*RestartPolicyTest`, and `*SupervisionTest`. It runs on every PR across Linux, macOS, and Windows in `.github/workflows/build.yml`.
 
-### Full suite (nightly + on release tag)
+### Nightly-equivalent local suite
 ```bash
-./gradlew test nightlyRegressionTest
+./gradlew test nightlyRegressionTest edtGuardWithoutAssertionsTest
 ```
-Adds the integration, concurrency, backpressure, and supervisor restart-policy suites. Automatically executed by `.github/workflows/nightly-regression.yml` at 03:30 UTC and by `.github/workflows/release.yml` on every version tag.
+This adds integration, concurrency, backpressure, restart-policy, and supervision suites, then proves the MCP executor's EDT guard with JVM assertions disabled. The nightly workflow runs all three tasks and also builds `shadowJar`. The release workflow runs `test`, `nightlyRegressionTest`, lint, and the artifact build on each version tag; it does not invoke the separate assertion-disabled EDT task.
 
 ### Integration / concurrency tests
-Some tests require a local Ollama instance or mock server. Ensure your environment is set up before running the heavy suite locally.
+Heavy suites use local test servers and concurrency fixtures; backend-specific manual checks can additionally require an installed CLI or local model. Read a failing test's setup before assuming external services are required.
 
 ## Lint
 
@@ -26,7 +26,7 @@ Some tests require a local Ollama instance or mock server. Ensure your environme
 ./gradlew ktlintCheck    # verify style
 ```
 
-`ktlintCheck` runs in CI as its own job. Until the baseline is clean it is configured as non-blocking (`continue-on-error: true` in the workflow, `ignoreFailures = true` in `build.gradle.kts`). Flip both off with `-PktlintStrict=true` once the repository passes cleanly.
+`ktlintCheck` and `detekt` are blocking CI jobs. Ktlint is strict by default; `-PktlintLenient=true` is an explicit local escape hatch, not the CI setting.
 
 ## Coverage
 
@@ -40,7 +40,7 @@ Reports land at `build/reports/jacoco/test/html/index.html` and `build/reports/j
 
 ## Building from Source
 
-The build produces two artifacts (see [issue #231](https://github.com/six2dez/burp-ai-agent/issues/231)):
+The build produces two artifacts (see PortSwigger's [extension-portal issue #231](https://github.com/PortSwigger/extension-portal/issues/231)):
 
 ```bash
 ./gradlew clean shadowJar                  # full build (default, GitHub releases)
@@ -58,7 +58,7 @@ The `-PstoreBuild` flag sets the generated `BuildFlags.STORE_BUILD` constant tha
 ./gradlew cyclonedxBom
 ```
 
-Produces `build/reports/sbom/bom.json` (CycloneDX 1.5). The release workflow attaches it to the GitHub Release alongside the JAR and its SHA-256 checksum.
+Produces the CycloneDX JSON file `build/reports/sbom/bom.json`. The release workflow attaches it to the GitHub Release alongside the JAR and its SHA-256 checksum.
 
 ## Debugging
 
@@ -80,7 +80,7 @@ If you launched Burp from a terminal, check the terminal window for detailed log
 If a backend is failing:
 1.  Check the **Status** indicator in the top bar.
 2.  If it says **Crashed**, check **Extensions → Installed → Custom AI Agent → Output/Errors** for the exit code.
-3.  Check the `audit.jsonl` file (if Audit Logging is enabled) to see exactly what was sent to the model.
+3.  Check `audit.jsonl` (if Audit Logging is enabled) to inspect the captured dispatch text and response events. Remember that separate system-role profile text and reconstructed conversation history are not serialized into the prompt bundle.
 
 ## Manual UI Checks
 Before a release, perform these sanity checks:
@@ -101,7 +101,9 @@ JAVA_HOME=/Library/Java/JavaVirtualMachines/temurin-21.jdk/Contents/Home ./gradl
 Additional focus areas covered by the test suite:
 
 - Passive scanner JSON parsing with nested/escaped content.
+- Redaction policy mapping, RFC 5869 host pseudonyms, structured cookie/header/parameter carriers, serialized MCP results, and scanner issue-detail ownership.
 - Injection point extraction for escaped strings, booleans, and nulls.
 - Active payload generation paths (numeric/string/UUID).
 - Response analyzer diff and time-based detection boundaries.
 - Shared HTTP conversation history trimming and concurrent writes.
+- MCP executor EDT confinement with assertions both enabled and disabled.

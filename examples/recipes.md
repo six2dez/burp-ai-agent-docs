@@ -7,7 +7,7 @@ Short, copy-pasteable answers to common operational questions. Each recipe is se
 When the **External Access** path is exposed, the bearer token in **Settings → MCP Server → Token** acts as the only credential. Rotate it when sharing a workstation, after a suspected leak, or on a schedule.
 
 1. Open **Settings → MCP Server**.
-2. Click the regenerate icon next to **Token** (or delete the value and tab out — the field re-fills with a fresh random token).
+2. Click **Regenerate** next to **Token**. Clearing the editable field does not generate a replacement automatically.
 3. Hit **Save**. The MCP server restarts automatically.
 4. Push the new value to every external client that connects (Claude Desktop config, gateway env var, etc.).
 
@@ -30,14 +30,14 @@ Cross-reference: [Configuration Directory](../reference/configuration-directory.
 
 ## …filter the audit log for a specific trace?
 
-Every prompt, scanner job, and MCP call carries a trace ID (`chat-turn-…`, `scanner-job-…`, `mcp-tool-…`). To pull the full timeline for one trace:
+Trace correlation is stored by the AI Request Logger. If rolling persistence is enabled, pull one trace from its active JSONL file with:
 
 ```bash
-jq -c 'select(.traceId == "scanner-job-12345")' \
-  ~/.burp-ai-agent/audit.jsonl
+jq -c 'select(.metadata.traceId == "scanner-job-12345")' \
+  ~/.burp-ai-agent/logs/ai-request-log.jsonl
 ```
 
-Or for a specific custom-prompt source:
+The separate audit stream does not put a trace ID on every event. It can still filter prompt launch metadata, for example a specific custom-prompt source:
 
 ```bash
 jq 'select(.type == "prompt" and .payload.promptSource == "CUSTOM_SAVED")' \
@@ -48,7 +48,7 @@ Cross-reference: [Audit Logging](../privacy/audit-logging.md).
 
 ## …clear the prompt cache for one engagement?
 
-Each project has its own cache subdirectory. Find the project ID in `~/.burp-ai-agent/cache/` (Burp generates it from the `.burp` project file) and delete that subdirectory:
+Each project has its own cache subdirectory. Its name is the first eight characters of `api.project().id()` (or `default` if that API lookup fails). Identify the directory by time/size while the relevant project is open, disable the passive scanner, and remove only that subdirectory:
 
 ```bash
 ls ~/.burp-ai-agent/cache/
@@ -63,14 +63,11 @@ The plugin recreates the directory on the next cache write. Other projects' cach
 
 Cross-reference: [Passive AI Scanner → Cache Behavior](../scanners/passive.md#cache-key-prompt-hash).
 
-## …force a fresh AI call without disabling caching globally?
+## …force a fresh passive-scanner AI call?
 
-The persistent cache key is the SHA-256 of the normalized prompt. To force a cache miss for one specific request without flipping the global toggle:
+There is no per-request cache-bypass switch. Three independent gates can reuse or skip work: endpoint dedup, response-fingerprint dedup, and the in-memory/persistent prompt-result cache. Changing a header alone does not bypass the earlier endpoint gate.
 
-* Add or remove a non-security-relevant token in the request that is **not** stripped by cache normalization (e.g., a unique header `X-Cache-Buster: <uuid>`). The new fingerprint produces a new cache entry.
-* Or temporarily lower **Prompt cache TTL (min)** to `1` in **Settings → AI Passive Scanner**, run the request, then revert.
-
-The clean option is to disable **Persistent cache** for the duration of the targeted run and re-enable it after.
+For a controlled fresh run, disable the passive scanner, turn **Persistent cache** off, set **Endpoint dedup**, **Response dedup**, and **Prompt cache TTL** to `1` minute, then reload the extension (or restart Burp) to clear the in-memory maps. Re-enable the scanner, wait past the one-minute window if the request was already seen, run the request once, and restore the prior settings. If persistent cache must remain enabled, remove only the current project's cache directory while the scanner is disabled as described above.
 
 ## …connect an external MCP client?
 
@@ -129,7 +126,7 @@ Privacy mode applies to the prompt that is *about to* be built, not retroactivel
 2. Confirm the top-bar pill reflects the new mode.
 3. Re-trigger the analysis. The next context capture is redacted under the new mode.
 
-Anything already in the audit log or already in flight stays redacted under the old mode — there is no rewrite. If that is a problem, also clear the relevant cache subdirectory and rerun against the same request to produce a fresh audit entry under the new mode.
+Anything already in the audit log or already in flight keeps the representation produced under the old mode — including unredacted content if that mode was `OFF`. There is no rewrite. If that is a problem, protect or remove the relevant artifact according to the engagement's retention policy, clear the relevant cache state, and rerun under the new mode.
 
 Cross-reference: [Privacy Modes](../privacy/privacy-modes.md), [Best Practices → Privacy Posture by Environment](../reference/best-practices.md#privacy-posture-by-environment).
 
@@ -138,10 +135,11 @@ Cross-reference: [Privacy Modes](../privacy/privacy-modes.md), [Best Practices �
 The in-memory logger keeps the last `500` entries by default. To also persist them to rotating JSONL files, set JVM properties at Burp startup:
 
 ```bash
-java -jar burpsuite.jar \
+java \
   -Dburp.ai.logger.rolling.enabled=true \
   -Dburp.ai.logger.rolling.maxBytes=2097152 \
-  -Dburp.ai.logger.rolling.maxFiles=10
+  -Dburp.ai.logger.rolling.maxFiles=10 \
+  -jar burpsuite.jar
 ```
 
 Files land in `~/.burp-ai-agent/logs/`. Defaults: `1 MB` per file, `5` rolled files.

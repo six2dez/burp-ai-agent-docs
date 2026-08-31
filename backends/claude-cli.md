@@ -35,7 +35,7 @@ claude "hello"
 
 | Setting | Value |
 | :--- | :--- |
-| **Preferred Backend** | `Claude CLI` |
+| **Preferred Backend** | `claude-cli` |
 | **Claude CLI Command** | `claude` or full path |
 
 Model example:

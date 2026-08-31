@@ -17,7 +17,7 @@ NVIDIA NIM (`integrate.api.nvidia.com`) hosts a range of open and proprietary mo
 
 | Setting | Default | Description |
 | :--- | :--- | :--- |
-| **Preferred Backend** | `NVIDIA NIM` | Select backend. |
+| **Preferred Backend** | `nvidia-nim` | Select backend. |
 | **Base URL** | `https://integrate.api.nvidia.com` | NVIDIA-hosted endpoint; override only when targeting a self-hosted NIM. |
 | **Model** | *(empty)* | Model identifier, e.g. `moonshotai/kimi-k2.5`. |
 | **API Key** | *(empty)* | Your `nvapi-…` token. Sent as `Authorization: Bearer …`. |
@@ -32,6 +32,14 @@ Base URL: https://integrate.api.nvidia.com
 Model: moonshotai/kimi-k2.5
 API Key: nvapi-...
 ```
+
+## Health Check Traffic
+
+While NVIDIA NIM is the selected backend, the top-bar status check runs about every 5 seconds. It sends a fixed, non-streaming `"Hey"` completion with `max_tokens: 16` through Burp's Montoya HTTP stack. It contains no captured Burp context and is visible in Proxy history, but it is a real provider request and may count toward quota or billing.
+
+## Response Delivery Limitation
+
+Normal NIM requests currently include `stream: true`, but the production Montoya transport buffers the response and the shared parser expects one JSON document before calling the UI once. It does not decode SSE `data:` frames. If the selected NIM endpoint honors streaming strictly, the response may fail JSON parsing; the current implementation should not be described as functional token-by-token streaming.
 
 ## Privacy Considerations
 
@@ -63,7 +71,7 @@ The extension sets `max_tokens` automatically per request type:
 
 ## Retry Behavior
 
-Transient network failures trigger automatic retries (max 6 attempts) with the standard bounded stepped backoff (`500 / 1000 / 1500 / 2000 / 3000 / 4000 ms`). Each retry is recorded in the [AI Request Logger](../privacy/ai-request-logger.md) as a `RETRY` activity.
+Classified transient transport exceptions trigger up to 6 total attempts with five possible delays (`500 / 1000 / 1500 / 2000 / 3000 ms`). HTTP error responses are not retried inside the same call, although 429/5xx responses count toward the connection's circuit breaker. Each actual retry is recorded in the [AI Request Logger](../privacy/ai-request-logger.md) as a `RETRY` activity.
 
 ## Related Pages
 
