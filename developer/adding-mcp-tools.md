@@ -37,7 +37,7 @@ private val urlEncodeHandler: ToolHandler =
     }
 ```
 
-`McpToolDescriptor` has these fields: `id`, `title`, `description`, `category`, `defaultEnabled`, `proOnly` (default `false`; `true` if it requires Burp Pro), `unsafeOnly` (default `false`; `true` if it modifies state or sends traffic), `requiresBurpAi` (default `false`; `true` if the tool sends AI requests, so the executor refuses it while Burp's "Use AI" is off) and `secTier`.
+`McpToolDescriptor` has these fields: `id`, `title`, `description`, `category`, `defaultEnabled`, `proOnly` (default `false`; `true` if the tool is subject to the edition gate), `unsafeOnly` (default `false`; `true` if it modifies state or sends traffic), `requiresBurpAi` (default `false`; `true` if the tool sends AI requests, so the executor refuses it while Burp's "Use AI" is off) and `secTier`.
 
 `secTier` has no default: every new tool must make an explicit trust decision. Use `AUTO` only for read-only tools with bounded output, `CONFIRM` when one approval may be remembered for the chat session, and `CONFIRM_EACH` when every invocation needs a fresh decision. This confirmation applies to tool calls emitted by the extension's own model; it is separate from the MCP server's authentication, enablement, unsafe, edition, and scope gates.
 
