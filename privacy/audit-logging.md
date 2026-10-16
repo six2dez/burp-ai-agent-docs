@@ -35,7 +35,7 @@ Each event entry can include:
 * response callback chunks (currently one complete chunk for built-in backends),
 * launch metadata (see below).
 
-For chat dispatches, the prompt bundle records the current `text` argument sent through `AgentSupervisor.sendChat`. It is not a full wire transcript: conversation history is supplied separately, and HTTP-capable backends can receive the active agent profile through a separate `systemPrompt` argument that is not serialized into the bundle. CLI backends instead prepend that profile to their user text. Treat the bundle as a review artifact for the captured dispatch, not as proof of every byte a provider received.
+For chat dispatches, the prompt bundle records the current `text` argument sent through `AgentSupervisor.sendChat`. It is not a full wire transcript: conversation history is supplied separately, and HTTP-capable backends can receive the active agent profile through a separate `systemPrompt` argument that is not serialized into the bundle. CLI backends (full build only) instead prepend that profile to their user text. Treat the bundle as a review artifact for the captured dispatch, not as proof of every byte a provider received.
 
 ## Launch Metadata
 

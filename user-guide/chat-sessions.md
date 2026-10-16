@@ -17,7 +17,9 @@ Session context is preserved per session. Follow-up prompts in the same session 
 History is trimmed to keep runtime bounded:
 
 * HTTP backends: up to `20` messages and `40000` total characters (minimum latest 2 messages retained).
-* CLI backends: up to `10` messages or `20000` total characters.
+* CLI backends (full build only): up to `10` messages or `20000` total characters.
+
+The CLI backends (Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI and Copilot CLI) are part of the GitHub full build only; the BApp Store build does not include them. See [Which Build?](../getting-started/which-build.md).
 
 ### Parallel Sessions
 
@@ -42,17 +44,17 @@ Sessions are stored **per Burp project** (in `extensionData()` rather than globa
 * The current sessions are saved against the **old** project before the switch is acted on.
 * In-memory chat state is cleared and the **new** project's sessions are restored from storage.
 * The shared `ScanKnowledgeBase` (tech stack, auth patterns, prior findings) is cleared to prevent cross-project contamination.
-* Live backend chat connections (conversation history held inside CLI processes or HTTP session loops) are shut down — the next prompt opens a fresh connection.
+* Live backend chat connections (conversation history held inside HTTP session loops, or inside the processes of CLI backends, which are full build only) are shut down — the next prompt opens a fresh connection.
 
 {% hint style="warning" %}
-Anything held purely in-memory (like the conversation context inside a running CLI process) is **lost** on a project switch. Persisted sessions, audit logs, and per-project cache directories under `~/.burp-ai-agent/cache/<projectId-prefix>/` survive — see [Passive AI Scanner → Cache Behavior](../scanners/passive.md#cache-key-prompt-hash) for cache details.
+Anything held purely in-memory (like the conversation context inside a running CLI backend process; CLI backends are full build only) is **lost** on a project switch. Persisted sessions, audit logs, and per-project cache directories under `~/.burp-ai-agent/cache/<projectId-prefix>/` survive — see [Passive AI Scanner → Cache Behavior](../scanners/passive.md#cache-key-prompt-hash) for cache details.
 {% endhint %}
 
 ## Chat Interface
 
 ### Response Delivery
 
-The chat renderer accepts incremental chunks, but every built-in backend currently buffers/parses a complete response and invokes the UI once. Burp AI, HTTP backends, and CLI adapters therefore appear as a single completed block rather than token-by-token streaming. See the [backend capability matrix](../backends/overview.md#capability-matrix), including the current NVIDIA NIM/Perplexity framing caveat.
+The chat renderer accepts incremental chunks, but every built-in backend currently buffers/parses a complete response and invokes the UI once. Burp AI, HTTP backends, and CLI adapters (full build only) therefore appear as a single completed block rather than token-by-token streaming. See the [backend capability matrix](../backends/overview.md#capability-matrix), including the current NVIDIA NIM/Perplexity framing caveat.
 
 ### Markdown Rendering
 
@@ -75,7 +77,7 @@ Before a manual context action is sent, you can preview that action's composed, 
 If a backend fails or returns an error, the chat panel displays diagnostic information including:
 
 * Error messages from the backend.
-* Exit codes for CLI backends.
+* Exit codes for CLI backends (full build only).
 * Suggestions for common fixes.
 
 ### Cancel Requests
@@ -97,7 +99,7 @@ When the AI emits an MCP tool call, the SEC-06 approval gate evaluates it before
 * **Maximum chain depth**: 8 sequential tool calls per interaction.
 * **Transparent execution**: Each tool call is logged in the [AI Request Logger](../privacy/ai-request-logger.md) with a shared trace ID so you can follow the full chain.
 * **Automatic follow-up**: After each tool result, the AI continues reasoning with the original question plus all accumulated tool results. The final response is the complete answer, not intermediate tool output.
-* **Works with all backends**: Tool chaining works with HTTP backends (Ollama, LM Studio, OpenAI-compatible) and CLI backends (Gemini, Claude, Codex, OpenCode, Copilot).
+* **Works with all backends**: Tool chaining works with the HTTP backends in both builds (Ollama, LM Studio, NVIDIA NIM, Perplexity, Anthropic and Generic (OpenAI-compatible)) and with the CLI backends (full build only: Gemini, Claude, Codex, OpenCode, Copilot).
 
 ### How It Works
 

@@ -1,6 +1,6 @@
 # Burp Scan Skill
 
-The **Burp Scan Skill** is a standalone knowledge file that lets you use any AI coding assistant (Claude Code, Gemini CLI, Codex, OpenCode, Copilot, etc.) as a Burp scanner from your terminal. Instead of relying on the plugin's built-in AI backends, your preferred terminal AI becomes the reasoning engine while Burp provides MCP tools. The skill drives the generic Montoya tools (`proxy_http_history`, `http1_request`, `scanner_issues`, etc.), so it requires the **full build** (`Custom-AI-Agent-full-<version>.jar`), which registers all 59 MCP tools. The BApp Store build (`Custom-AI-Agent-<version>.jar`) ships only the 8 extension-native AI tools and does not expose these.
+The **Burp Scan Skill** is a standalone knowledge file that lets you use any AI coding assistant (Claude Code, Gemini CLI, Codex, OpenCode, Copilot, etc.) as a Burp scanner from your terminal. Instead of relying on the plugin's built-in AI backends, your preferred terminal AI becomes the reasoning engine while Burp provides MCP tools. The skill drives the generic Montoya tools (`proxy_http_history`, `http1_request`, `scanner_issues`, etc.), so it requires the **full build** (`Custom-AI-Agent-full-<version>.jar`), which registers all 59 MCP tools. The BApp Store build (`Custom-AI-Agent-bapp-<version>.jar`, built with `./gradlew bappJar`) ships only the 8 extension-native AI tools and does not expose these.
 
 ## Why Use the Skill?
 
@@ -79,7 +79,7 @@ The skill is a self-contained Markdown file. You can use it with any AI that acc
 Before using the skill, ensure:
 
 1. **Burp Suite is running** (Community or Professional)
-2. **The full-build extension is loaded** and active (it appears as **Custom AI Agent** in Burp's Extensions list; the skill's tools require the full build)
+2. **The full build is loaded** and active (it appears as **Custom AI Agent** in Burp's Extensions list). The BApp Store build exposes only the 8 extension-native AI tools, so the skill's generic tools need the full build. See [Which Build?](../getting-started/which-build.md).
 3. **MCP server is enabled** in Settings > MCP Server
 4. **Your AI assistant is connected** to the MCP server (via SSE, stdio, or HTTP)
 

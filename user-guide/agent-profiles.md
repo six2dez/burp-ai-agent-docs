@@ -15,8 +15,8 @@ If you delete them, simply re-run Burp or drop the files back into the directory
 3. When a chat session or context menu action runs, the extension loads the corresponding `.md` file and picks the matching section.
 4. **Delivery depends on the backend:**
    * **HTTP backends** that advertise `supportsSystemRole = true` (Burp AI, Ollama, LM Studio, Generic OpenAI-compatible, NVIDIA NIM, Perplexity) receive the profile text as a dedicated **system-role message** at the start of the conversation, separate from the user prompt.
-   * **CLI backends** (Gemini, Claude, Codex, Copilot, OpenCode) do not have a system-role channel, so the profile text is **prepended to the user prompt** before the command is invoked.
-   * For either path, the delivered block is labeled `System instructions (AGENTS):`. On CLI backends it becomes part of the logged prompt text. On system-role HTTP backends it is passed separately and is not serialized into the current prompt bundle; the AI Request Logger records dispatch metadata, not the profile body.
+   * **CLI backends** (full build only: Gemini, Claude, Codex, Copilot, OpenCode) do not have a system-role channel, so the profile text is **prepended to the user prompt** before the command is invoked.
+   * For either path, the delivered block is labeled `System instructions (AGENTS):`. On CLI backends (full build only) it becomes part of the logged prompt text. On system-role HTTP backends it is passed separately and is not serialized into the current prompt bundle; the AI Request Logger records dispatch metadata, not the profile body.
 
 ```mermaid
 flowchart TD
@@ -117,7 +117,7 @@ The profile loader caches the parsed profile and checks the file modification ti
 * Keep global instructions concise (2-3 sentences) to avoid consuming too much of the model's context window.
 * Use section-specific instructions for detailed guidance per action type.
 * The `[DEFAULT]` section is a good place for general output formatting preferences.
-* Profile instructions appear as `System instructions (AGENTS):` in the payload sent to the backend (inside the system-role message on supporting HTTP backends, at the top of the combined text on CLI backends). The [audit prompt bundle](../privacy/audit-logging.md) does not currently capture the separate HTTP `systemPrompt` argument.
+* Profile instructions appear as `System instructions (AGENTS):` in the payload sent to the backend (inside the system-role message on supporting HTTP backends, at the top of the combined text on CLI backends, which are full build only). The [audit prompt bundle](../privacy/audit-logging.md) does not currently capture the separate HTTP `systemPrompt` argument.
 
 
 ## Profile Validation
