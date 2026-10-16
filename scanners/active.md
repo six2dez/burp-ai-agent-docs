@@ -285,16 +285,22 @@ The scanner automatically identifies the following injection point types in each
 
 ## Deduplication
 
-The scanner prevents duplicate scanning of the same target. If a URL has been scanned within the last **1 hour**, it is skipped automatically. This applies to both manual and auto-queued scans.
+The scanner records every target it scans (URL, injection point and vulnerability class) for **1 hour**. Targets queued automatically skip a target scanned inside that window. Targets you queue yourself, in either build, do not: the context-menu **AI Active Scan**, **AI Scan on Selected Insertion Point** and suggested targets queued by hand always queue a fresh scan, because you asked for it explicitly.
 
-## Auto-Queue from Passive
+## Suggested Targets from Passive Findings
 
-When **Auto-Queue to Active** is enabled in the passive scanner settings, high-confidence passive findings are automatically forwarded to the active scanner queue. This creates a pipeline:
+The passive scanner never queues active traffic on its own. When a new passive finding points to a vulnerability the AI Active Scanner can test (a class that is not passive-only and is allowed by the current scan mode), its injection points are added to a **Suggested targets** list, in both builds:
 
-1. Passive scanner identifies a potential vulnerability.
-2. Finding is automatically queued for active verification.
-3. Active scanner sends targeted payloads to confirm the finding.
-4. Confirmed findings are promoted to Burp issues.
+1. Open **View queue** on the **AI Active Scanner** tab. The **AI Active Scanner Queue** dialog lists the queued targets and, below them, the **Suggested targets** section with Suggested At, Vulnerability, Injection Point, URL and Confidence. The AI Active Scanner status line counts them as `Suggested: N` (`Suggested: N (cap reached)` once the cap is hit).
+2. Click **Queue N suggested targets** to queue all of them, or select rows and click **Queue selected**.
+3. If the selected AI backend is not allowed to run (for example Burp's "Use AI" is off where the build requires it), the reason is shown and nothing is queued. Otherwise, if the AI Active Scanner is off, you are asked to enable it. The same **Confirm AI Active Scan** dialog as the context menu then shows the target and host counts. Nothing is sent to a target before you confirm.
+4. The targets the scanner really queued leave the list; targets filtered out by scope, scan mode or a full queue stay in it. **Clear suggestions** empties the list.
+
+The list is kept in memory for the session only: it holds at most 500 entries (the oldest are dropped first), one per URL, injection point and vulnerability class, is never saved and is emptied when the extension unloads.
+
+{% hint style="info" %}
+**Full build only.** The **Auto-queue passive findings for active testing** setting on the AI Active Scanner tab is part of the GitHub full build (`Custom-AI-Agent-full-<version>.jar`, built with `./gradlew fullJar`). The BApp Store build (`./gradlew bappJar`) does not include it. It is opt-in and off by default for every install, including upgraded ones. While it is on and the AI Active Scanner is enabled, suggested targets are queued without the manual step, subject to the same scope, scan-mode, queue-size and 1-hour dedup filters; targets it does not queue stay in the Suggested targets list. See [Which Build?](../getting-started/which-build.md).
+{% endhint %}
 
 ## Burp Pro Integration
 

@@ -28,17 +28,19 @@ flowchart LR
     AI[Run AI analysis]
     Gate{Confidence >= 85% and severity gate?}
     Issue[Create [AI Passive] issue]
-    Auto{Auto-Queue from Passive enabled?}
-    Active[Queue in Active Scanner]
+    Testable{Class testable by the Active Scanner?}
+    Suggest[Add to Suggested targets - queued by hand]
 
     Traffic --> Prefilter --> Local --> Dedup --> Cache
     Cache -->|Yes| Hit --> Gate
     Cache -->|No| AI --> Gate
     Gate -->|No| End[No issue]
-    Gate -->|Yes| Issue --> Auto
-    Auto -->|Yes| Active
-    Auto -->|No| End2[Passive only]
+    Gate -->|Yes| Issue --> Testable
+    Testable -->|Yes| Suggest
+    Testable -->|No| End2[Passive only]
 ```
+
+The passive check never sends traffic to the target: a finding the AI Active Scanner can test only adds its injection points to the **Suggested targets** list, which you queue by hand from the AI Active Scanner Queue dialog after the **Confirm AI Active Scan** dialog. The full build can opt in to an automatic queue instead. See [Active AI Scanner → Suggested Targets from Passive Findings](active.md#suggested-targets-from-passive-findings).
 
 ## Configuration
 

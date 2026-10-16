@@ -25,7 +25,7 @@ Map and analyze a large application surface.
 5.  Check findings in the extension's **View Findings** panel.
 6.  Filter by severity (HIGH/CRITICAL) and review the most interesting endpoints.
 7.  For promising findings, right-click the request → **Find vulnerabilities** for a deeper analysis.
-8.  Promote high-confidence findings by enabling **Auto-Queue to Active**.
+8.  Promote high-confidence findings to active testing: open **View queue** on the **AI Active Scanner** tab and use **Queue N suggested targets** (or **Queue selected**) in the Suggested targets section, then confirm. In the full build you may instead opt in to **Auto-queue passive findings for active testing** (off by default).
 
 ## API Security Assessment
 

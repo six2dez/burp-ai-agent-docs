@@ -43,13 +43,13 @@ If after filtering no classes remain, you get a "No vulnerability classes select
 
 ## Priority and Queue Behavior
 
-Each selected vulnerability class generates one queued target with **priority 60**, ahead of the default priority **50** used by both the broader manual **AI Active Scan** and the auto-queue from the passive scanner. In practice this means an insertion-point scan jumps over the existing manual/passive backlog and starts running as soon as the active scanner's worker slot frees up.
+Each selected vulnerability class generates one queued target with **priority 60**. The broader manual **AI Active Scan** uses priority **50**, and suggested targets from passive findings (queued by hand in both builds, or by the full build's opt-in **Auto-queue passive findings for active testing**) carry a priority from the finding's severity (`CRITICAL` 100, `HIGH` 80, `MEDIUM` 60, otherwise 40). The priority is recorded on the target, but the queue itself runs first in, first out: an insertion-point scan starts after the targets already queued ahead of it.
 
 Other queue semantics:
 
 * **Scope-only**: respects the **Scope Only** toggle on the **AI Active Scanner** settings tab. Out-of-scope requests are dropped before queueing — the dialog reports `0 target(s) queued` and points at scope or queue exhaustion as possible causes.
 * **Queue limit**: targets are dropped when the active scan queue is at its cap (default `2000`, see [Settings Reference](../reference/settings-reference.md)).
-* **Dedup bypass**: unlike the auto-queue path, this action is **not** rate-limited by the `processedTargets` window. Re-invoking on the same insertion point queues fresh targets each time — match the existing manual-scan behavior where the user is consciously asking for another pass.
+* **Dedup bypass**: like the manual **AI Active Scan** and suggested targets queued by hand (both builds), this action is **not** rate-limited by the 1-hour `processedTargets` window; only the full build's opt-in auto-queue applies it. Re-invoking on the same insertion point queues fresh targets each time — matching the manual-scan behavior where the user is consciously asking for another pass.
 
 The post-queue dialog reports `Queue size: <before> -> <after>` so you can see the inflation immediately. If `0 target(s) queued` is reported, the most likely causes are scope filtering, all classes filtered out by Scan Mode, or the queue already at its cap.
 
