@@ -2,6 +2,10 @@
 
 Use GitHub Copilot CLI for multi-model cloud analysis powered by GitHub's AI infrastructure. Copilot CLI supports Claude, GPT, and Gemini model families through a single tool.
 
+{% hint style="info" %}
+**Full build only.** The Copilot CLI backend is part of the GitHub full build (`Custom-AI-Agent-full-<version>.jar`, built with `./gradlew fullJar`). The BApp Store build (`./gradlew bappJar`) does not include it: all five CLI backends (Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI and Copilot CLI) are full build only. See [Which Build?](../getting-started/which-build.md).
+{% endhint %}
+
 ## Requirements
 
 * `copilot` CLI installed.
