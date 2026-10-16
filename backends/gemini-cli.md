@@ -2,6 +2,10 @@
 
 Gemini CLI is useful for large-context cloud analysis and agent-style workflows.
 
+{% hint style="info" %}
+**Full build only.** The Gemini CLI backend is part of the GitHub full build (`Custom-AI-Agent-full-<version>.jar`, built with `./gradlew fullJar`). The BApp Store build (`./gradlew bappJar`) does not include it: all five CLI backends (Gemini CLI, Claude CLI, Codex CLI, OpenCode CLI and Copilot CLI) are full build only. See [Which Build?](../getting-started/which-build.md).
+{% endhint %}
+
 ## Requirements
 
 * `gemini` CLI installed.

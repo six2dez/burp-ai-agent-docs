@@ -2,13 +2,17 @@
 
 Beyond Burp's built-in MCP tools, Custom AI Agent can connect to **external or custom MCP servers** over **SSE** (HTTP) or **stdio** (local process) transports. Their tools appear alongside the built-in Burp tools in the agent's tool preamble, namespaced `ext:<server>:<tool>`. Introduced in v0.9.0 (closes #41).
 
+{% hint style="info" %}
+**Full build only.** External MCP servers, the **Settings > MCP Server > External MCP Servers** section and the `ext:<server>:<tool>` tools are part of the GitHub full build (`Custom-AI-Agent-full-<version>.jar`, built with `./gradlew fullJar`). The BApp Store build (`./gradlew bappJar`) does not include them. See [Which Build?](../getting-started/which-build.md).
+{% endhint %}
+
 ## Setup
 
-1. Open **Settings > MCP > External Servers**.
-2. Click **Add** and choose a transport:
+1. Open **Settings > MCP Server** and expand **External MCP Servers**.
+2. Click **Add Server** and choose a transport:
    * **SSE** — enter the server's SSE URL (e.g. `http://127.0.0.1:3000/sse`) and, if required, a bearer token.
    * **stdio** — enter the executable command (e.g. `/usr/local/bin/my-mcp-server`). stdio is **off by default** (it launches a local process) — enable it explicitly and confirm the local-process warning first.
-3. Click **Connect**. The Status column shows `Connected (N tools)`, and the server's tools become callable as `ext:<server>:<tool>` and listed in the agent's tool preamble.
+3. Click **Save Server**, then **Save settings**. The Status column shows `Connected (N tools)`, and the server's tools become callable as `ext:<server>:<tool>` and listed in the agent's tool preamble.
 
 ## Transport Types
 
