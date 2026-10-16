@@ -37,10 +37,15 @@ Use the backend ID consistently so audit logs can trace which backend was used f
 ### 5. Package and Deploy
 
 **Option A: Built-in**
-Add your backend to the main source tree and rebuild the extension JAR.
+Add your backend to the source tree and rebuild the extension JAR. A backend under `src/main` ships in both builds; a backend under `src/full`, listed in `src/full/resources/META-INF/services/com.six2dez.burp.aiagent.backends.AiBackendFactory`, ships in the GitHub full build only (this is where the CLI backends live).
 
 **Option B: Drop-in JAR**
-Package your backend as a standalone JAR and place it in `~/.burp-ai-agent/backends/`. The `BackendRegistry` will discover it automatically via `URLClassLoader` on startup.
+
+{% hint style="info" %}
+**Full build only.** Drop-in backend JARs are part of the GitHub full build (`Custom-AI-Agent-full-<version>.jar`, built with `./gradlew fullJar`). The BApp Store build (`./gradlew bappJar`) does not include the drop-in loader: it loads no code from outside its JAR and never creates or reads `~/.burp-ai-agent/backends/`. See [Which Build?](../getting-started/which-build.md).
+{% endhint %}
+
+Package your backend as a standalone JAR and place it in `~/.burp-ai-agent/backends/`. In the full build, the drop-in loader (`DropInBackendJars`) creates that directory when it is missing and, on every backend registry reload, opens one `URLClassLoader` over the JARs in it and registers every `AiBackendFactory` its `ServiceLoader` finds.
 
 ## Backend Interface
 
@@ -91,7 +96,7 @@ class MyConnection(
 
 ## Tips
 
-* Follow existing backend implementations as examples: `OllamaBackendFactory` for HTTP and `CodexCliBackendFactory` or `CopilotCliBackendFactory` for CLI.
+* Follow existing backend implementations as examples: `OllamaBackendFactory` for HTTP and `CodexCliBackendFactory` or `CopilotCliBackendFactory` for CLI (in `src/full`; CLI backends are full build only).
 * Use the shared Montoya HTTP transport and retry/circuit-breaker support instead of creating an unrelated client stack.
 * Never block the Swing EDT. The connection callback contract is asynchronous.
 * Ensure `onComplete` fires exactly once on success, error, cancellation, and timeout.

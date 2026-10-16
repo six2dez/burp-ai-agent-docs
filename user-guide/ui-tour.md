@@ -36,7 +36,7 @@ All Settings tabs are built on a shared internal design system (consistent spaci
 | **AI Passive Scanner** | Scope/rate/size controls, dedup/cache, context caps, findings. |
 | **AI Active Scanner** | Concurrency, risk level, scan mode, queue controls, Collaborator. |
 | **MCP Server** | Host/port/TLS/token/limits/unsafe-tool master switch. |
-| **Burp Integration** | Redesigned MCP Tools panel: tools grouped extension-native (AI) vs generic (Montoya), each tagged store-build / full-build, with search/filter and per-group bulk toggles. |
+| **Burp Integration** | Redesigned MCP Tools panel with search/filter and per-group bulk toggles. Tools are grouped under two subtitles: "Extension-native tools — available in both the BApp Store and the full build." and "Generic Montoya API wrappers — available in the full build only." In the BApp Store build only the extension-native group lists tools; the generic group reads "No Montoya tools available in this build." |
 | **Prompt Templates** | Built-in request and scanner-issue template editing. |
 | **Custom Prompts** | Saved free-form prompt library plus BountyPrompt enablement, directory, issue threshold, and curated-ID controls. |
 | **Privacy & Logging** | Privacy mode, determinism, salt, audit logging, AI request logger. |

@@ -68,17 +68,21 @@ flowchart LR
     AI[AI analysis]
     Conf{Confidence >= 85%?}
     Issue["Burp issue<br/>[AI Passive]"]
-    Queue{Auto-queue to active enabled?}
+    Testable{Class testable by<br/>the active scanner?}
+    Suggest["Suggested targets<br/>session-only list"]
+    Confirm["User queues by hand<br/>after Confirm AI Active Scan"]
     ActiveQ[Active scanner queue]
 
     T --> F --> L --> D --> C
     C -->|Hit| Hit --> Conf
     C -->|Miss| AI --> Conf
     Conf -->|No| EndNoIssue[No issue creation]
-    Conf -->|Yes| Issue --> Queue
-    Queue -->|Yes| ActiveQ
-    Queue -->|No| EndDone[Done]
+    Conf -->|Yes| Issue --> Testable
+    Testable -->|No| EndDone[Done]
+    Testable -->|Yes| Suggest --> Confirm --> ActiveQ
 ```
+
+A new finding whose vulnerability class the AI Active Scanner can test (not passive-only, and allowed by the active scan mode) adds its injection points to the **Suggested targets** list, in both builds. Building the list is local parsing only: nothing is sent to the target. The user queues entries by hand from the AI Active Scanner Queue dialog, after the **Confirm AI Active Scan** dialog. The full build can additionally opt in to **Auto-queue passive findings for active testing** on the AI Active Scanner tab (off by default): while it is on and the AI Active Scanner is enabled, the same targets are queued without the manual step, and any target the active scanner does not queue stays in the list.
 
 ### Batch Analysis & Persistent Cache Flow
 
