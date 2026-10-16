@@ -23,7 +23,7 @@ flowchart TD
     end
 
     subgraph L5[5. Backend Adapters]
-      BA[CLI and HTTP backends]
+      BA["HTTP backends, plus CLI backends (full build only)"]
     end
 
     subgraph L6[6. Supervisors]
@@ -63,6 +63,10 @@ flowchart TD
     AUD --> ALT
 ```
 
+### Two Builds
+
+The repository builds two JARs from separate source sets. `src/main` is the BApp Store build. `src/full` adds the full-only plug-ins on top of it: the generic MCP tools, the CLI backends, the external MCP client, the passive-to-active auto-queue and the drop-in backend loader. Each plug-in registers through a `META-INF/services` provider file that only the full JAR carries. `./gradlew bappJar` packages `src/main` alone; `./gradlew fullJar` packages `src/main` + `src/full` (GitHub full build). See [Testing & Debugging](testing.md#building-from-source).
+
 ## Initialization Sequence
 
 `BurpAiAgentExtension.initialize(MontoyaApi)` performs startup in a strict order.
@@ -77,7 +81,7 @@ sequenceDiagram
     participant MCP as MCP Server
 
     Burp->>Ext: initialize(api)
-    Ext->>Reg: load built-in + drop-in backends
+    Ext->>Reg: load built-in backends (+ drop-in backends, full build only)
     Ext->>Core: initialize settings, audit, scanners, supervisors
     Ext->>UI: register tab and context menus
     Ext->>Core: register scanner integration (Pro/Community paths)

@@ -22,8 +22,8 @@ The directory is created on first start. `AGENTS/` is populated with bundled pro
 ├── cache/
 │   └── <projectId-prefix>/
 │       └── <prompt-sha256>.json
-├── backends/
-│   └── my-backend.jar        # optional drop-in
+├── backends/                 # full build only
+│   └── my-backend.jar        # optional drop-in (full build only)
 ├── AGENTS/
 │   ├── default               # plain-text marker with the active profile name
 │   ├── pentester.md
@@ -45,7 +45,7 @@ The directory is created on first start. `AGENTS/` is populated with bundled pro
 | `bundles/` | `AuditLogger.writePromptBundle` | `PromptBundle` JSON snapshots of dispatched prompt text and embedded context for reproducibility. A ZIP-export helper exists in code but has no production UI/caller in the current release. | Yes. Treat as engagement evidence, not sanitized public output. |
 | `contexts/` | `AuditLogger` initialization | Reserved directory. The runtime creates it, but no production caller currently invokes `writeContextFile`; bundle JSON embeds `contextJson` directly. | Empty in normal current operation; treat future contents as sensitive. |
 | `cache/<projectId-prefix>/` | `PersistentPromptCache` | Per-project on-disk cache of parsed scanner AI results. The directory name is the first eight characters of `api.project().id()` (or `default` on lookup failure); JSON files are keyed by prompt SHA-256. TTL and max size come from **Passive Scanner** settings. | Potentially. Model output can repeat source values, and cached entries are not retroactively rewritten when privacy mode changes. |
-| `backends/*.jar` | User | Drop-in backend JARs loaded via `ServiceLoader` at startup; see [Adding a Backend](../developer/adding-backend.md). | Depends on the JAR. |
+| `backends/*.jar` | User | **Full build only.** Drop-in backend JARs loaded via `ServiceLoader` at startup; see [Adding a Backend](../developer/adding-backend.md). The BApp Store build never creates or reads this directory. | Depends on the JAR. |
 | `AGENTS/*.md` | Extension at first launch + user | Agent profiles. Editable; changes are picked up on the next action without restart. | No. |
 | `AGENTS/default` | `AgentProfileLoader` | Plain-text marker file with the active profile name (matches a sibling `*.md`). | No. |
 | `certs/mcp-keystore.p12` | `McpTls` auto-generation | PKCS12 keystore for the MCP TLS listener (RSA 2048 / SHA256withRSA / 365 d / `CN=burp-mcp`). | Yes — keystore password is stored in Burp preferences. |
@@ -59,7 +59,7 @@ Chat sessions do **not** live in this directory. They are stored in Burp's `exte
 
 ## Backup and Portability
 
-* **Portable between machines**: `AGENTS/*.md` and intentionally selected `backends/*.jar`. Treat backend JARs as executable code and re-verify their source/checksum on the destination.
+* **Portable between machines**: `AGENTS/*.md` and intentionally selected `backends/*.jar` (full build only). Treat backend JARs as executable code and re-verify their source/checksum on the destination.
 * **Portable but sensitive**: `audit.jsonl` and `bundles/` can be archived or moved, but may contain engagement traffic, prompts, and model output. Treat any future `contexts/` contents the same way. Transfer them only through an approved encrypted channel.
 * **Do not copy between machines**: `cache/<projectId-prefix>/`. The namespace is derived from the local Burp project ID and entries are keyed by prompt hash; moving it to another host can produce irrelevant hits.
 * **Secrets**: the MCP keystore at `certs/mcp-keystore.p12` and its password (stored in Burp preferences, not here) together authenticate the local MCP listener. Rotate both when a host is retired.
@@ -75,14 +75,14 @@ Chat sessions do **not** live in this directory. They are stored in Burp's `exte
 
 ## Legacy Identifier Reference
 
-The product is called **Custom AI Agent** but several internal identifiers still use the legacy name `burp-ai-agent`. This table lists exactly where each form appears.
+The product is called **Custom AI Agent** but several internal identifiers still use the legacy name `burp-ai-agent`. This table lists exactly where each form appears. For what each of the two release JARs contains, see [Which Build?](../getting-started/which-build.md).
 
 | Context | Value | Notes |
 | :--- | :--- | :--- |
 | Product and Burp extension name | `Custom AI Agent` | Visible in Burp's Extensions list and in the main tab. |
-| Release artifact (full build) | `Custom-AI-Agent-full-<version>.jar` | Published on GitHub Releases; registers all 59 MCP tools. Built with `./gradlew shadowJar`. |
-| BApp Store-targeted artifact | `Custom-AI-Agent-<version>.jar` | Not currently published while submission #231 remains open; build locally with `./gradlew shadowJar -PstoreBuild=true`. Registers only the 8 extension-native AI MCP tools. |
-| Checksum / SBOM | `Custom-AI-Agent-full-<version>.jar.sha256`, `bom.json` | The current release workflow attaches both beside the full JAR. |
+| Release artifact (full build) | `Custom-AI-Agent-full-<version>.jar` | Published on GitHub Releases; registers all 59 MCP tools. Built with `./gradlew fullJar`. |
+| BApp Store build | `custom-ai-agent-bapp.jar` (Gradle output) / `Custom-AI-Agent-bapp-<version>.jar` (release asset) | Attached to every GitHub release beside the full build; built with `./gradlew bappJar`; registers only the 8 extension-native AI MCP tools. |
+| Checksum / SBOM | `Custom-AI-Agent-full-<version>.jar.sha256`, `Custom-AI-Agent-bapp-<version>.jar.sha256`, `bom.json` | The release workflow attaches all three beside the two JARs. |
 | Burp tab title | `Custom AI Agent` | Registered by `App` and shown in Burp's main tab navigation. |
 | GitHub repository | `github.com/six2dez/burp-ai-agent` | Repo URL kept to avoid breaking external links, issues, and forks. |
 | Runtime directory | `~/.burp-ai-agent/` (Windows: `%USERPROFILE%\.burp-ai-agent\`) | Documented above. |
@@ -110,7 +110,7 @@ The product is called **Custom AI Agent** because PortSwigger naming guidance as
 
 When wiring scripts, automation, or dashboards against this extension:
 
-* Scripts that download or pin the GitHub release JAR should target `Custom-AI-Agent-full-*.jar` and its matching `.jar.sha256` file.
+* Scripts that download or pin a GitHub release JAR should target `Custom-AI-Agent-full-*.jar` (GitHub full build) or `Custom-AI-Agent-bapp-*.jar` (BApp Store build) and the matching `.jar.sha256` file.
 * Dashboards or Slack messages that reference the Burp tab should use **`Custom AI Agent`**, matching the user-visible tab name.
 
 Scripts that reference `~/.burp-ai-agent/`, the GitHub repo URL, the Java package, or the MCP implementation string follow the legacy identifier form — those do **not** need to match the product name.

@@ -4,17 +4,30 @@
 
 The project uses JUnit Platform with JUnit Jupiter `6.0.3` and a Java 21 toolchain.
 
+### Store and full test suites
+
+The two builds are tested separately, each on its own classpath:
+
+| Task | What it runs |
+| :--- | :--- |
+| `test` | `src/test` on the BApp Store classpath (`src/main` only). |
+| `fullTest` | `src/fullTest` on the full classpath (`src/main` + `src/full`). |
+| `storeJarContentTest` | Builds both JARs and fails if the BApp Store JAR contains a full-only class or a CLI backend. |
+| `unloadLeakTest` | The load/unload lifecycle tests, one JVM per class. |
+| `edtGuardWithoutAssertionsTest` | The MCP executor's EDT guard with JVM assertions disabled. |
+| `check` | `test`, `fullTest`, `storeJarContentTest`, `unloadLeakTest`, coverage verification, `ktlintCheck` and `detekt`. |
+
 ### Fast suite (default in CI PR gate)
 ```bash
-./gradlew test -PexcludeHeavyTests=true
+./gradlew test fullTest -PexcludeHeavyTests=true
 ```
-Excludes `*IntegrationTest`, `*ConcurrencyTest`, `*BackpressureTest`, `*RestartPolicyTest`, and `*SupervisionTest`. It runs on every PR across Linux, macOS, and Windows in `.github/workflows/build.yml`.
+Excludes `*IntegrationTest`, `*ConcurrencyTest`, `*BackpressureTest`, `*RestartPolicyTest`, and `*SupervisionTest` from both suites. It runs on every PR across Linux, macOS, and Windows in `.github/workflows/build.yml`, followed by `edtGuardWithoutAssertionsTest`, `unloadLeakTest` and `bappJar fullJar storeJarContentTest`.
 
 ### Nightly-equivalent local suite
 ```bash
-./gradlew test nightlyRegressionTest edtGuardWithoutAssertionsTest
+./gradlew test nightlyRegressionTest nightlyRegressionFullTest edtGuardWithoutAssertionsTest unloadLeakTest fullJar bappJar storeJarContentTest
 ```
-This adds integration, concurrency, backpressure, restart-policy, and supervision suites, then proves the MCP executor's EDT guard with JVM assertions disabled. The nightly workflow runs all three tasks and also builds `shadowJar`. The release workflow runs `test`, `nightlyRegressionTest`, lint, and the artifact build on each version tag; it does not invoke the separate assertion-disabled EDT task.
+This adds the integration, concurrency, backpressure, restart-policy, and supervision suites for both builds (`nightlyRegressionTest` on the store classpath, `nightlyRegressionFullTest` on the full classpath), proves the MCP executor's EDT guard with JVM assertions disabled, runs the unload lifecycle tests, and builds and inspects both JARs. It is the task list the nightly workflow (`.github/workflows/nightly-regression.yml`) runs. On each version tag the release workflow runs `ktlintCheck` and `detekt`, then `test fullTest nightlyRegressionTest nightlyRegressionFullTest edtGuardWithoutAssertionsTest unloadLeakTest`, then `bappJar fullJar storeJarContentTest`, then `cyclonedxBom`.
 
 ### Integration / concurrency tests
 Heavy suites use local test servers and concurrency fixtures; backend-specific manual checks can additionally require an installed CLI or local model. Read a failing test's setup before assuming external services are required.
@@ -40,17 +53,19 @@ Reports land at `build/reports/jacoco/test/html/index.html` and `build/reports/j
 
 ## Building from Source
 
-The build produces two artifacts (see PortSwigger's [extension-portal issue #231](https://github.com/PortSwigger/extension-portal/issues/231)):
+The repository produces two builds, each with its own Gradle task (see PortSwigger's [extension-portal issue #231](https://github.com/PortSwigger/extension-portal/issues/231)):
 
 ```bash
-./gradlew clean shadowJar                  # full build (default, GitHub releases)
-./gradlew clean shadowJar -PstoreBuild=true # BApp Store build
+./gradlew clean fullJar   # GitHub full build
+./gradlew clean bappJar   # BApp Store build
 ```
 
-* **Full build** → `build/libs/Custom-AI-Agent-full-<version>.jar` — registers all 59 MCP tools.
-* **Store build** → `build/libs/Custom-AI-Agent-<version>.jar` — registers only the 8 extension-native AI MCP tools (BApp Store compliance).
+* **GitHub full build** → `build/libs/Custom-AI-Agent-full-<version>.jar` — registers all 59 MCP tools.
+* **BApp Store build** → `build/libs/custom-ai-agent-bapp.jar` — registers only the 8 extension-native AI MCP tools.
 
-The `-PstoreBuild` flag sets the generated `BuildFlags.STORE_BUILD` constant that gates which tools register. Use the resulting JAR to install the extension in Burp, where it appears as **Custom AI Agent**.
+A build's contents are decided by source set, not by a Gradle property or a generated constant: `src/main` is the BApp Store build, and `src/full` adds the full-only plug-ins on top of it. `bappJar` packages `src/main` alone; `fullJar` packages `src/main` + `src/full`; `./gradlew build` builds both. Use the resulting JAR to install the extension in Burp, where it appears as **Custom AI Agent** in both builds.
+
+Each GitHub release attaches `Custom-AI-Agent-full-<version>.jar` and `Custom-AI-Agent-bapp-<version>.jar` (a byte copy of `custom-ai-agent-bapp.jar`), each with a `.sha256` file, plus `bom.json`.
 
 ## SBOM
 
@@ -58,7 +73,7 @@ The `-PstoreBuild` flag sets the generated `BuildFlags.STORE_BUILD` constant tha
 ./gradlew cyclonedxBom
 ```
 
-Produces the CycloneDX JSON file `build/reports/sbom/bom.json`. The release workflow attaches it to the GitHub Release alongside the JAR and its SHA-256 checksum.
+Produces the CycloneDX JSON file `build/reports/sbom/bom.json`. The release workflow attaches it to the GitHub Release alongside both JARs and their SHA-256 checksums. One `bom.json` covers both builds: it lists the full build's runtime dependencies, which include every dependency the BApp Store build packages.
 
 ## Debugging
 

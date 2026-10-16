@@ -56,7 +56,7 @@ Threshold check used before auto-creating BountyPrompt issues.
 
 ### Backend Adapter
 
-Provider-specific implementation for CLI or HTTP model backends.
+Provider-specific implementation for HTTP model backends, or for CLI backends (full build only).
 
 ### ServiceLoader
 
@@ -96,7 +96,7 @@ Active scanner class-selection strategy (`BUG_BOUNTY`, `PENTEST`, `FULL`).
 
 ### Drop-in Backend
 
-External backend JAR loaded from `~/.burp-ai-agent/backends/`.
+External backend JAR loaded from `~/.burp-ai-agent/backends/` (full build only; the BApp Store build loads no code from outside its JAR).
 
 ### Privacy Mode
 
