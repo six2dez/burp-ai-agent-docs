@@ -22,30 +22,32 @@ The extension integrates directly with Burp tools and workflows so AI analysis s
 | Context menu actions (requests) | Yes | Yes |
 | Context menu actions (issues) | No | Yes |
 | Chat & sessions | Yes | Yes |
-| AI backends | Independent backends only; Burp AI unavailable | All, subject to provider configuration and Burp AI entitlement |
+| AI backends | BApp Store build: AI requests need "Use AI" enabled for the extension; with it off they are refused. GitHub full build: the HTTP and CLI backends work regardless; Burp AI needs "Use AI" | BApp Store build: AI requests need "Use AI" enabled for the extension; with it off they are refused. GitHub full build: the HTTP and CLI backends work regardless; Burp AI needs "Use AI" |
 | MCP server | Yes (non-Pro tools) | Yes (all tools) |
 | Passive AI Scanner | Manual queue path | Automatic passive scan check + manual queue |
 | Active AI Scanner | Manual queue path | Native scanner integration + queue |
-| Scanner MCP tools | No | Yes |
+| Scanner MCP tools | No | Yes (GitHub full build only) |
 | Collaborator OAST | No | Yes |
-| Scan reports via MCP | No | Yes |
+| Scan reports via MCP | No | Yes (GitHub full build only) |
 
 The extension detects Burp edition at startup and disables unsupported capabilities automatically.
 
-The current `ai_analyze` and `ai_passive_scan` MCP handlers have an additional Burp-AI availability check. They refuse on Community or when **Use AI for extensions** is off even if an independent backend is selected; this does not affect normal chat or the manual scanner queues. See the [MCP Tools Reference](../mcp/tools-reference.md#ai-extension-native).
+Which Burp editions can turn "Use AI" on is decided by Burp, not by this extension. PortSwigger documents "Use AI" as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**. See [Which Build?](../getting-started/which-build.md#burp-edition-requirements).
+
+MCP `ai_analyze` and `ai_passive_scan` return a tool error while "Use AI" is off, in both builds, even if another backend is selected. See the [MCP Tools Reference](../mcp/tools-reference.md#ai-extension-native).
 
 ## MCP Tool Toggles
 
-You control MCP exposure from **Burp Integration** and **MCP Server** tabs. The **Burp Integration** tab embeds the redesigned MCP Tools panel: tools are grouped **extension-native (AI)** vs **generic (Montoya)**, each tagged **store-build** / **full-build**, with a search/filter box and per-group bulk toggles.
+You control MCP exposure from **Burp Integration** and **MCP Server** tabs. The **Burp Integration** tab embeds the redesigned MCP Tools panel: tools are grouped under **AI Tools (extension-native)**, subtitled "Extension-native tools — available in both the BApp Store and the full build.", and **Montoya Tools (generic)**, subtitled "Generic Montoya API wrappers — available in the full build only.", with a search/filter box and per-group bulk toggles.
 
 ### Build matters
 
-There are two build artifacts, and which tools are even registered depends on the build:
+There are two builds, and which tools are even registered depends on the build. [Which Build?](../getting-started/which-build.md) compares them.
 
-* **Full build** (default, GitHub releases — `Custom-AI-Agent-full-<version>.jar`): registers all **59** MCP tools, including the generic Montoya-API tools (proxy history, Repeater, scanner, scope, site map, Intruder, Collaborator, utilities, etc.).
-* **Store build** (BApp Store — `Custom-AI-Agent-<version>.jar`): registers only the **8** extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). The generic Montoya-API tools are not exposed over MCP in this build — PortSwigger's official Burp MCP Server provides those.
+* **GitHub full build** (`./gradlew fullJar` → `build/libs/Custom-AI-Agent-full-<version>.jar`; release asset `Custom-AI-Agent-full-<version>.jar`): registers all **59** MCP tools, including the generic Montoya-API tools (proxy history, Repeater, scanner, scope, site map, Intruder, Collaborator, utilities, etc.).
+* **BApp Store build** (`./gradlew bappJar` → `build/libs/custom-ai-agent-bapp.jar`; release asset `Custom-AI-Agent-bapp-<version>.jar`): registers only the **8** extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). The generic Montoya-API tools are not exposed over MCP in this build — PortSwigger's official Burp MCP Server provides those.
 
-The tags in the panel show which group each tool belongs to so you can see at a glance what is available in your build.
+The group subtitles in the panel show which build offers each group, so you can see at a glance what is available in your build.
 
 ### Safe vs Unsafe
 

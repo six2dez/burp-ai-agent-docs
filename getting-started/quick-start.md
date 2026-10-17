@@ -4,12 +4,13 @@ This walkthrough gets from installation to first AI analysis quickly.
 
 ## 0. Pick a Backend (Prerequisites)
 
-* **Using Burp AI built-in (Burp Pro only)**: open Burp's **Settings → Burp AI**, enable **Use AI for extensions**, and confirm there are AI credits available. No URL or key is needed on the extension side. See [Burp AI (Built-in)](../backends/burp-ai.md).
+* **Burp's "Use AI" for the extension**: PortSwigger documents "Use AI" as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**. In the BApp Store build every AI backend needs it on; in the GitHub full build only Burp AI does (the MCP `ai_analyze` and `ai_passive_scan` tools need it in both). See [Which Build?](which-build.md).
+* **Using Burp AI built-in**: turn on "Use AI" as above and confirm there are AI credits available. No URL or key is needed on the extension side. See [Burp AI (Built-in)](../backends/burp-ai.md).
 * **Using Ollama / LM Studio**: install the server locally and pull at least one model.
 * **Using NVIDIA NIM / Generic OpenAI-compatible**: have the base URL, model name, and API key handy.
-* **Using a CLI backend (Gemini, Claude, Codex, Copilot, OpenCode)**: the CLI must already be installed and authenticated in the same shell environment that launches Burp.
+* **Using a CLI backend (Gemini, Claude, Codex, Copilot, OpenCode; GitHub full build only)**: the CLI must already be installed and authenticated in the same shell environment that launches Burp.
 
-If you skip this step, the backend will show `Offline` in the top bar until the prerequisite is satisfied.
+If you skip this step, a health check shows `AI: Offline` in the top bar until the prerequisite is satisfied. In the BApp Store build the status pill reads "Not checked · click to test" until the first check (Save, a backend change, a click on the pill, **Test connection** or the first chat message), and "AI disabled in Burp" while "Use AI" is off.
 
 ## 1. Enable MCP (Optional but Recommended)
 
@@ -30,10 +31,10 @@ To add custom profiles, place `*.md` files in that directory and refresh profile
 
 1. Open **AI Backend** tab in Settings.
 2. Choose backend.
-3. Set CLI command or HTTP URL/model fields.
+3. Set the HTTP URL/model fields, or the CLI command (GitHub full build only).
 
 {% hint style="warning" %}
-If using cloud CLIs, required credentials must exist in the runtime environment where Burp is launched. GUI launchers often do not inherit shell env vars.
+If using cloud CLIs (GitHub full build only), required credentials must exist in the runtime environment where Burp is launched. GUI launchers often do not inherit shell env vars.
 {% endhint %}
 
 For backend-specific values, see [Backends Overview](../backends/overview.md).

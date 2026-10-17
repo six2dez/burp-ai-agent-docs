@@ -5,10 +5,10 @@ Use this checklist after installation before starting a real assessment.
 ## Essential Setup
 
 * [ ] **Extension loaded**: `Custom AI Agent` tab is visible.
-* [ ] **Burp AI prerequisite checked** — if you plan to use the built-in **Burp AI** backend, open Burp's **Settings → Burp AI** and confirm *Use AI for extensions* is **ON** (Burp Pro only). Without this, the backend stays `Offline` and cannot be selected. See [Burp AI (Built-in)](../backends/burp-ai.md).
+* [ ] **"Use AI" checked** — PortSwigger documents "Use AI" as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**. In the BApp Store build every AI backend needs it **ON**: with it off, every AI request is refused and the status pill reads "AI disabled in Burp". In the GitHub full build only the built-in **Burp AI** backend (and the MCP `ai_analyze` and `ai_passive_scan` tools) need it. See [Which Build?](which-build.md) and [Burp AI (Built-in)](../backends/burp-ai.md).
 * [ ] **Backend selected**: backend set in **AI Backend** tab.
 * [ ] **Backend configured**: command/URL/model/auth values are valid (or leave blank when using Burp AI built-in).
-* [ ] **Backend healthy**: top status indicator shows active state.
+* [ ] **Backend healthy**: top status indicator shows `AI: OK`. In the BApp Store build it reads "Not checked · click to test" until the first check: click the pill or **Test connection** to run one.
 * [ ] **Context menus available**: request right-click menu shows Custom AI Agent actions.
 
 ## MCP Server (Recommended)
