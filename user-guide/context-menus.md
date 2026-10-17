@@ -112,7 +112,7 @@ Placeholders such as `$URL`, `$REQUEST`, `$RESPONSE` are **not supported** in v1
 
 ## AI Scan on Selected Insertion Point
 
-Highlight the value of a single parameter, header, JSON field, XML element, or path-segment ID in any request editor and the **AI Scan on Selected Insertion Point** entry appears in the context menu, labelled with the resolved type and name (for example `AI Scan on Selected Insertion Point (json field: user_id)`). It runs an active AI scan scoped to that one insertion point, ahead of the regular manual/passive queue (priority 60). The action is hidden when the selection is empty, on the response side, or does not overlap any candidate.
+Highlight the value of a single parameter, header, JSON field, XML element, or path-segment ID in any request editor and the **AI Scan on Selected Insertion Point** entry appears in the context menu, labelled with the resolved type and name (for example `AI Scan on Selected Insertion Point (json field: user_id)`). It queues an active AI scan scoped to that one insertion point, recorded with priority 60. The queue runs first in, first out, so the scan starts after the targets already queued ahead of it. The action is hidden when the selection is empty, on the response side, or does not overlap any candidate.
 
 See [Insertion Point Scan](insertion-point-scan.md) for the supported insertion-point types, the vuln-class picker filtering rules, queue/scope behavior, and safety boundaries.
 

@@ -96,7 +96,7 @@ Adaptive payloads require a running AI backend and consume additional tokens. En
 
 ## Knowledge Base Priority Boost
 
-The active scanner consults the shared `ScanKnowledgeBase` when queueing targets. Endpoints with high-priority signals (Critical/High severity, confidence >= 80%) from the passive scanner receive a +20 priority boost, causing them to be tested earlier in the queue.
+When the GitHub full build's opt-in auto-queue adds a target, the active scanner consults the shared `ScanKnowledgeBase`. Endpoints with high-priority signals (Critical/High severity, confidence >= 80%) from the passive scanner have +20 added to the target's recorded priority, capped at 100. The queue itself runs first in, first out, so the boost does not change the order in which targets are tested.
 
 Additionally, confirmed findings from the active scanner are recorded back into the Knowledge Base, including database technology hints extracted from error evidence (MySQL, PostgreSQL, MSSQL, Oracle, SQLite). This information feeds into adaptive payload generation for subsequent scans.
 
