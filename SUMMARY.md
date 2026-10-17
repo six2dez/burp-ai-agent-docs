@@ -5,6 +5,7 @@
 ## Getting Started
 
 * [Installation](getting-started/installation.md)
+* [Which Build?](getting-started/which-build.md)
 * [Quick Start](getting-started/quick-start.md)
 * [First Run Checklist](getting-started/first-run-checklist.md)
 

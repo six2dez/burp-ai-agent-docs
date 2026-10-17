@@ -13,18 +13,25 @@ MCP TLS certificate generation launches the `keytool` binary from the active Jav
 
 ## Install Path
 
+There are two builds: the **BApp Store build** and the **GitHub full build**. [Which Build?](which-build.md) explains what each contains and what it needs from Burp.
+
 {% tabs %}
-{% tab title="BApp Store (not yet available)" %}
+{% tab title="BApp Store (not yet listed)" %}
 {% hint style="warning" %}
-**Custom AI Agent is not on the BApp Store yet.** The [submission](https://github.com/PortSwigger/extension-portal/issues/231) is still open with PortSwigger. Install from [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases) — see the next tab.
+Custom AI Agent is not listed in the BApp Store yet: the BApp Store build is going through PortSwigger's review in [extension-portal#231](https://github.com/PortSwigger/extension-portal/issues/231).
 {% endhint %}
 
-The *store build* referenced throughout this documentation is a real build target you can produce yourself (`-PstoreBuild=true`), and it is the artifact that will be published once the submission is accepted. It registers only the 8 extension-native AI MCP tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). For the full set of 59 MCP tools, use the full build.
+The BApp Store build (`./gradlew bappJar`) holds the 8 extension-native MCP tools and 7 AI backends (Burp AI and six HTTP backends), and sends AI requests only while Burp's "Use AI" setting is enabled for the extension. Until it is listed, download it from GitHub Releases (next tab) or build it yourself (last tab). See [Which Build?](which-build.md).
 {% endtab %}
 
 {% tab title="Download from Releases" %}
 1. Open [GitHub Releases](https://github.com/six2dez/burp-ai-agent/releases).
-2. Download the latest full build `Custom-AI-Agent-full-<version>.jar` plus its `*.jar.sha256` checksum and, optionally, the `bom.json` CycloneDX SBOM. These three are what a release publishes. (The store build, `Custom-AI-Agent-<version>.jar`, is **not** attached to releases — it is the artifact that will be distributed through the BApp Store once the submission is accepted, and you can build it yourself with `-PstoreBuild=true`.)
+2. Download one build. From v1.1.0, every release attaches both:
+   * `Custom-AI-Agent-full-<version>.jar`, the GitHub full build, with `Custom-AI-Agent-full-<version>.jar.sha256`;
+   * `Custom-AI-Agent-bapp-<version>.jar`, the BApp Store build, with `Custom-AI-Agent-bapp-<version>.jar.sha256`;
+   * one `bom.json` (CycloneDX SBOM) for the release.
+
+   [Which Build?](which-build.md) explains which one to pick.
 3. Verify the JAR integrity (see [Verify JAR Integrity](#verify-jar-integrity-sha-256)) before loading.
 
 {% hint style="info" %}
@@ -40,24 +47,22 @@ git clone https://github.com/six2dez/burp-ai-agent.git
 cd burp-ai-agent
 ```
 
-2. Build a fat JAR. The default build is the **full** artifact (all 59 MCP tools, for GitHub releases); pass `-PstoreBuild=true` for the **store** artifact (only the 8 extension-native AI MCP tools, for the BApp Store):
+2. Build a fat JAR with JDK 21. Each build has its own task:
 
 ```bash
-# Full build (default) -> build/libs/Custom-AI-Agent-full-<version>.jar
-./gradlew clean shadowJar
+# BApp Store build (8 extension-native MCP tools, 7 AI backends)
+./gradlew clean bappJar
 
-# Store build (BApp Store) -> build/libs/Custom-AI-Agent-<version>.jar
-./gradlew clean shadowJar -PstoreBuild=true
+# GitHub full build (all 59 MCP tools, 12 AI backends)
+./gradlew clean fullJar
 ```
 
 3. Output paths:
 
 ```text
-build/libs/Custom-AI-Agent-full-<version>.jar   # full build (default)
-build/libs/Custom-AI-Agent-<version>.jar        # store build (-PstoreBuild=true)
+build/libs/custom-ai-agent-bapp.jar             # BApp Store build
+build/libs/Custom-AI-Agent-full-<version>.jar   # GitHub full build
 ```
-
-A generated compile-time flag (`BuildFlags.STORE_BUILD`) gates which MCP tools register.
 
 4. (Optional) Generate an SBOM alongside the JAR:
 
@@ -70,13 +75,14 @@ A generated compile-time flag (`BuildFlags.STORE_BUILD`) gates which MCP tools r
 
 ## Verify JAR Integrity (SHA-256)
 
-The current GitHub release workflow publishes a `*.jar.sha256` checksum file next to the JAR and a CycloneDX `bom.json` software bill of materials. Verify the JAR before loading it:
+The GitHub release workflow publishes a `.sha256` checksum file (in `sha256sum` format) next to each JAR and one CycloneDX `bom.json` software bill of materials. Verify the JAR before loading it. The examples use the full build; for the BApp Store build, use `Custom-AI-Agent-bapp-<version>.jar` and its `.sha256`:
 
 {% tabs %}
 {% tab title="macOS / Linux" %}
 ```bash
-shasum -a 256 Custom-AI-Agent-full-<version>.jar
-# Compare against Custom-AI-Agent-full-<version>.jar.sha256
+# Run in the folder that holds the JAR and its .sha256 file
+sha256sum -c Custom-AI-Agent-full-<version>.jar.sha256        # Linux
+shasum -a 256 -c Custom-AI-Agent-full-<version>.jar.sha256    # macOS
 ```
 {% endtab %}
 
@@ -90,6 +96,8 @@ Get-FileHash -Algorithm SHA256 Custom-AI-Agent-full-<version>.jar
 If the two values differ, **do not load the JAR** — re-download from the official release page.
 
 ## Load into Burp Suite
+
+Load only one build. Both builds register as **Custom AI Agent**; unload any other copy before you add a JAR (see [Which Build?](which-build.md#load-only-one-build)).
 
 1. Open **Extensions -> Installed -> Add**.
 2. Select extension type `Java`.
@@ -118,7 +126,7 @@ On first start, `~/.burp-ai-agent/` is created:
 ├── audit.jsonl
 ├── bundles/
 ├── contexts/
-├── backends/
+├── backends/         # GitHub full build only: drop-in backend JARs
 ├── cache/            # created on demand by PersistentPromptCache (per project)
 ├── certs/
 │   └── mcp-keystore.p12
@@ -135,7 +143,7 @@ The directory keeps the legacy `burp-ai-agent` name on disk to preserve upgrades
 Custom additions:
 
 * profiles: `~/.burp-ai-agent/AGENTS/*.md` ([Agent Profiles](../user-guide/agent-profiles.md))
-* backend plugins: `~/.burp-ai-agent/backends/` ([Adding a Backend](../developer/adding-backend.md))
+* backend plugins (GitHub full build only; the BApp Store build never creates or loads this directory): `~/.burp-ai-agent/backends/` ([Adding a Backend](../developer/adding-backend.md))
 
 ## Troubleshooting
 
