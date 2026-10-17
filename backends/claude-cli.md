@@ -40,7 +40,7 @@ claude "hello"
 | Setting | Value |
 | :--- | :--- |
 | **Preferred Backend** | `claude-cli` |
-| **Claude CLI Command** | `claude` or full path |
+| **Claude Code command** | `claude` or full path |
 
 Model example:
 
@@ -75,7 +75,7 @@ npm-installed CLI shims are resolved automatically on Windows. The extension det
 
 ### Windows + WSL bridge
 
-If Burp runs on Windows and Claude CLI is installed inside WSL, the simplest setup is to point **Claude CLI Command** at a one-liner that invokes WSL with an interactive shell so `PATH` and auth env vars from `~/.bashrc` / `~/.profile` are loaded:
+If Burp runs on Windows and Claude CLI is installed inside WSL, the simplest setup is to point **Claude Code command** at a one-liner that invokes WSL with an interactive shell so `PATH` and auth env vars from `~/.bashrc` / `~/.profile` are loaded:
 
 ```
 wsl -d Debian bash -ic "/home/<username>/.local/bin/claude"

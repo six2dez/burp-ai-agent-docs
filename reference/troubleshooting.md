@@ -97,7 +97,7 @@ If Burp runs on Windows and Codex runs in WSL, use a `.cmd` wrapper that forward
 
 ### Windows + WSL Claude CLI bridge
 
-If Burp runs on Windows and Claude CLI is installed in WSL, set **Claude CLI Command** to a one-liner like `wsl -d Debian bash -ic "/home/<username>/.local/bin/claude"`. The interactive `bash -ic` sources `~/.bashrc` so `ANTHROPIC_API_KEY` and `PATH` are populated before launching the binary. Full example and notes in [Claude CLI → Windows + WSL bridge](../backends/claude-cli.md#windows--wsl-bridge).
+If Burp runs on Windows and Claude CLI is installed in WSL, set **Claude Code command** to a one-liner like `wsl -d Debian bash -ic "/home/<username>/.local/bin/claude"`. The interactive `bash -ic` sources `~/.bashrc` so `ANTHROPIC_API_KEY` and `PATH` are populated before launching the binary. Full example and notes in [Claude CLI → Windows + WSL bridge](../backends/claude-cli.md#windows--wsl-bridge).
 
 ## MCP Issues
 
