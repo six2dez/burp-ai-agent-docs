@@ -68,4 +68,4 @@ cd burp-ai-agent
 ./gradlew clean fullJar
 ```
 
-`./gradlew shadowJar` is retired: it fails with a message naming the two tasks. See [Installation](installation.md) for loading the JAR into Burp.
+The old single-JAR Gradle task is retired: running it fails with a message naming the two tasks above. See [Installation](installation.md) for loading the JAR into Burp.
