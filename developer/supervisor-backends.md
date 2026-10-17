@@ -4,36 +4,36 @@ The supervisors coordinate backend process lifecycle, health state, and MCP serv
 
 ## Agent Supervisor
 
-The `AgentSupervisor` controls CLI and HTTP backend sessions.
+The `AgentSupervisor` controls backend sessions: HTTP backends and Burp AI in both builds, plus the CLI backends in the GitHub full build.
 
 ### Responsibilities
 
 * Start or attach backend sessions.
-* Run health checks and expose backend state.
-* Auto-restart crashed backends when policy allows it.
+* Apply the "Use AI" gate to every AI request (see [Use AI Gate](#use-ai-gate)).
+* Run health checks on request and expose backend state.
+* Start the local Ollama or LM Studio server when the user agrees to it after a chat send finds it unreachable.
 * Emit operational events used by diagnostics and audit flows.
 
 ### Lifecycle
 
 ```mermaid
 flowchart TD
-    Start[startOrAttach()] --> Alive{Backend already alive?}
+    Start["startOrAttach(backendId)"] --> Gate{"aiAccessRefusal(backendId) null?"}
+    Gate -->|No| Refused[Refuse: record and log the policy's text]
+    Gate -->|Yes| Alive{Same backend already running and alive?}
     Alive -->|Yes| Reuse[Reuse existing backend session]
-    Alive -->|No| Config[Build launch config from settings]
+    Alive -->|No| Config[Stop the previous session, build launch config from settings]
     Config --> Kind{Backend type}
-    Kind -->|CLI| Cli[Spawn subprocess and bind session ID]
-    Kind -->|HTTP| Http[Connect to remote endpoint and run health check]
-    Cli --> Bind[Session binding]
+    Kind -->|"CLI (GitHub full build)"| Cli[Spawn subprocess and bind session ID]
+    Kind -->|HTTP or Burp AI| Http[Create the connection on the shared Montoya transport]
+    Cli --> Bind[Session Running]
     Http --> Bind
-    Bind --> Loop[Health monitoring loop - 2s interval]
-    Loop --> Healthy{Healthy?}
-    Healthy -->|Yes| Loop
-    Healthy -->|No| Crash[Set status: Crashed]
-    Crash --> Restart{Auto-restart enabled and budget available?}
-    Restart -->|Yes| Backoff[Relaunch with bounded stepped backoff]
-    Backoff --> Loop
-    Restart -->|No| Stopped[Remain stopped until manual restart]
+    Bind --> Dead{Connection still alive at the next call?}
+    Dead -->|Yes| Bind
+    Dead -->|No| Crashed["status() reports Crashed; the next startOrAttach launches a new session"]
 ```
+
+There is no background health-monitoring loop and no automatic restart in the supervisor: a dead session is reported as `Crashed` and replaced the next time a start is requested. The status pill's health checks are described in [Backends Overview](../backends/overview.md).
 
 ### Supervisor State Machine
 
@@ -44,22 +44,26 @@ stateDiagram-v2
     Starting --> Running: launch OK + CAS to Running
     Starting --> Idle: launch failure or stop while starting
     Running --> Idle: stop()
-    Running --> Starting: auto-restart
-    Running --> Running: isAlive() false handled by health monitor
+    Running --> Starting: startOrAttach() after the connection died or for another backend
 ```
 
 ### Use AI Gate
 
-The supervisor exposes two helpers that scope Burp Pro's *Use AI for extensions* toggle to the only backend that actually depends on it:
+Which backends need Burp's "Use AI" setting is decided by an injected `AiAccessPolicy` (`com.six2dez.burp.aiagent.spi`), not by a build flag:
 
-* `requiresBurpAiAndDisabled(backendId: String): Boolean` — returns `true` only when `backendId == "burp-ai"` **and** `api.ai().isEnabled()` returns `false`. Used by call sites that know which backend they're about to talk to before starting it.
-* `isBlockedByBurpAiGate(): Boolean` — convenience wrapper that checks `requiresBurpAiAndDisabled` against the currently-running session's backend id.
+* `StoreAiAccessPolicy` is the core default and the BApp Store build's policy. While "Use AI" is off it refuses a request to **every** backend, whatever its id, with: "This build sends AI requests only while Burp's 'Use AI' setting is enabled. Turn it on in Burp's settings to use any AI backend."
+* `FullAiAccessPolicy` (`src/full`, registered through `META-INF/services/com.six2dez.burp.aiagent.spi.AiAccessPolicy`, a file only the full JAR carries) refuses only the `burp-ai` backend, with: "Burp AI is disabled in Burp Suite settings. Enable 'Use AI' for extensions, or pick a different backend."
 
-`startOrAttach`, `send`, and `sendChat` short-circuit through `requiresBurpAiAndDisabled` so they only refuse when the user has selected **Burp AI (built-in)** with Burp's toggle off. Every other backend — Ollama, LM Studio, OpenAI-compatible, NVIDIA NIM, Perplexity, Anthropic, and the Claude / Codex / Gemini / OpenCode / Copilot CLI agents — starts regardless of `api.ai().isEnabled()`. This also unblocks Burp Community users, where `api.ai().isEnabled()` is permanently `false`.
+With no provider on the classpath, or with more than one, the extension uses `StoreAiAccessPolicy`, so a packaging error leaves the build stricter, never laxer.
 
-The same helpers gate the two scanner pipelines outside the supervisor: `PassiveAiScanner` and `ActiveAiScanner` call `isBlockedByBurpAiGate()` before scheduling work, and `ChatPanel.send` calls `requiresBurpAiAndDisabled` before opening a session.
+The supervisor applies the policy through two call-site helpers:
 
-When the gate trips on the `burp-ai` startup path, callers surface the error string `"Burp AI is disabled in Burp Suite settings. Enable 'Use AI' for extensions, or pick a different backend."` See [Burp AI (Built-in)](../backends/burp-ai.md) for the end-user-visible behaviour.
+* `AgentSupervisor.aiAccessRefusal(backendId: String): String?` returns `null` when a request to `backendId` may start, otherwise the policy's refusal text. It reads `api.ai().isEnabled()` live on every call (an exception reads as `false`) and asks the policy with that value. Once unload has begun it answers "AI request refused: the extension is unloading." instead. `startOrAttach`, `send`, `sendChat`, the chat panel, the status pill, **Test connection** and the scanners (through `refusalForSavedBackend`) all ask it before they start work.
+* `AgentSupervisor.aiToolRefusal(): String?` is the refusal for the MCP tools that send AI requests (`ai_analyze` and `ai_passive_scan`, the descriptors with `requiresBurpAi = true`). It asks the policy for the running backend, or else the saved one, and then requires "Use AI" to be on whatever the backend. `McpToolExecutorImpl` calls it on every call before the tool's handler runs, so those two tools return a tool error while "Use AI" is off, in both builds.
+
+The enforcement point is per request, not per session. The supervisor builds the single `MontoyaHttpTransport` with a `ProviderEgressGate` (`backends/http/ProviderEgressGate.kt`) that calls `aiAccessRefusal`. Every HTTP request a backend sends, health checks and readiness probes included, goes through the transport's private `execute`, whose first statement is `MontoyaHttpTransport.requireEgress()`: it asks the gate for the backend the transport view is bound to and throws `AiAccessRefusedException` with the policy's text, before any Montoya call, when the request is refused. Burp AI sends no HTTP request, so `BurpAiBackend` calls the same `requireEgress()` before every `api.ai().prompt().execute`. An unbound transport refuses every request, so a wiring mistake fails closed.
+
+What the user sees while a backend is refused: the status pill reads "AI disabled in Burp", the chat shows the refusal inline, and an AI scanner that is switched on shows "Paused: Use AI is off". See [Burp AI (Built-in)](../backends/burp-ai.md) and [Which Build?](../getting-started/which-build.md).
 
 ### Session Management
 
@@ -105,7 +109,7 @@ stateDiagram-v2
 
 ## HTTP Backend Circuit Breaker
 
-HTTP model-request connections use `HttpBackendSupport` circuit breakers. Health polling is separate; notably, the current Perplexity health provider uses a direct shared HTTP client and NVIDIA NIM runs its live health POST through Montoya.
+HTTP model-request connections use `HttpBackendSupport` circuit breakers. Health checks are separate: they go through the same `MontoyaHttpTransport` (and its egress gate) but not through the breaker. NVIDIA NIM and Perplexity check health with a free `GET /v1/models`.
 
 * **Failure threshold** (`CIRCUIT_FAILURE_THRESHOLD`): `5` consecutive failures.
 * **Reset timeout** (`CIRCUIT_RESET_TIMEOUT_MS`): `30_000` ms before the breaker moves to half-open.
@@ -114,7 +118,7 @@ HTTP model-request connections use `HttpBackendSupport` circuit breakers. Health
 
 When the breaker is open the backend fails fast with `"<backend> backend is temporarily unavailable (circuit open). Retry in <n>ms."` Retries inside the wrapper are logged to the [AI Request Logger](../privacy/ai-request-logger.md) as `RETRY` entries with `attempt` and `delayMs` metadata.
 
-The built-in Burp AI backend does **not** route through this wrapper — it relies on Burp Pro's internal error handling.
+The built-in Burp AI backend does **not** route through this wrapper — it relies on Burp's internal error handling.
 
 ## Backend Types
 
@@ -123,6 +127,7 @@ The built-in Burp AI backend does **not** route through this wrapper — it reli
 * Run as subprocesses from configured commands.
 * Read stdout/stderr continuously into a bounded buffer for liveness/timeout diagnostics, then parse and deliver the final response through one `onChunk` callback after the process completes.
 * Include Gemini CLI, Claude CLI, Codex CLI, Copilot CLI, OpenCode CLI.
+* GitHub full build only: they live in `src/full` and the BApp Store build does not contain them.
 * **Windows**: npm-installed shims are resolved automatically. The launcher detects `.cmd` siblings for shell script shims and falls back to `cmd /c` wrapping when needed.
 * **Output parsing**: Each CLI backend has a dedicated output parser that strips metadata, status lines, and prompt echoes from raw stdout to extract the AI response.
 
@@ -134,10 +139,9 @@ The built-in Burp AI backend does **not** route through this wrapper — it reli
 
 ## Failure Handling
 
-* **Immediate startup exit**: marked as crashed; usually indicates config/auth/command errors.
-* **Runtime crash**: restart attempts follow backoff policy.
-* **Crash suppression**: repeated failures disable restart loops.
-* **Manual control**: restart remains available from UI.
+* **Launch failure**: `startOrAttach` returns to `Idle` and records the error (`lastStartError()`); usually a config, auth or command error.
+* **Dead session**: `status()` reports `Crashed` and a send fails with "Session is not alive"; the next start launches a new session. Nothing restarts it automatically.
+* **Refused request**: an `AiAccessRefusedException` is a policy outcome, not a connection failure: it is never retried and never counted by a circuit breaker.
 
 ## Diagnostics
 

@@ -31,9 +31,9 @@ without being unsafe tools at all.
 The build you load is the first gate on what MCP can reach:
 
 * The **BApp Store build** exposes **only the 8 extension-native AI tools** (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`). It does **not** expose generic Burp/Montoya tools (proxy history, repeater, scanner, scope, site map, intruder, Collaborator, utilities, etc.) — for those, run PortSwigger's official Burp MCP Server.
-* The **full build** (GitHub releases) exposes all 59 MCP tools.
+* The **GitHub full build** exposes all 59 MCP tools. See [Which Build?](../getting-started/which-build.md).
 
-The `ai_analyze` and `ai_passive_scan` handlers currently check Burp's `api.ai().isEnabled()` unconditionally before invoking the extension supervisor. As a result, those two MCP tools are unavailable on Community or with **Use AI for extensions** off even when an independent backend is selected. This is narrower than the normal chat/scanner backend gate, which only blocks the `burp-ai` backend.
+`ai_analyze` and `ai_passive_scan` are the two MCP tools that send AI requests. In both builds they need Burp's "Use AI" setting enabled for the extension, whatever backend is selected. The executor checks this on every call, before the tool's handler runs: while "Use AI" is off, the call returns a tool error with the reason and sends nothing. The extension's AI request gate still applies underneath, and it differs per build: in the BApp Store build every AI backend needs "Use AI", while in the GitHub full build only the `burp-ai` backend does.
 
 ### Scope Restriction
 
