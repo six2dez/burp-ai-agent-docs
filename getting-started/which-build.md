@@ -26,7 +26,7 @@ The **Settings > Help** caption names the running build the same way. In **Setti
 
 The BApp Store build runs on Burp Community and Burp Professional; it sends AI requests only while Burp's "Use AI" setting is enabled for the extension, and with it off it loads and refuses every AI request.
 
-The BApp Store build checks Burp's "Use AI" setting through api.ai().isEnabled() at each AI request. While it is off, the extension still loads and its MCP server, native tools and privacy settings keep working, but every AI request is refused and the status pill shows "AI disabled in Burp". Which Burp editions can turn "Use AI" on is decided by Burp, not by this extension, and it was not measured on Burp Community. For local or CLI AI that does not depend on "Use AI", use the GitHub full build: its HTTP and CLI backends do not depend on that setting, while Burp AI and the MCP ai_* tools still do.
+The BApp Store build checks Burp's "Use AI" setting through api.ai().isEnabled() at each AI request. While it is off, the extension still loads and its MCP server, native tools and privacy settings keep working, but every AI request is refused and the status pill shows "AI disabled in Burp". Which Burp editions can turn "Use AI" on is decided by Burp, not by this extension, and it was not measured on Burp Community. For local or CLI AI that does not depend on "Use AI", use the GitHub full build: its HTTP and CLI backends do not depend on that setting, while Burp AI and the MCP tools ai_analyze and ai_passive_scan still do.
 
 What each build does with "Use AI" on and off. This is the gate the code enforces; it is not a statement about any Burp edition:
 
