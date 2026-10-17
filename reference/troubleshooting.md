@@ -67,7 +67,7 @@ HTTP backends receive a request-specific output limit: 4096 for chat, 2048 for s
 
 ### Backend will not start
 
-* Verify auto-restart and command settings.
+* Verify the backend settings: the HTTP URL and model, or the CLI command (GitHub full build only).
 * Check port conflicts for HTTP backends.
 * Ensure required API keys exist in Burp runtime environment.
 
