@@ -69,7 +69,7 @@ Perplexity is a cloud backend. The same guidance as other cloud providers applie
 
 ## Health Check Traffic
 
-While Perplexity is the selected backend, the top-bar status check runs about every 5 seconds and sends a fixed, non-streaming `"Hey"` completion with `max_tokens: 16`. The current health-check provider uses the shared direct HTTP client rather than Burp's Montoya transport. It contains no captured Burp context, but it bypasses Burp's upstream proxy/Proxy history and may count toward quota or billing. Normal chat and scanner requests still use Montoya.
+The Perplexity health check is a free `GET /v1/models` against the configured Base URL, with the API key as a bearer token. It sends no prompt and no captured Burp context, and runs no billed completion. It goes through Burp's networking (the same Montoya transport as chat and scanner requests), so Burp's upstream proxy settings apply to it. It runs on the same schedule as every remote provider: in the BApp Store build only on demand (Save, a backend change, a pill click, or a chat reply); in the GitHub full build at startup, after a settings or backend change and on a pill click, never on a timer. Like every AI request, it is refused while Burp's "Use AI" gate refuses the backend (see [Which Build?](../getting-started/which-build.md)).
 
 ## Output Token Limits
 

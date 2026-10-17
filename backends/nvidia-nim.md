@@ -35,7 +35,7 @@ API Key: nvapi-...
 
 ## Health Check Traffic
 
-While NVIDIA NIM is the selected backend, the top-bar status check runs about every 5 seconds. It sends a fixed, non-streaming `"Hey"` completion with `max_tokens: 16` through Burp's Montoya HTTP stack. It contains no captured Burp context and is visible in Proxy history, but it is a real provider request and may count toward quota or billing.
+The NVIDIA NIM health check is a free `GET /v1/models` against the configured Base URL, with the API key as a bearer token, sent through Burp's networking (the same Montoya transport as chat and scanner requests), so Burp's upstream proxy settings apply to it. It contains no captured Burp context and is visible in Proxy history. It runs no billed completion. It runs on the same schedule as every remote provider: in the BApp Store build only on demand (Save, a backend change, a pill click, or a chat reply); in the GitHub full build at startup, after a settings or backend change and on a pill click, never on a timer. Like every AI request, it is refused while Burp's "Use AI" gate refuses the backend (see [Which Build?](../getting-started/which-build.md)).
 
 ## Response Delivery Limitation
 

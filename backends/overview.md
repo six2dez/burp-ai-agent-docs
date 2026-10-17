@@ -1,15 +1,15 @@
 # Backends Overview
 
-Custom AI Agent is backend-agnostic. You can run the built-in Burp AI backend, local models, cloud CLI providers, or OpenAI-compatible HTTP providers. Twelve backends ship with the extension, and additional ones can be dropped in as JARs.
+Custom AI Agent is backend-agnostic. You can run the built-in Burp AI backend, local models, OpenAI-compatible and other HTTP providers, or (in the GitHub full build) cloud CLI providers. The BApp Store build ships 7 backends: Burp AI plus the 6 HTTP backends. The GitHub full build ships 12: the same 7 plus the 5 CLI backends, and it also loads custom backends dropped in as JARs. See [Which Build?](../getting-started/which-build.md).
 
 ## Backend Selection Guide
 
 ```mermaid
 flowchart TD
     Start[Choose backend]
-    BurpPro{Running Burp Pro with Use AI enabled?}
+    BurpPro{"Burp AI usable, with Burp's Use AI enabled for the extension?"}
     Privacy{Need maximum privacy?}
-    Cli{Prefer CLI provider workflow?}
+    Cli{"Prefer a CLI provider workflow (GitHub full build only)?"}
     OwnApi{Using your own API/provider endpoint?}
 
     Start --> BurpPro
@@ -30,21 +30,21 @@ flowchart TD
 
 | Backend | Type | Privacy Posture | Typical Use |
 | :--- | :--- | :--- | :--- |
-| **Burp AI (built-in)** | In-process (Burp Pro) | High (no extra outbound) | Burp Pro users with AI credits and **Use AI for extensions** enabled. |
+| **Burp AI (built-in)** | In-process (Burp's AI) | High (no extra outbound) | Burp users with AI credits and Burp's "Use AI" enabled for the extension (PortSwigger documents it as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**). |
 | **Ollama** | Local HTTP | High | Offline or strict data control. |
 | **LM Studio** | Local HTTP | High | Local models with GUI management. |
 | **NVIDIA NIM** | Cloud HTTP | Medium | NVIDIA-hosted models (e.g. `moonshotai/kimi-k2.5`) via `integrate.api.nvidia.com`. |
 | **Perplexity** | Cloud HTTP | Medium | Sonar family of web-aware reasoning models via `api.perplexity.ai`. |
 | **Anthropic** | Cloud HTTP | Medium | Native Anthropic Messages API (Claude) via `api.anthropic.com`; encrypted key + token counting (v0.9.0). |
 | **Generic (OpenAI-compatible)** | HTTP | Medium | Any compatible provider endpoint. |
-| **Gemini CLI** | Cloud CLI | Medium | Large-context cloud workflows. |
-| **Claude CLI** | Cloud CLI | Medium | Reasoning-heavy analysis. |
-| **Codex CLI** | Cloud CLI | Medium | Code/security analysis and PoCs. |
-| **Copilot CLI** | Cloud CLI | Medium | Multi-model analysis via GitHub infrastructure. |
-| **OpenCode CLI** | Cloud CLI | Medium | Multi-provider via one CLI. |
+| **Gemini CLI** | Cloud CLI (GitHub full build only) | Medium | Large-context cloud workflows. |
+| **Claude CLI** | Cloud CLI (GitHub full build only) | Medium | Reasoning-heavy analysis. |
+| **Codex CLI** | Cloud CLI (GitHub full build only) | Medium | Code/security analysis and PoCs. |
+| **Copilot CLI** | Cloud CLI (GitHub full build only) | Medium | Multi-model analysis via GitHub infrastructure. |
+| **OpenCode CLI** | Cloud CLI (GitHub full build only) | Medium | Multi-provider via one CLI. |
 
 {% hint style="info" %}
-**Network transport:** normal chat and scanner requests from every built-in HTTP backend use Burp's `MontoyaHttpTransport`, so those requests respect Burp's upstream proxy/TLS configuration and are visible in Proxy history. There is one current health-check exception: while **Perplexity** is selected, its five-second status check sends a fixed, minimal `"Hey"` chat completion through the shared direct HTTP client rather than Montoya. It carries no captured Burp context, but it bypasses Burp's upstream proxy and may count toward provider usage. NVIDIA NIM uses a similar live completion for health, but routes it through Montoya. Anthropic performs no live health request; a non-empty key is treated as healthy until an actual request proves otherwise.
+**Network transport:** normal chat and scanner requests from every built-in HTTP backend use Burp's `MontoyaHttpTransport`, so those requests respect Burp's upstream proxy/TLS configuration and are visible in Proxy history. Health checks go through the same transport: Ollama, LM Studio and Generic OpenAI-compatible send a `GET` to the server, and NVIDIA NIM and Perplexity send a free `GET /v1/models`, which carries no captured Burp context and runs no billed completion. Anthropic performs no live health request; a non-empty key is treated as healthy until an actual request proves otherwise. Every one of these requests, health checks included, passes the "Use AI" gate described below.
 {% endhint %}
 
 ### Capability Matrix
@@ -78,6 +78,8 @@ See [Agent Profiles → How It Works](../user-guide/agent-profiles.md#how-it-wor
 
 {% tabs %}
 {% tab title="CLI Backends" %}
+GitHub full build only.
+
 Configure executable command and ensure authentication is already completed in the same runtime environment as Burp.
 
 Windows tip: with npm-installed tools, prefer full shim paths like `C:\\Users\\<you>\\AppData\\Roaming\\npm\\claude.cmd`.
@@ -90,6 +92,8 @@ For local servers, verify the service is running and port is reachable from Burp
 {% endtab %}
 
 {% tab title="Custom Drop-in" %}
+GitHub full build only: the BApp Store build never creates, lists or loads this directory.
+
 Drop custom backend JARs implementing `AiBackendFactory` into:
 
 `~/.burp-ai-agent/backends/`
@@ -100,7 +104,7 @@ Restart Burp to load them.
 
 ## Cross-Platform CLI Detection
 
-CLI backends depend on environment inheritance from the Burp process.
+The CLI backends are in the GitHub full build only. They depend on environment inheritance from the Burp process.
 
 * If Burp starts from GUI, shell `PATH` and env vars may differ.
 * Use explicit command paths when detection fails.
@@ -116,19 +120,31 @@ On Windows, npm-installed CLI tools (Codex, Gemini, OpenCode, Copilot) install a
 
 This eliminates the `CreateProcess error=193` that occurs when Java tries to execute shell script shims directly.
 
-## Burp Edition Notes
+## Burp Edition Notes and the "Use AI" Gate
 
-Backends are available in both Community and Professional editions. MCP tool availability still depends on Burp edition and tool safety gates. Every backend except **Burp AI (built-in)** runs on Burp Community without any change in behaviour — the *Use AI for extensions* setting and the AI-credits requirement are specific to the Burp AI backend, which delegates inference to Burp's bundled AI provider.
+**BApp Store build.** The BApp Store build runs on Burp Community and Burp Professional; it sends AI requests only while Burp's "Use AI" setting is enabled for the extension, and with it off it loads and refuses every AI request. That covers every backend on this page, Burp AI included: while "Use AI" is off, the status pill reads "AI disabled in Burp" whatever backend is selected.
+
+**GitHub full build.** Every backend except **Burp AI (built-in)** works whatever "Use AI" says, including the CLI backends. Burp AI needs "Use AI" in both builds.
+
+In both builds, MCP `ai_analyze` and `ai_passive_scan` return a tool error while "Use AI" is off. Which Burp editions can turn "Use AI" on is decided by Burp, not by this extension. PortSwigger documents "Use AI" as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**. Some MCP tools of the GitHub full build (the scanner tools) also need Burp Professional; see the [MCP Tools Reference](../mcp/tools-reference.md). See [Which Build?](../getting-started/which-build.md#burp-edition-requirements).
 
 ## Health States
 
-The UI polls the selected backend every **5 seconds** and renders the backend-specific result as a colored pill in the top bar. Separately, the supervisor checks an already-running agent connection every 2 seconds for crash/restart handling; that liveness monitor does not drive the pill.
+The selected backend's health is shown as a colored pill in the top bar. When the checks run depends on the build:
+
+* **BApp Store build:** on demand only. A check runs after **Save** in Settings, after a backend change and when you click the pill, and the first chat reply repaints it. Nothing is checked at startup or on a timer, so the pill reads "Not checked · click to test" until then.
+* **GitHub full build:** a startup check for every backend, then every 30 seconds for local backends only (Burp AI, the CLI backends, and HTTP servers on a loopback address). Remote providers are checked again only after a settings or backend change and when you click the pill.
+
+In both builds a chat reply also repaints the pill, with no extra request, and **Test connection** in Settings runs a check of its own and shows the result in a dialog. Before any check is sent, the pill reads Burp's "Use AI" setting locally: if the selected backend is refused, it shows "AI disabled in Burp" and sends nothing. That local read repeats about once a second, so turning "Use AI" on or off shows up without a click.
 
 | Pill | Internal state | Meaning | Typical cause |
 | :--- | :--- | :--- | :--- |
-| **AI: OK** (green) | `Healthy` | The backend-specific check passed. This can mean HTTP reachability/live completion, an executable CLI command, Burp AI enabled, or—for Anthropic—only that a key is present. It does not guarantee the next inference will succeed. | Normal configured state. |
-| **AI: Degraded** (amber) | `Degraded` | A live HTTP check reached the endpoint but received an authentication failure; NVIDIA NIM and Perplexity also map HTTP 429 to this state. The tooltip carries the status. | Invalid/expired API key or rate limiting on a live cloud health completion. |
-| **AI: Offline** (red) | `Unavailable` | The configured check failed or required configuration is absent. The *Use AI for extensions* gate affects only **Burp AI (built-in)**. | Missing URL/model, unreachable endpoint, unresolved CLI executable, or Burp AI disabled. |
+| **Not checked · click to test** | none yet | BApp Store build, before the first check. | Nothing has asked for a check yet. |
+| **AI: ?** | none yet | GitHub full build, before the startup check. | The startup check has not run yet. |
+| **AI: OK** (green) | `Healthy` | The backend-specific check passed. This can mean HTTP reachability, an executable CLI command, Burp AI enabled, or—for Anthropic—only that a key is present. It does not guarantee the next inference will succeed. | Normal configured state. |
+| **AI: Degraded** (amber) | `Degraded` | An HTTP health `GET` reached the endpoint but received HTTP 401, 403 or 429. The tooltip carries the status. | Invalid/expired API key or rate limiting. |
+| **AI: Offline** (red) | `Unavailable` | The configured check failed or required configuration is absent. | Missing URL/model, unreachable endpoint, or unresolved CLI executable. |
+| **AI disabled in Burp** | refused by the gate | Burp's "Use AI" is off and the build refuses the selected backend: any backend in the BApp Store build, Burp AI in the GitHub full build. The tooltip carries the refusal text. No request is sent. | "Use AI" is off for the extension. |
 
 The check runs off the Swing event thread. Status transitions themselves are not written to the AI Request Logger; actual prompt failures and transport retries are.
 
@@ -154,7 +170,7 @@ Each launched HTTP connection has its own circuit breaker:
 
 The top-bar health checker is independent of this per-connection breaker. Starting a new chat session creates a new connection; it does not mutate the breaker held by an existing session.
 
-The **Burp AI (built-in)** backend uses Burp Pro's own retry and error handling, so the schedule above does not apply to it. CLI backends handle failures through the supervisor restart mechanism rather than per-request retries.
+The **Burp AI (built-in)** backend uses Burp's own retry and error handling, so the schedule above does not apply to it. CLI backends (GitHub full build only) have no per-request retry schedule.
 
 CLI processes also have a shared **120-second hard runtime ceiling**. OpenCode adds a separate 30-second idle-output timeout; either limit can terminate its run first. The current settings panel does not expose the shared CLI timeout as an editable field.
 
