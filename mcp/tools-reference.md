@@ -27,7 +27,12 @@ The tools split into two groups, which the build you load decides between:
 * **Extension-native (AI) tools — 8 total**: `status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`. These are present in **both** the BApp Store build and the full build. They are marked **Native = Yes** in the tables below.
 * **Generic (Montoya) tools — 51 total**: every other tool on this page (proxy history, repeater, scanner, scope, site map, intruder, Collaborator, utilities, etc.). These are present **only in the full build** (GitHub releases). The BApp Store build does not expose them — for those, run PortSwigger's official Burp MCP Server alongside this extension. They are marked **Native = No**.
 
-The redesigned **MCP Tools** settings tab mirrors this split: tools are grouped into extension-native (AI) vs generic (Montoya), each tagged **store-build** or **full-build**, with search/filter and per-group bulk toggles.
+The **MCP Tools** settings tab mirrors this split with two groups, each with a subtitle, a search field above both and per-group **Enable all** / **Disable all** buttons:
+
+* **AI Tools (extension-native)**: "Extension-native tools — available in both the BApp Store and the full build."
+* **Montoya Tools (generic)**: "Generic Montoya API wrappers — available in the full build only."
+
+The BApp Store build registers only the extension-native group. See [Which Build?](../getting-started/which-build.md).
 
 Conventions:
 
@@ -58,7 +63,9 @@ The generic pass cannot infer every structured carrier. Current boundaries inclu
 
 ## AI (extension-native)
 
-These tools call or support the extension's AI engine and are present in every build. There is a current gate mismatch to know about: `ai_analyze` and `ai_passive_scan` call Burp's `api.ai().isEnabled()` unconditionally before using the extension supervisor. They therefore refuse on Community or when **Use AI for extensions** is off, even if the selected backend is Ollama, Anthropic, or another independent backend. Chat and the normal scanner pipelines do not have that extra gate.
+These tools call or support the extension's AI engine and are present in every build. `ai_analyze` and `ai_passive_scan` send AI requests, so they need Burp's "Use AI" setting enabled for the extension, in both builds and whatever backend is selected: while it is off, a call returns a tool error with the reason and sends nothing. Both tools stay listed. The other four tools in this group send no AI request and work whatever "Use AI" says.
+
+What else "Use AI" gates depends on the build: in the BApp Store build every AI backend needs it; in the GitHub full build only the Burp AI backend does. See [Which Build?](../getting-started/which-build.md#burp-edition-requirements).
 
 | Tool | Native | Unsafe | Default enabled | Pro only | Description |
 |---|---|---|---|---|---|
