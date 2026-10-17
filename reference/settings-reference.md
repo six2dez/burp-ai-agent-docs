@@ -11,13 +11,13 @@ For tuning model spend, also see [Token Usage & Cost Management](../user-guide/t
 | Setting                             | Type               | Default                                                       | Description                                                                                                                                                                                                                                                                        |
 | ----------------------------------- | ------------------ | ------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Preferred Backend**               | Dropdown           | `burp-ai`                                                     | Backend used for new chat sessions. All registered backends are shown regardless of CLI availability; errors are reported at usage time via health check. The persisted default is the built-in Burp AI backend; select another backend explicitly when Burp does not expose AI capability. |
-| **Burp AI (built-in)**              | Dropdown selection | _(auto-detected)_                                             | In-process backend available only when Burp Pro is running with **Use AI for extensions** enabled. No URL, model, or credentials are required — configuration lives in Burp's own AI settings. See [Burp AI (Built-in)](../backends/burp-ai.md).                                   |
-| **Codex CLI Command**               | Text               | `codex chat`                                                  | Shell command used to launch Codex CLI.                                                                                                                                                                                                                                            |
-| **Gemini CLI Command**              | Text               | `gemini --output-format text --model gemini-2.5-flash --yolo` | Shell command used to launch Gemini CLI.                                                                                                                                                                                                                                           |
-| **Claude CLI Command**              | Text               | `claude`                                                      | Shell command used to launch Claude CLI.                                                                                                                                                                                                                                           |
-| **Copilot CLI Command**             | Text               | `copilot`                                                     | Shell command used to launch Copilot CLI.                                                                                                                                                                                                                                          |
-| **OpenCode CLI Command**            | Text               | `opencode`                                                    | Shell command used to launch OpenCode CLI.                                                                                                                                                                                                                                         |
-| **Ollama CLI Command**              | Text               | `ollama run llama3.1`                                        | Command used for CLI validation and as a fallback source for the HTTP model name.                                                                                                                                                                                                  |
+| **Burp AI (built-in)**              | Dropdown selection | _(auto-detected)_                                             | In-process backend that sends requests only while Burp's "Use AI" setting is enabled for the extension (PortSwigger documents "Use AI" as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**). No URL, model, or credentials are required. In the BApp Store build every AI backend needs "Use AI"; in the GitHub full build only this one does. See [Burp AI (Built-in)](../backends/burp-ai.md) and [Which Build?](../getting-started/which-build.md).                                   |
+| **Codex CLI Command**               | Text               | `codex chat`                                                  | Shell command used to launch Codex CLI. GitHub full build only. |
+| **Gemini CLI Command**              | Text               | `gemini --output-format text --model gemini-2.5-flash --yolo` | Shell command used to launch Gemini CLI. GitHub full build only. |
+| **Claude CLI Command**              | Text               | `claude`                                                      | Shell command used to launch Claude CLI. GitHub full build only. |
+| **Copilot CLI Command**             | Text               | `copilot`                                                     | Shell command used to launch Copilot CLI. GitHub full build only. |
+| **OpenCode CLI Command**            | Text               | `opencode`                                                    | Shell command used to launch OpenCode CLI. GitHub full build only. |
+| **Ollama CLI Command**              | Text               | `ollama run llama3.1`                                        | Command used for CLI validation and as a fallback source for the HTTP model name. GitHub full build only. |
 | **Ollama URL**                      | Text               | `http://127.0.0.1:11434`                                      | Base URL for Ollama API.                                                                                                                                                                                                                                                           |
 | **Ollama Model**                    | Text               | `llama3.1`                                                    | Model identifier sent to Ollama.                                                                                                                                                                                                                                                   |
 | **Ollama API Key**                  | Password           | _(empty)_                                                     | Optional bearer token for Ollama-compatible servers; encrypted at rest in Burp preferences.                                                                                                                                                                                        |
@@ -92,7 +92,7 @@ The Privacy Mode tooltip in the current UI states the write-time boundary explic
 
 ### External MCP Servers
 
-The **External Servers** sub-tab stores a list of outbound MCP connections. The default is an empty list. Each entry selects SSE or stdio transport, server name, URL or command, enabled state, and optional bearer token. Tokens are encrypted per field before the v5 settings blob is persisted; stdio remains an explicit opt-in because it launches a local process. See [External MCP Servers](../mcp/external-servers.md).
+The **External Servers** sub-tab (GitHub full build only) stores a list of outbound MCP connections. The default is an empty list. Each entry selects SSE or stdio transport, server name, URL or command, enabled state, and optional bearer token. Tokens are encrypted per field before the v5 settings blob is persisted; stdio remains an explicit opt-in because it launches a local process. See [External MCP Servers](../mcp/external-servers.md).
 
 ### MCP Proxy History Preprocessing
 
@@ -110,13 +110,17 @@ Applies to MCP tools that surface Burp proxy history (`proxy_http_history`, `pro
 
 ## Burp Integration
 
-This is the redesigned MCP Tools tab. Tools are grouped into **extension-native (AI)** tools and **generic (Montoya)** tools, each tagged with the build it ships in (**store-build** vs **full-build**), with a search/filter box and per-group bulk toggles. The full build registers all 59 MCP tools; the BApp Store build registers only the 8 extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`).
+This is the redesigned MCP Tools tab. Tools are grouped under **AI Tools (extension-native)**, subtitled "Extension-native tools — available in both the BApp Store and the full build.", and **Montoya Tools (generic)**, subtitled "Generic Montoya API wrappers — available in the full build only.", with a search/filter box and per-group bulk toggles. The GitHub full build registers all 59 MCP tools; the BApp Store build registers only the 8 extension-native AI tools (`status`, `issue_create`, `ai_analyze`, `ai_passive_scan`, `ai_findings_recent`, `redact_preview`, `ai_audit_query`, `ai_backends_list`).
 
 | Setting | Type | Default | Description |
 | :--- | :--- | :--- | :--- |
 | **Tool Toggles** | Checkboxes | *(varies)* | Enable/disable MCP tools per group, individually or with the per-group bulk toggle. |
 
 ## Passive AI Scanner
+
+{% hint style="info" %}
+The passive and active AI scanners start **OFF** at every load, in both builds. Switching one on lasts until Burp unloads the extension; it is not restored at the next load. The **Enabled** defaults below are what each load starts with.
+{% endhint %}
 
 | Setting                       | Type     | Default                                                                                                                   | Description                                                                                               |
 | ----------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
@@ -158,9 +162,16 @@ This is the redesigned MCP Tools tab. Tools are grouped into **extension-native 
 | **Max Risk Level**          | Dropdown | `SAFE`  | Maximum payload risk (`SAFE`, `MODERATE`, `DANGEROUS`).                                                           |
 | **Scope Only**              | Toggle   | On      | Scan only in-scope targets.                                                                                       |
 | **Scan Mode**               | Dropdown | `FULL`  | Vulnerability-class strategy (`BUG_BOUNTY`, `PENTEST`, `FULL`).                                                   |
-| **Auto-Queue from Passive** | Toggle   | On      | Queue high-confidence passive findings into active scanner.                                                       |
 | **Use Collaborator (OAST)** | Toggle   | Off     | Enable out-of-band tests using Burp Collaborator.                                                                 |
 | **AI Adaptive Payloads**    | Toggle   | Off     | Generate context-aware payloads using AI based on detected tech stack and error patterns from the Knowledge Base. |
+
+### Auto-queue (GitHub full build only)
+
+The full build adds an **Auto-queue** section to the AI Active Scanner tab. The BApp Store build does not have it; there, passive findings that the active scanner can test are listed as suggested targets that you queue by hand ("Queue N suggested targets" in the AI Active Scanner Queue dialog), and the full build lists them too.
+
+| Setting | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| **Auto-queue findings** | Checkbox: "Auto-queue passive findings for active testing" | Off | Off by default. When on, AI passive findings are queued to the Active Scanner, which sends requests to the target. |
 
 ## Prompt Templates
 

@@ -20,14 +20,17 @@ Common issues and practical resolution steps.
 
 ### Burp AI (built-in) shows `Offline`
 
-The steps below apply **only when the selected Preferred Backend is Burp AI (built-in)**. If a different backend shows `AI: Offline`, the cause is unrelated to Burp Pro's *Use AI for extensions* toggle — see [Backend Troubleshooting](../backends/troubleshooting.md) for per-backend error signatures.
+Which backends Burp's "Use AI" setting affects depends on the build ([Which Build?](../getting-started/which-build.md)):
 
-The built-in Burp AI backend depends on Burp Pro's native AI feature. If the top bar shows `AI: Offline` while this backend is selected:
+* **BApp Store build:** with "Use AI" off, every AI backend is refused, not only Burp AI, and the status pill reads "AI disabled in Burp" instead of `AI: Offline`. Turn "Use AI" on for the extension (step 1).
+* **GitHub full build:** "Use AI" affects only the Burp AI backend (and the MCP `ai_analyze` and `ai_passive_scan` tools). If a different backend shows `AI: Offline`, the cause is elsewhere — see [Backend Troubleshooting](../backends/troubleshooting.md) for per-backend error signatures.
 
-1. Open **Burp Settings → Burp AI → Use AI for extensions** and ensure it is **ON**.
-2. Confirm your Burp Pro license has active AI credits.
+The built-in Burp AI backend uses Burp's own AI feature. If the top bar shows `AI: Offline` or "AI disabled in Burp" while this backend is selected:
+
+1. Make sure "Use AI" is **ON** for the extension. PortSwigger documents "Use AI" as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**.
+2. Confirm your Burp account has active AI credits.
 3. Re-run **Test connection** in **AI Backend** settings. A healthy backend reports `Healthy`; otherwise the response includes the text `"Burp AI is not enabled. Enable 'Use AI' in Burp Suite settings."`.
-4. This backend is not available on Burp Community — pick a different backend (see [Backends Overview](../backends/overview.md)).
+4. Which Burp editions can turn "Use AI" on is decided by Burp, not by this extension. If you cannot turn it on, the GitHub full build's HTTP and CLI backends do not depend on it — pick a different backend (see [Backends Overview](../backends/overview.md)); in the BApp Store build every AI backend needs it.
 
 ### Backend status is `Crashed`
 

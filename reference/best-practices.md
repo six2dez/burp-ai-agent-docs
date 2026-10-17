@@ -8,9 +8,9 @@ Pick the privacy mode that matches the trust level of the **AI backend**, not th
 
 | Environment | Backend | Recommended mode | Why |
 | :--- | :--- | :--- | :--- |
-| Public bug bounty / customer engagement on a cloud LLM | Cloud HTTP (Anthropic, Perplexity, NVIDIA NIM, OpenAI-compatible) or Cloud CLI (Claude/Gemini/Codex/Copilot/OpenCode) | `STRICT` | Anonymizes covered hostname carriers and sanitizes recognized secrets. Reduces leakage if the provider logs prompts; does not replace pre-sanitization for a hard egress policy. |
+| Public bug bounty / customer engagement on a cloud LLM | Cloud HTTP (Anthropic, Perplexity, NVIDIA NIM, OpenAI-compatible) or Cloud CLI (Claude/Gemini/Codex/Copilot/OpenCode; GitHub full build only) | `STRICT` | Anonymizes covered hostname carriers and sanitizes recognized secrets. Reduces leakage if the provider logs prompts; does not replace pre-sanitization for a hard egress policy. |
 | Mixed workflow where the target hostname is part of the report context | Any cloud backend | `BALANCED` (default) | Preserves hostnames and sanitizes recognized token/cookie carriers. Review the emitted shape before relying on it. |
-| Internal lab / private model with no third-party transit | Ollama, LM Studio, or Burp AI (Burp Pro built-in) | `BALANCED` for shared infra, `OFF` only for genuinely isolated single-user setups | Local does not mean unaccountable — keep redaction on unless you can prove no second copy of the prompts is being kept. |
+| Internal lab / private model with no third-party transit | Ollama, LM Studio, or Burp AI (built-in; needs Burp's "Use AI" enabled for the extension) | `BALANCED` for shared infra, `OFF` only for genuinely isolated single-user setups | Local does not mean unaccountable — keep redaction on unless you can prove no second copy of the prompts is being kept. |
 
 Cross-references: [Privacy Modes](../privacy/privacy-modes.md), [Backends Overview](../backends/overview.md).
 
@@ -52,7 +52,7 @@ Active scanning sends real traffic to the target. The plugin enforces caps and g
 - [ ] **Request Delay** is non-zero (default `100` ms) on shared/production infrastructure.
 - [ ] **Use Collaborator (OAST)** is **on** only if Burp Collaborator is reachable from the engagement network. Off when running fully air-gapped.
 - [ ] **AI Adaptive Payloads** is on only after baseline payloads have been validated — the adaptive layer can probe further than the operator expects.
-- [ ] **Auto-Queue from Passive** is on if you trust the passive scanner's high-confidence findings to escalate; off if you want a manual gate between detection and exploitation.
+- [ ] **Suggested targets** are reviewed and queued by hand ("Queue N suggested targets" in the AI Active Scanner Queue dialog), which keeps a manual gate between detection and exploitation. In the GitHub full build only, **"Auto-queue passive findings for active testing"** (off by default) queues passive findings to the active scanner automatically; turn it on only if you trust the passive scanner's findings to escalate.
 - [ ] Before queueing many requests, glance at the queue size in the **AI Active Scanner** tab — the cap is `2000`, but anything near it suggests the previous run was not cleared.
 
 Cross-references: [Active AI Scanner](../scanners/active.md), [Insertion Point Scan](../user-guide/insertion-point-scan.md), [Limitations & Hallucinations](../privacy/limitations.md).
@@ -91,8 +91,8 @@ Quick decision matrix when the engagement does not dictate a backend:
 | Lowest leakage, slowest model | Ollama or LM Studio with a local model. |
 | Fastest cloud cycle, JSON-mode scanner workflows | OpenAI-compatible / NVIDIA NIM. |
 | Web-aware reasoning, can give up JSON mode | Perplexity (Sonar family). |
-| Already paying for Burp Pro AI credits | Burp AI (built-in) — no extra config. |
-| Long context, code-heavy analysis | Gemini CLI or Claude CLI. |
+| Already paying for Burp AI credits | Burp AI (built-in) — no extra config; needs Burp's "Use AI" enabled for the extension. |
+| Long context, code-heavy analysis | Gemini CLI or Claude CLI (GitHub full build only). |
 
 Cross-reference: [Backends Overview](../backends/overview.md), [Backend Troubleshooting](../backends/troubleshooting.md).
 

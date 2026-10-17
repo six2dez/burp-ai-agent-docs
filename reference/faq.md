@@ -2,7 +2,11 @@
 
 ## Does it work with Burp Community Edition?
 
-Yes. Core chat, context actions, manual scanner queues, independent backends, and non-Pro MCP functionality work in Community. Native Burp Scanner registration, the built-in Burp AI backend, active scanner APIs, and some MCP tools remain Pro-only. The current `ai_analyze` and `ai_passive_scan` MCP handlers also refuse when Burp's AI surface is unavailable, even if an independent backend is selected; see the [MCP Tools Reference](../mcp/tools-reference.md#ai-extension-native).
+The BApp Store build runs on Burp Community and Burp Professional; it sends AI requests only while Burp's "Use AI" setting is enabled for the extension, and with it off it loads and refuses every AI request.
+
+Without AI, the BApp Store build still loads: its MCP server, native tools and privacy settings keep working, while every AI request is refused and the status pill shows "AI disabled in Burp". Which Burp editions can turn "Use AI" on is decided by Burp, not by this extension; PortSwigger documents "Use AI" as a per-extension checkbox, off by default: **Extensions > Installed > Custom AI Agent > Use AI**. For local or CLI AI that does not depend on "Use AI", use the GitHub full build: its HTTP and CLI backends do not depend on that setting, while Burp AI and the MCP `ai_analyze` and `ai_passive_scan` tools still do. See [Which Build?](../getting-started/which-build.md).
+
+Independent of AI, native Burp Scanner registration, active scanner APIs and some MCP tools need Burp Professional; see [Burp Integration](../user-guide/burp-integration.md#burp-pro-vs-community-edition).
 
 ## Does the passive scanner send extra traffic?
 
@@ -20,6 +24,8 @@ No. The passive scanner is a Burp `PassiveScanCheck` that runs per request on tr
 * Multi-model flexibility via GitHub: Copilot CLI.
 * General purpose and code-heavy analysis: Codex CLI.
 
+The CLI backends are GitHub full build only; the BApp Store build offers Burp AI and the six HTTP backends. See [Which Build?](../getting-started/which-build.md).
+
 ## How can I reduce cloud cost?
 
 Tune passive scanner caps, dedup/cache settings, and context size controls. See [Token Usage & Cost Management](../user-guide/token-management.md).
@@ -34,7 +40,7 @@ Health checks detected command/API issues. Use backend **Test connection** and i
 
 ## Why are MCP tools missing?
 
-Check tool toggles in **Burp Integration**, unsafe-tool master switch in **MCP Server**, and Burp edition constraints. Also confirm which build you are running: the BApp Store build (`Custom-AI-Agent-<version>.jar`) registers only the 8 extension-native AI tools, while the full build (`Custom-AI-Agent-full-<version>.jar`, from GitHub releases) registers all 59. The generic Montoya tools (proxy history, repeater, scanner, etc.) exist only in the full build — for those in the store build, use PortSwigger's official Burp MCP Server.
+Check tool toggles in **Burp Integration**, unsafe-tool master switch in **MCP Server**, and Burp edition constraints. Also confirm which build you are running (the Output tab banner names it): the BApp Store build (`custom-ai-agent-bapp.jar` from `./gradlew bappJar`, release asset `Custom-AI-Agent-bapp-<version>.jar`) registers only the 8 extension-native AI tools, while the GitHub full build (`Custom-AI-Agent-full-<version>.jar`) registers all 59. See [Which Build?](../getting-started/which-build.md). The generic Montoya tools (proxy history, repeater, scanner, etc.) exist only in the full build — for those in the store build, use PortSwigger's official Burp MCP Server.
 
 ## What is the AI Request Logger?
 
